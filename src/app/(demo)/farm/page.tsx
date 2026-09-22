@@ -54,6 +54,7 @@ import TileLayer from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Feature from "ol/Feature";
+import type { FeatureLike } from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
 import CircleGeom from "ol/geom/Circle";
 import { fromLonLat, toLonLat, getPointResolution } from "ol/proj";
@@ -414,14 +415,14 @@ export default function FarmPage() {
       overlay.setPosition(fromLonLat([pin.lng, pin.lat]));
     }
 
-    const hitFarmAtPixel = (pixel: number[]) => {
-      let found: Feature | null = null;
+    const hitFarmAtPixel = (pixel: number[]): FeatureLike | null => {
+      let found: FeatureLike | null = null;
       map.forEachFeatureAtPixel(
         pixel,
         (f, layer) => {
           if (layer !== farmLayer) return undefined;
           if (f.get("farmId")) {
-            found = f as Feature;
+            found = f;
             return f;
           }
           return undefined;
