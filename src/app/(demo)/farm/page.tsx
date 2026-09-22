@@ -771,7 +771,6 @@ export default function FarmPage() {
     setRadiusAcres(acres);
     setRuntimeAnalysisAcres(acres);
     setPin({ lat: DEMO_AQUA_FARM.lat, lng: DEMO_AQUA_FARM.lng });
-    setPlaceLabel(`${DEMO_AQUA_FARM.place} · ${DEMO_AQUA_FARM.coordsLabel}`);
     setEditing(false);
     setEditingFarms(false);
     setDrawingFarms(false);
@@ -877,7 +876,6 @@ export default function FarmPage() {
     setRadiusAcres(acres);
     setRuntimeAnalysisAcres(acres);
     setPin({ lat: DEMO_AQUA_FARM.lat, lng: DEMO_AQUA_FARM.lng });
-    setPlaceLabel(`${DEMO_AQUA_FARM.place} · ${DEMO_AQUA_FARM.coordsLabel}`);
     setEditingFarms(false);
     setDrawingFarms(true);
     setConfirmed(true);
@@ -1443,9 +1441,7 @@ export default function FarmPage() {
           const mapHint = !collectMode
             ? aiDetecting
               ? "Kronis AI detecting farm boundaries…"
-              : confirmed
-                ? null
-                : `Analysis radius · ${radiusAcres.toFixed(2)} ac · Confirm to load fields`
+              : null
             : drawingFarms
               ? `Draw at ${radiusAcres.toFixed(2)} ac · tap corners · double-tap to close · ${farms.length} drawn`
               : editingFarms
@@ -1863,21 +1859,19 @@ export default function FarmPage() {
           Clear all & redraw from scratch
         </button>
       ) : null}
-      {collectMode || !confirmed ? (
+      {collectMode ? (
         <p className="px-4 pb-4 text-center text-[11px]" style={{ color: kronis.inkMuted }}>
-          {!collectMode
-            ? "Drag radius → Confirm → show saved boundaries"
-            : saveStatus === "saved"
-              ? `Saved ${farms.length} fields @ ${radiusAcres.toFixed(2)} ac · other radii kept`
-              : confirmed
-                ? editingFarms
-                  ? "Drag corners to fix a field · Save JSON when done"
-                  : drawingFarms
-                    ? `Drawing @ ${radiusAcres.toFixed(2)} ac · then Save JSON (keeps other radii)`
-                    : farms.length
-                      ? `${farms.length} fields @ ${radiusAcres.toFixed(2)} ac · change slider for another radius`
-                      : `No fields @ ${radiusAcres.toFixed(2)} ac yet · tap Draw`
-                : `Pick radius → Draw → Save · repeat for each radius`}
+          {saveStatus === "saved"
+            ? `Saved ${farms.length} fields @ ${radiusAcres.toFixed(2)} ac · other radii kept`
+            : confirmed
+              ? editingFarms
+                ? "Drag corners to fix a field · Save JSON when done"
+                : drawingFarms
+                  ? `Drawing @ ${radiusAcres.toFixed(2)} ac · then Save JSON (keeps other radii)`
+                  : farms.length
+                    ? `${farms.length} fields @ ${radiusAcres.toFixed(2)} ac · change slider for another radius`
+                    : `No fields @ ${radiusAcres.toFixed(2)} ac yet · tap Draw`
+              : `Pick radius → Draw → Save · repeat for each radius`}
         </p>
       ) : (
         <div className="pb-4" />
