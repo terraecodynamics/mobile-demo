@@ -30,8 +30,10 @@ export type DummyNotification = {
   title: string;
   body: string;
   time: string;
+  /** Section header, e.g. TODAY or SEPTEMBER 18, 2026 */
+  section: string;
   unread: boolean;
-  kind: "pump" | "weather" | "rental" | "system";
+  kind: "rental" | "alert" | "security" | "pump" | "weather" | "system";
 };
 
 export const dummyUser = {
@@ -139,35 +141,111 @@ export const dummyRentals: DummyRental[] = [
 export const dummyNotifications: DummyNotification[] = [
   {
     id: "n1",
-    title: "Pump went offline",
-    body: "Test Pump 007 lost connection. Last seen recently.",
-    time: "12m ago",
+    title: "Rental expired: Test Pump 007",
+    body: "Test Pump 007 (test-007) rented to Rahul has expired. Please update status to make it available for rent.",
+    time: "1 day ago",
+    section: "TODAY",
     unread: true,
-    kind: "pump",
+    kind: "rental",
   },
   {
     id: "n2",
-    title: "Rain expected today",
-    body: "Light showers near your farm this afternoon.",
-    time: "1h ago",
+    title: "New Rental Created",
+    body: "A new rental has been created for Test Pump 007",
+    time: "3 days ago",
+    section: "SEPTEMBER 18, 2026",
     unread: true,
-    kind: "weather",
+    kind: "rental",
   },
   {
     id: "n3",
-    title: "Rental started",
-    body: "Ramesh Kumar · Test Pump 007 · ₹3,500",
-    time: "Yesterday",
-    unread: false,
+    title: "New Rental Created",
+    body: "A new rental has been created for Test Pump 007",
+    time: "3 days ago",
+    section: "SEPTEMBER 18, 2026",
+    unread: true,
     kind: "rental",
   },
   {
     id: "n4",
-    title: "Soil moisture low",
-    body: "North Field Pump soil at 41%. Consider irrigation.",
-    time: "Yesterday",
+    title: "Movement Alert",
+    body: "Test Pump 007 — Movement alert: device moved outside the geofence (13085m from center, limit 10m).",
+    time: "2 weeks ago",
+    section: "SEPTEMBER 8, 2026",
+    unread: true,
+    kind: "alert",
+  },
+  {
+    id: "n5",
+    title: "Theft Alarm",
+    body: "Test Pump 007 — Theft alarm triggered near the farm boundary. Check device location immediately.",
+    time: "2 weeks ago",
+    section: "SEPTEMBER 8, 2026",
+    unread: true,
+    kind: "security",
+  },
+  {
+    id: "n6",
+    title: "Pump went offline",
+    body: "Canal Pump lost connection. Last seen 2 minutes ago.",
+    time: "2 weeks ago",
+    section: "SEPTEMBER 8, 2026",
     unread: false,
     kind: "pump",
+  },
+  {
+    id: "n7",
+    title: "Rain expected today",
+    body: "Light showers near Puri district this afternoon. Consider pausing irrigation.",
+    time: "3 weeks ago",
+    section: "AUGUST 28, 2026",
+    unread: false,
+    kind: "weather",
+  },
+  {
+    id: "n8",
+    title: "Soil moisture low",
+    body: "North Field Pump soil at 41%. Consider starting a timed irrigation run.",
+    time: "3 weeks ago",
+    section: "AUGUST 28, 2026",
+    unread: false,
+    kind: "pump",
+  },
+  {
+    id: "n9",
+    title: "Rental started",
+    body: "Ramesh Kumar · Test Pump 007 · ₹3,500 · ends Sep 25.",
+    time: "1 month ago",
+    section: "AUGUST 20, 2026",
+    unread: true,
+    kind: "rental",
+  },
+  {
+    id: "n10",
+    title: "Geofence assigned",
+    body: "Pump 1 was assigned to Field 1 geofence on your farm map.",
+    time: "1 month ago",
+    section: "AUGUST 20, 2026",
+    unread: true,
+    kind: "system",
+  },
+  {
+    id: "n11",
+    title: "Flow sensor update",
+    body: "Test Pump 007 reported 0 L/min while stopped — sensor healthy.",
+    time: "1 month ago",
+    section: "AUGUST 15, 2026",
+    unread: true,
+    kind: "pump",
+  },
+  {
+    id: "n12",
+    title: "Weekly summary ready",
+    body: "Your irrigation summary for last week is available in Profile.",
+    time: "1 month ago",
+    section: "AUGUST 15, 2026",
+    unread: true,
+    kind: "system",
   },
 ];
 

@@ -21,6 +21,10 @@ type Props = {
   flow: string;
   soil: string;
   onMetrics?: () => void;
+  onOpenSoilMoisture?: () => void;
+  onOpenSchedule?: () => void;
+  moistureEnabled?: boolean;
+  moistureSubtitle?: string | null;
 };
 
 /** Native pumpDialSize — reserve status + metrics so nothing clips */
@@ -36,15 +40,18 @@ function AutoCard({
   icon: Icon,
   selected,
   subtitle,
+  onClick,
 }: {
   label: string;
   icon: typeof Clock;
   selected: boolean;
   subtitle: string;
+  onClick?: () => void;
 }) {
   return (
     <button
       type="button"
+      onClick={onClick}
       className="relative flex aspect-square max-h-[128px] flex-1 flex-col items-center justify-center overflow-hidden active:scale-[0.98]"
       style={{
         borderRadius: 18,
@@ -55,6 +62,8 @@ function AutoCard({
         boxShadow: selected
           ? "6px 8px 14px rgba(102,109,122,0.25), -3px -3px 8px rgba(255,255,255,0.8)"
           : "4px 5px 10px rgba(102,109,122,0.2)",
+        transition:
+          "background 220ms ease, box-shadow 220ms ease, border-color 220ms ease, transform 120ms ease",
       }}
     >
       <span
@@ -102,9 +111,18 @@ export function PumpControlSheet({
   flow,
   soil,
   onMetrics,
+  onOpenSoilMoisture,
+  onOpenSchedule,
+  moistureEnabled = false,
+  moistureSubtitle = null,
 }: Props) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [dialSize, setDialSize] = useState(220);
+  const [autoKind, setAutoKind] = useState<"schedule" | "moisture">("schedule");
+
+  const soilCardSubtitle =
+    moistureSubtitle ||
+    (moistureEnabled ? "Armed · watching soil" : "Off · enable to automate");
 
   useEffect(() => {
     const el = bodyRef.current;
@@ -150,7 +168,7 @@ export function PumpControlSheet({
           style={{ paddingTop: 4, paddingBottom: 2 }}
         >
           <div
-            className="font-bold tracking-[-0.3px]"
+            className="font-bold tracking-[-0.3px] transition-colors duration-300"
             style={{
               fontSize: 22,
               lineHeight: 1.15,
@@ -160,7 +178,7 @@ export function PumpControlSheet({
             {statusTitle}
           </div>
           <div
-            className="font-semibold"
+            className="font-semibold transition-opacity duration-200"
             style={{
               marginTop: 2,
               marginBottom: 0,
@@ -173,29 +191,50 @@ export function PumpControlSheet({
           </div>
         </div>
 
-        {/* Dial / auto cards — sized to fit between status and metrics */}
+        {/* Dial / auto cards — crossfade like native mode switch */}
         <div className="relative z-[2] flex min-h-0 flex-1 items-center justify-center overflow-visible">
-          {mode === "manual" ? (
-            <PumpDial
-              size={dialSize}
-              timerMinutes={timerMinutes}
-              running={running}
-              offline={offline}
-              powerLoading={powerLoading}
-              onToggle={onToggle}
-              onTimerChange={onTimerChange}
-            />
-          ) : (
-            <div className="flex w-full max-w-[320px] items-stretch gap-3 self-center py-1">
-              <AutoCard label="Schedule" icon={Clock} selected subtitle="Off · enable to run" />
-              <AutoCard
-                label="Soil moisture"
-                icon={Droplets}
-                selected={false}
-                subtitle="Off · enable to automate"
+          <div
+            key={mode}
+            className="flex w-full items-center justify-center"
+            style={{
+              animation: "kronis-mode-in 280ms cubic-bezier(0.22, 1.2, 0.36, 1) both",
+            }}
+          >
+            {mode === "manual" ? (
+              <PumpDial
+                size={dialSize}
+                timerMinutes={timerMinutes}
+                running={running}
+                offline={offline}
+                powerLoading={powerLoading}
+                onToggle={onToggle}
+                onTimerChange={onTimerChange}
               />
-            </div>
-          )}
+            ) : (
+              <div className="flex w-full max-w-[320px] items-stretch gap-3 self-center py-1">
+                <AutoCard
+                  label="Schedule"
+                  icon={Clock}
+                  selected={autoKind === "schedule"}
+                  subtitle="Off · enable to run"
+                  onClick={() => {
+                    setAutoKind("schedule");
+                    onOpenSchedule?.();
+                  }}
+                />
+                <AutoCard
+                  label="Soil moisture"
+                  icon={Droplets}
+                  selected={autoKind === "moisture" || moistureEnabled}
+                  subtitle={soilCardSubtitle}
+                  onClick={() => {
+                    setAutoKind("moisture");
+                    onOpenSoilMoisture?.();
+                  }}
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="relative z-[2] shrink-0 pt-1">

@@ -140,6 +140,7 @@ export function SoftButton({
   icon: Icon,
 }: SoftButtonProps) {
   const isSoft = variant === "soft";
+  const isInk = variant === "ink";
   return (
     <button
       type="button"
@@ -147,15 +148,16 @@ export function SoftButton({
       className={`relative inline-flex items-center justify-center gap-2 overflow-hidden px-5 py-3 text-[14px] font-bold active:scale-[0.98] ${className}`}
       style={{
         borderRadius: 16,
-        color: isSoft ? kronis.ink : "#fff",
+        /* ink = native SkeuomorphicButton: dark face + lime label */
+        color: isSoft ? kronis.ink : isInk ? kronis.lime : "#fff",
         background: isSoft
           ? "linear-gradient(145deg, #f1f2f3, #e8e9eb, #dfe1e4)"
           : variant === "orange"
             ? `linear-gradient(145deg, ${kronis.lime}, ${kronis.limeDark})`
-            : kronis.ink,
+            : "linear-gradient(145deg, #2C3026, #1C2018, #12150F)",
         boxShadow: isSoft
           ? "6px 8px 14px rgba(102,109,122,0.28), -4px -4px 10px rgba(255,255,255,0.9)"
-          : "0 8px 18px rgba(23,26,18,0.22)",
+          : "0 8px 18px rgba(10,12,8,0.4)",
       }}
     >
       {Icon ? <Icon size={18} /> : null}

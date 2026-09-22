@@ -79,6 +79,29 @@ body {
   animation: cloud-move-slow 18s ease-in-out infinite;
 }
 
+/* Manual ↔ Automatic content enter (matches native springy swap) */
+@keyframes kronis-mode-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes kronis-bar-in {
+  from {
+    transform: scaleY(0);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
 /* OpenLayers — must stay `none` so wheel / pinch / drag zoom work */
 .ol-viewport {
   touch-action: none;

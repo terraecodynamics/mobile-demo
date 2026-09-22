@@ -4,7 +4,12 @@ import { PumpHomeAppBar } from "@/components/pump/PumpHomeAppBar";
 import { MapStage } from "@/components/pump/MapStage";
 import { PumpControlSheet } from "@/components/pump/PumpControlSheet";
 import { PumpMapMarker } from "@/components/pump/PumpMapMarker";
+import {
+  SoilTargetSheet,
+  type SoilTargetPayload,
+} from "@/components/pump/SoilTargetSheet";
 import { SoftRaised, SoftButton, SoftChip } from "@/components/ui/SoftUi";
+import { SheetModal } from "@/components/ui/SheetModal";
 import {
   dummyNotifications,
   dummyPumps,
@@ -61,6 +66,12 @@ export default function HomePage() {
   const [selectedId, setSelectedId] = useState(dummyPumps[0].id);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [metricsOpen, setMetricsOpen] = useState(false);
+  const [soilTargetOpen, setSoilTargetOpen] = useState(false);
+  const [moistureRule, setMoistureRule] = useState<SoilTargetPayload>({
+    startBelow: 30,
+    stopAbove: 60,
+    isEnabled: true,
+  });
   const [mode, setMode] = useState<"manual" | "auto">("manual");
   const [timerMinutes, setTimerMinutes] = useState(0);
   const [remainingMinutes, setRemainingMinutes] = useState<number | null>(null);
@@ -333,122 +344,124 @@ export default function HomePage() {
               }
               soil={String(pump.soilPct)}
               onMetrics={() => setMetricsOpen(true)}
+              onOpenSoilMoisture={() => setSoilTargetOpen(true)}
+              moistureEnabled={moistureRule.isEnabled}
+              moistureSubtitle={
+                moistureRule.isEnabled
+                  ? `Armed · ${moistureRule.startBelow}–${moistureRule.stopAbove}%`
+                  : null
+              }
             />
           </div>
         </div>
       </div>
 
-      {pickerOpen ? (
-        <div className="absolute inset-0 z-50 flex flex-col justify-end bg-black/35">
-          <button
-            type="button"
-            className="absolute inset-0"
-            aria-label="Close"
-            onClick={() => setPickerOpen(false)}
-          />
-          <div
-            className="relative rounded-t-[28px] px-4 pb-8 pt-3"
-            style={{ background: kronis.background }}
-          >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#c5ccd6]" />
-            <div className="mb-3 text-[17px] font-extrabold" style={{ color: kronis.ink }}>
-              Select pump
-            </div>
-            <div className="space-y-2.5">
-              {pumps.map((p) => (
-                <SoftRaised
-                  key={p.id}
-                  className="w-full p-3.5"
-                  onClick={() => {
-                    setSelectedId(p.id);
-                    setRunningOverride(null);
-                    setRemainingMinutes(null);
-                    setFlowOverride(null);
-                    setTimerMinutes(0);
-                    setPickerOpen(false);
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden">
-                      <PumpMapMarker
-                        number={p.number}
-                        selected={p.id === selectedId}
-                        isRunning={
-                          p.id === selectedId
-                            ? running
-                            : p.running
-                        }
-                        compact
-                      />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate font-bold" style={{ color: kronis.ink }}>
-                        {p.name}
-                      </div>
-                      <div className="text-xs" style={{ color: kronis.inkMuted }}>
-                        {p.online ? "Online" : "Offline"} · soil {p.soilPct}%
-                        {fenceFields?.length
-                          ? ` · ${fenceFields.length} geofence`
-                          : ""}
-                      </div>
-                    </div>
-                    {p.id === selectedId ? (
-                      <span className="text-xs font-bold" style={{ color: kronis.lime }}>
-                        Selected
-                      </span>
-                    ) : null}
-                  </div>
-                </SoftRaised>
-              ))}
-            </div>
+      <SheetModal
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        dim
+        header={
+          <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
+            Select pump
           </div>
+        }
+      >
+        <div className="space-y-2.5 pb-2">
+          {pumps.map((p) => (
+            <SoftRaised
+              key={p.id}
+              className="w-full p-3.5"
+              onClick={() => {
+                setSelectedId(p.id);
+                setRunningOverride(null);
+                setRemainingMinutes(null);
+                setFlowOverride(null);
+                setTimerMinutes(0);
+                setPickerOpen(false);
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden">
+                  <PumpMapMarker
+                    number={p.number}
+                    selected={p.id === selectedId}
+                    isRunning={
+                      p.id === selectedId ? running : p.running
+                    }
+                    compact
+                  />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate font-bold" style={{ color: kronis.ink }}>
+                    {p.name}
+                  </div>
+                  <div className="text-xs" style={{ color: kronis.inkMuted }}>
+                    {p.online ? "Online" : "Offline"} · soil {p.soilPct}%
+                    {fenceFields?.length
+                      ? ` · ${fenceFields.length} geofence`
+                      : ""}
+                  </div>
+                </div>
+                {p.id === selectedId ? (
+                  <span className="text-xs font-bold" style={{ color: kronis.lime }}>
+                    Selected
+                  </span>
+                ) : null}
+              </div>
+            </SoftRaised>
+          ))}
         </div>
-      ) : null}
+      </SheetModal>
 
-      {metricsOpen ? (
-        <div className="absolute inset-0 z-50 flex flex-col justify-end bg-black/35">
-          <button
-            type="button"
-            className="absolute inset-0"
-            aria-label="Close"
-            onClick={() => setMetricsOpen(false)}
-          />
-          <div
-            className="relative rounded-t-[28px] px-4 pb-8 pt-3"
-            style={{ background: kronis.background }}
-          >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#c5ccd6]" />
-            <div className="mb-1 text-[17px] font-extrabold" style={{ color: kronis.ink }}>
+      <SheetModal
+        open={metricsOpen}
+        onClose={() => setMetricsOpen(false)}
+        dim
+        header={
+          <div>
+            <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
               This week
             </div>
-            <div className="mb-4 text-sm" style={{ color: kronis.inkMuted }}>
+            <div className="mt-0.5 text-sm" style={{ color: kronis.inkMuted }}>
               {pump.name}
             </div>
-            <div className="mb-5 flex h-28 items-end gap-2 px-1">
-              {dummyWeeklyStats.map((d) => (
-                <div key={d.day} className="flex flex-1 flex-col items-center gap-1">
-                  <div
-                    className="w-full rounded-t-md"
-                    style={{
-                      height: `${Math.max(8, d.hours * 28)}px`,
-                      background: `linear-gradient(180deg, ${kronis.lime}, ${kronis.limeDark})`,
-                    }}
-                  />
-                  <span className="text-[10px] font-semibold" style={{ color: kronis.inkMuted }}>
-                    {d.day}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <SoftButton
-              label="Close"
-              variant="soft"
-              className="w-full"
-              onClick={() => setMetricsOpen(false)}
-            />
           </div>
+        }
+      >
+        <div className="mb-5 flex h-28 items-end gap-2 px-1">
+          {dummyWeeklyStats.map((d, i) => (
+            <div key={d.day} className="flex flex-1 flex-col items-center gap-1">
+              <div
+                className="w-full origin-bottom rounded-t-md"
+                style={{
+                  height: `${Math.max(8, d.hours * 28)}px`,
+                  background: `linear-gradient(180deg, ${kronis.lime}, ${kronis.limeDark})`,
+                  animation: `kronis-bar-in 400ms cubic-bezier(0.22, 1.2, 0.36, 1) both`,
+                  animationDelay: `${i * 45}ms`,
+                }}
+              />
+              <span className="text-[10px] font-semibold" style={{ color: kronis.inkMuted }}>
+                {d.day}
+              </span>
+            </div>
+          ))}
         </div>
-      ) : null}
+        <SoftButton
+          label="Close"
+          variant="soft"
+          className="w-full"
+          onClick={() => setMetricsOpen(false)}
+        />
+      </SheetModal>
+
+      <SoilTargetSheet
+        open={soilTargetOpen}
+        deviceName={pump.name}
+        soilNow={pump.soilPct}
+        initial={moistureRule}
+        onClose={() => setSoilTargetOpen(false)}
+        onSaved={(payload) => setMoistureRule(payload)}
+      />
     </div>
   );
 }
