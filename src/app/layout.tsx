@@ -10,12 +10,22 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: "TerraEco Mobile Demo",
   description: "UI-only Next.js replica of TerraEco mobile (dummy data)",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "TerraEco",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
+  viewportFit: "cover",
   themeColor: "#d9dee7",
 };
 
