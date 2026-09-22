@@ -54,7 +54,6 @@ import TileLayer from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
 import VectorSource from "ol/source/Vector";
 import Feature from "ol/Feature";
-import type { FeatureLike } from "ol/Feature";
 import Polygon from "ol/geom/Polygon";
 import CircleGeom from "ol/geom/Circle";
 import { fromLonLat, toLonLat, getPointResolution } from "ol/proj";
@@ -415,21 +414,22 @@ export default function FarmPage() {
       overlay.setPosition(fromLonLat([pin.lng, pin.lat]));
     }
 
-    const hitFarmAtPixel = (pixel: number[]): FeatureLike | null => {
-      let found: FeatureLike | null = null;
+    const farmIdAtPixel = (pixel: number[]): string | null => {
+      let farmId: string | null = null;
       map.forEachFeatureAtPixel(
         pixel,
         (f, layer) => {
           if (layer !== farmLayer) return undefined;
-          if (f.get("farmId")) {
-            found = f;
-            return f;
+          const id = f.get("farmId");
+          if (id != null && id !== "") {
+            farmId = String(id);
+            return true;
           }
           return undefined;
         },
         { hitTolerance: 14, layerFilter: (layer) => layer === farmLayer }
       );
-      return found;
+      return farmId;
     };
 
     const onPointerMove = (evt: { dragging: boolean; pixel: number[] }) => {
@@ -443,7 +443,7 @@ export default function FarmPage() {
         host.style.cursor = "default";
         return;
       }
-      host.style.cursor = hitFarmAtPixel(evt.pixel) ? "pointer" : "default";
+      host.style.cursor = farmIdAtPixel(evt.pixel) ? "pointer" : "default";
     };
 
     const onClick = (evt: { coordinate: number[]; pixel: number[] }) => {
@@ -454,11 +454,8 @@ export default function FarmPage() {
         !editingFarmsRef.current &&
         !drawingFarmsRef.current
       ) {
-        const hit = hitFarmAtPixel(evt.pixel);
-        if (hit) {
-          const id = String(hit.get("farmId") ?? "");
-          toggleGeofenceRef.current(id);
-        }
+        const id = farmIdAtPixel(evt.pixel);
+        if (id) toggleGeofenceRef.current(id);
         return;
       }
       if (confirmedRef.current) return;
