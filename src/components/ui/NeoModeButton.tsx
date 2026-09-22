@@ -36,7 +36,10 @@ export function NeoModeButton({
     const node = hostRef.current;
     if (!node) return;
     const measure = () => {
-      const { width, height } = node.getBoundingClientRect();
+      // Use layout size, not getBoundingClientRect — PhoneShell CSS scale()
+      // would otherwise shrink the raised face and pin it top-left.
+      const width = node.offsetWidth;
+      const height = node.offsetHeight;
       setSize((prev) =>
         prev.w === width && prev.h === height ? prev : { w: width, h: height }
       );

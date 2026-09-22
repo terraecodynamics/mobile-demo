@@ -35,12 +35,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
  */
 function sheetHeightFor(stageH: number) {
   const usable = Math.max(1, stageH);
-  const mapReserve = 130;
+  const mapReserve = 150;
   let sheet: number;
-  if (usable < 600) sheet = Math.round(usable * 0.7);
-  else if (usable < 700) sheet = Math.round(usable * 0.64);
-  else sheet = Math.min(Math.round(usable * 0.6), usable - 150);
-  return Math.min(sheet, Math.max(220, usable - mapReserve));
+  if (usable < 600) sheet = Math.round(usable * 0.62);
+  else if (usable < 700) sheet = Math.round(usable * 0.58);
+  else sheet = Math.min(Math.round(usable * 0.54), usable - 160);
+  return Math.min(sheet, Math.max(240, usable - mapReserve));
 }
 
 function formatRemaining(mins: number) {

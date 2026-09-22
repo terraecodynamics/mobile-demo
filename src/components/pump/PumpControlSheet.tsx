@@ -25,10 +25,10 @@ type Props = {
 
 /** Native pumpDialSize — reserve status + metrics so nothing clips */
 function pumpDialSize(bodyH: number, winW: number) {
-  const reservedChrome = 210;
-  const byHeight = Math.max(168, (bodyH || 340) - reservedChrome);
-  const byWidth = Math.round(winW * 0.7);
-  return Math.min(248, byWidth, byHeight);
+  const reservedChrome = 190;
+  const byHeight = Math.max(160, (bodyH || 340) - reservedChrome);
+  const byWidth = Math.round(winW * 0.68);
+  return Math.min(232, byWidth, byHeight);
 }
 
 function AutoCard({
@@ -142,18 +142,18 @@ export function PumpControlSheet({
       <div
         ref={bodyRef}
         className="relative z-[1] flex min-h-0 flex-1 flex-col px-5"
-        style={{ paddingBottom: 14, gap: 16 }}
+        style={{ paddingBottom: 12, gap: 10 }}
       >
         {/* Status — always fully visible (native statusBlock) */}
         <div
           className="relative z-[4] shrink-0 px-2 text-center"
-          style={{ paddingTop: 10, paddingBottom: 8 }}
+          style={{ paddingTop: 4, paddingBottom: 2 }}
         >
           <div
             className="font-bold tracking-[-0.3px]"
             style={{
-              fontSize: 24,
-              lineHeight: 1.2,
+              fontSize: 22,
+              lineHeight: 1.15,
               color: running ? kronis.lime : kronis.ink,
             }}
           >
@@ -162,10 +162,10 @@ export function PumpControlSheet({
           <div
             className="font-semibold"
             style={{
-              marginTop: 4,
+              marginTop: 2,
               marginBottom: 0,
-              fontSize: 14,
-              lineHeight: 1.3,
+              fontSize: 13,
+              lineHeight: 1.25,
               color: "#555B4E",
             }}
           >
