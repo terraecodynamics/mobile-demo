@@ -130,6 +130,8 @@ type SoftButtonProps = {
   variant?: "ink" | "soft" | "orange";
   className?: string;
   icon?: LucideIcon;
+  /** Native SkeuomorphicButton size="pill" */
+  size?: "default" | "pill";
 };
 
 export function SoftButton({
@@ -138,29 +140,32 @@ export function SoftButton({
   variant = "soft",
   className = "",
   icon: Icon,
+  size = "default",
 }: SoftButtonProps) {
   const isSoft = variant === "soft";
   const isInk = variant === "ink";
+  const isPill = size === "pill";
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`relative inline-flex items-center justify-center gap-2 overflow-hidden px-5 py-3 text-[14px] font-bold active:scale-[0.98] ${className}`}
+      className={`relative inline-flex items-center justify-center gap-1.5 overflow-hidden font-bold active:scale-[0.98] ${
+        isPill ? "px-3.5 py-2 text-[12px]" : "px-5 py-3 text-[14px]"
+      } ${className}`}
       style={{
-        borderRadius: 16,
-        /* ink = native SkeuomorphicButton: dark face + lime label */
-        color: isSoft ? kronis.ink : isInk ? kronis.lime : "#fff",
+        borderRadius: isPill ? 9999 : 16,
+        color: isSoft ? (isPill ? kronis.lime : kronis.ink) : isInk ? kronis.lime : "#fff",
         background: isSoft
           ? "linear-gradient(145deg, #f1f2f3, #e8e9eb, #dfe1e4)"
           : variant === "orange"
             ? `linear-gradient(145deg, ${kronis.lime}, ${kronis.limeDark})`
             : "linear-gradient(145deg, #2C3026, #1C2018, #12150F)",
         boxShadow: isSoft
-          ? "6px 8px 14px rgba(102,109,122,0.28), -4px -4px 10px rgba(255,255,255,0.9)"
-          : "0 8px 18px rgba(10,12,8,0.4)",
+          ? "4px 5px 10px rgba(102,109,122,0.22), -3px -3px 8px rgba(255,255,255,0.85)"
+          : "0 6px 14px rgba(10,12,8,0.35)",
       }}
     >
-      {Icon ? <Icon size={18} /> : null}
+      {Icon ? <Icon size={isPill ? 14 : 18} /> : null}
       {label}
     </button>
   );

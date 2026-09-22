@@ -127,10 +127,6 @@ function analysisCircleGeom(lat: number, lng: number, radiusMeters: number) {
   return new CircleGeom(center, radiusMap);
 }
 
-function formatCoords(lat: number, lng: number) {
-  return `${lat.toFixed(3)}°N, ${Math.abs(lng).toFixed(3)}°${lng >= 0 ? "E" : "W"}`;
-}
-
 export default function FarmPage() {
   const router = useRouter();
   /** Start on Odisha demo; replace with GPS when available */
@@ -169,9 +165,6 @@ export default function FarmPage() {
   const [savedRadii, setSavedRadii] = useState<number[]>(() => listSavedRadii());
   const [geoStatus, setGeoStatus] = useState<"idle" | "locating" | "ok" | "denied" | "error">(
     "idle"
-  );
-  const [placeLabel, setPlaceLabel] = useState<string>(
-    `${DEMO_AQUA_FARM.place} · ${DEMO_AQUA_FARM.coordsLabel}`
   );
   const aiTimersRef = useRef<number[]>([]);
 
@@ -248,7 +241,6 @@ export default function FarmPage() {
   const requestCurrentLocation = useCallback(() => {
     if (typeof navigator === "undefined" || !navigator.geolocation) {
       setGeoStatus("error");
-      setPlaceLabel(`${DEMO_AQUA_FARM.place} (GPS unavailable)`);
       return;
     }
     setGeoStatus("locating");
@@ -257,16 +249,10 @@ export default function FarmPage() {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
         setGeoStatus("ok");
-        setPlaceLabel(`Current location · ${formatCoords(lat, lng)}`);
         goToLocation(lat, lng, true);
       },
       (err) => {
         setGeoStatus(err.code === err.PERMISSION_DENIED ? "denied" : "error");
-        setPlaceLabel(
-          err.code === err.PERMISSION_DENIED
-            ? `Location denied · ${DEMO_AQUA_FARM.place}`
-            : `GPS failed · ${DEMO_AQUA_FARM.place}`
-        );
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 }
     );
@@ -275,7 +261,6 @@ export default function FarmPage() {
   // Prefer Puri demo farm on open. GPS is opt-in via the locate chip.
   // (Auto-GPS was jumping to Keonjhar / other districts.)
   useEffect(() => {
-    setPlaceLabel(`${DEMO_AQUA_FARM.place} · ${DEMO_AQUA_FARM.coordsLabel}`);
     setGeoStatus("idle");
   }, []);
 
@@ -1321,11 +1306,6 @@ export default function FarmPage() {
           <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
             Farm boundary
           </div>
-          <div className="text-xs" style={{ color: kronis.inkMuted }}>
-            {geoStatus === "locating"
-              ? "Getting your location…"
-              : placeLabel}
-          </div>
         </div>
         <SoftChip
           icon={LocateFixed}
@@ -1459,14 +1439,12 @@ export default function FarmPage() {
             <Minus size={18} color={kronis.ink} />
           </button>
         </div>
-        <div className="pointer-events-none absolute bottom-3 left-3 right-3 z-10 rounded-full bg-black/55 px-3 py-2 text-center text-[11px] font-semibold text-white">
-          {!collectMode
+        {(() => {
+          const mapHint = !collectMode
             ? aiDetecting
               ? "Kronis AI detecting farm boundaries…"
               : confirmed
-                ? geofenceIds.length
-                  ? `${geofenceIds.length} in yellow fence · tap to add / remove`
-                  : "Yellow dashed circle = fence · tap a field inside"
+                ? null
                 : `Analysis radius · ${radiusAcres.toFixed(2)} ac · Confirm to load fields`
             : drawingFarms
               ? `Draw at ${radiusAcres.toFixed(2)} ac · tap corners · double-tap to close · ${farms.length} drawn`
@@ -1476,20 +1454,20 @@ export default function FarmPage() {
                   ? `${farms.length} farm boundaries · ${totalFarmAcres.toFixed(2)} ac total`
                   : editing
                     ? "Edit mode · adjust radius or move pin"
-                    : `Analysis radius · ${radiusAcres.toFixed(2)} ac · Draw to trace fields`}
-        </div>
-        {!collectMode && confirmed && !aiDetecting ? (
+                    : `Analysis radius · ${radiusAcres.toFixed(2)} ac · Draw to trace fields`;
+          if (!mapHint) return null;
+          return (
+            <div className="pointer-events-none absolute bottom-3 left-3 right-3 z-10 rounded-full bg-black/55 px-3 py-2 text-center text-[11px] font-semibold text-white">
+              {mapHint}
+            </div>
+          );
+        })()}
+        {!collectMode && confirmed && !aiDetecting && geofenceIds.length > 0 ? (
           <div
             className="pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2 rounded-full px-3 py-1.5 text-[11px] font-bold text-white shadow-lg"
-            style={{
-              background: geofenceIds.length
-                ? "rgba(23,26,18,0.78)"
-                : `linear-gradient(145deg, ${kronis.lime}, ${kronis.limeDark})`,
-            }}
+            style={{ background: "rgba(23,26,18,0.78)" }}
           >
-            {geofenceIds.length
-              ? `${geofenceIds.length} field(s) in fence · + assigns pumps`
-              : "Yellow ring = fence · tap field · + assigns pumps"}
+            {geofenceIds.length} in fence
           </div>
         ) : null}
       </div>
@@ -1614,15 +1592,6 @@ export default function FarmPage() {
 
       {confirmed ? (
         <div className="no-scrollbar mx-3.5 mb-3 max-h-[160px] space-y-2 overflow-y-auto">
-          {!collectMode ? (
-            <div
-              className="px-1 pb-0.5 text-[11px] font-semibold"
-              style={{ color: kronis.inkMuted }}
-            >
-              Tap fields for geofence · + to assign pumps
-              {geofenceIds.length ? ` · ${geofenceIds.length} fence` : ""}
-            </div>
-          ) : null}
           {farms.map((farm) => {
             const active = collectMode
               ? farm.id === selectedFarmId
@@ -1894,25 +1863,25 @@ export default function FarmPage() {
           Clear all & redraw from scratch
         </button>
       ) : null}
-      <p className="px-4 pb-4 text-center text-[11px]" style={{ color: kronis.inkMuted }}>
-        {!collectMode
-          ? confirmed
-            ? geofenceIds.length
-              ? `${geofenceIds.length} geofence · tap + to assign pumps · Done saves`
-              : "Multi-select fields → yellow geofence → + assign pumps"
-            : "Drag radius → Confirm → show saved boundaries"
-          : saveStatus === "saved"
-            ? `Saved ${farms.length} fields @ ${radiusAcres.toFixed(2)} ac · other radii kept`
-            : confirmed
-              ? editingFarms
-                ? "Drag corners to fix a field · Save JSON when done"
-                : drawingFarms
-                  ? `Drawing @ ${radiusAcres.toFixed(2)} ac · then Save JSON (keeps other radii)`
-                  : farms.length
-                    ? `${farms.length} fields @ ${radiusAcres.toFixed(2)} ac · change slider for another radius`
-                    : `No fields @ ${radiusAcres.toFixed(2)} ac yet · tap Draw`
-              : `Pick radius → Draw → Save · repeat for each radius`}
-      </p>
+      {collectMode || !confirmed ? (
+        <p className="px-4 pb-4 text-center text-[11px]" style={{ color: kronis.inkMuted }}>
+          {!collectMode
+            ? "Drag radius → Confirm → show saved boundaries"
+            : saveStatus === "saved"
+              ? `Saved ${farms.length} fields @ ${radiusAcres.toFixed(2)} ac · other radii kept`
+              : confirmed
+                ? editingFarms
+                  ? "Drag corners to fix a field · Save JSON when done"
+                  : drawingFarms
+                    ? `Drawing @ ${radiusAcres.toFixed(2)} ac · then Save JSON (keeps other radii)`
+                    : farms.length
+                      ? `${farms.length} fields @ ${radiusAcres.toFixed(2)} ac · change slider for another radius`
+                      : `No fields @ ${radiusAcres.toFixed(2)} ac yet · tap Draw`
+                : `Pick radius → Draw → Save · repeat for each radius`}
+        </p>
+      ) : (
+        <div className="pb-4" />
+      )}
 
       {/* Native-style: Pump in {field} multi-assign sheet */}
       {assignFieldId && !collectMode ? (

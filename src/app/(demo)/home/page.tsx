@@ -3,12 +3,16 @@
 import { PumpHomeAppBar } from "@/components/pump/PumpHomeAppBar";
 import { MapStage } from "@/components/pump/MapStage";
 import { PumpControlSheet } from "@/components/pump/PumpControlSheet";
-import { PumpMapMarker } from "@/components/pump/PumpMapMarker";
+import { PumpPickerSheet } from "@/components/pump/PumpPickerSheet";
 import {
   SoilTargetSheet,
   type SoilTargetPayload,
 } from "@/components/pump/SoilTargetSheet";
-import { SoftRaised, SoftButton, SoftChip } from "@/components/ui/SoftUi";
+import {
+  WateringTimesSheet,
+  type SchedulePayload,
+} from "@/components/pump/WateringTimesSheet";
+import { SoftButton, SoftChip } from "@/components/ui/SoftUi";
 import { SheetModal } from "@/components/ui/SheetModal";
 import {
   dummyNotifications,
@@ -67,11 +71,13 @@ export default function HomePage() {
   const [pickerOpen, setPickerOpen] = useState(false);
   const [metricsOpen, setMetricsOpen] = useState(false);
   const [soilTargetOpen, setSoilTargetOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
   const [moistureRule, setMoistureRule] = useState<SoilTargetPayload>({
     startBelow: 30,
     stopAbove: 60,
     isEnabled: true,
   });
+  const [scheduleRule, setScheduleRule] = useState<SchedulePayload | null>(null);
   const [mode, setMode] = useState<"manual" | "auto">("manual");
   const [timerMinutes, setTimerMinutes] = useState(0);
   const [remainingMinutes, setRemainingMinutes] = useState<number | null>(null);
@@ -345,73 +351,43 @@ export default function HomePage() {
               soil={String(pump.soilPct)}
               onMetrics={() => setMetricsOpen(true)}
               onOpenSoilMoisture={() => setSoilTargetOpen(true)}
+              onOpenSchedule={() => setScheduleOpen(true)}
               moistureEnabled={moistureRule.isEnabled}
               moistureSubtitle={
                 moistureRule.isEnabled
                   ? `Armed · ${moistureRule.startBelow}–${moistureRule.stopAbove}%`
                   : null
               }
+              scheduleEnabled={scheduleRule?.isEnabled === true}
             />
           </div>
         </div>
       </div>
 
-      <SheetModal
+      <PumpPickerSheet
         open={pickerOpen}
+        pumps={pumps.map((p) => ({
+          id: p.id,
+          name: p.name,
+          number: p.number,
+          online: p.online,
+          running: p.id === selectedId ? running : p.running,
+        }))}
+        selectedId={selectedId}
+        sheetHeight={sheetH}
+        onSelect={(id) => {
+          setSelectedId(id);
+          setRunningOverride(null);
+          setRemainingMinutes(null);
+          setFlowOverride(null);
+          setTimerMinutes(0);
+          setPowerLoading(false);
+          toggleLock.current = false;
+        }}
         onClose={() => setPickerOpen(false)}
-        dim
-        header={
-          <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
-            Select pump
-          </div>
-        }
-      >
-        <div className="space-y-2.5 pb-2">
-          {pumps.map((p) => (
-            <SoftRaised
-              key={p.id}
-              className="w-full p-3.5"
-              onClick={() => {
-                setSelectedId(p.id);
-                setRunningOverride(null);
-                setRemainingMinutes(null);
-                setFlowOverride(null);
-                setTimerMinutes(0);
-                setPickerOpen(false);
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden">
-                  <PumpMapMarker
-                    number={p.number}
-                    selected={p.id === selectedId}
-                    isRunning={
-                      p.id === selectedId ? running : p.running
-                    }
-                    compact
-                  />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="truncate font-bold" style={{ color: kronis.ink }}>
-                    {p.name}
-                  </div>
-                  <div className="text-xs" style={{ color: kronis.inkMuted }}>
-                    {p.online ? "Online" : "Offline"} · soil {p.soilPct}%
-                    {fenceFields?.length
-                      ? ` · ${fenceFields.length} geofence`
-                      : ""}
-                  </div>
-                </div>
-                {p.id === selectedId ? (
-                  <span className="text-xs font-bold" style={{ color: kronis.lime }}>
-                    Selected
-                  </span>
-                ) : null}
-              </div>
-            </SoftRaised>
-          ))}
-        </div>
-      </SheetModal>
+        onAddPump={() => router.push("/add-pump")}
+        onViewAll={() => router.push("/profile")}
+      />
 
       <SheetModal
         open={metricsOpen}
@@ -461,6 +437,14 @@ export default function HomePage() {
         initial={moistureRule}
         onClose={() => setSoilTargetOpen(false)}
         onSaved={(payload) => setMoistureRule(payload)}
+      />
+
+      <WateringTimesSheet
+        open={scheduleOpen}
+        deviceName={pump.name}
+        initial={scheduleRule}
+        onClose={() => setScheduleOpen(false)}
+        onSaved={(payload) => setScheduleRule(payload)}
       />
     </div>
   );

@@ -38,10 +38,15 @@ export type DummyNotification = {
 
 export const dummyUser = {
   name: "Terra Demo",
-  initials: "T",
+  initials: "TD",
   email: "demo@terraeco.app",
   mobile: "+91 98765 43210",
   farmName: "Green Valley Farm",
+  city: "Puri",
+  members: [
+    { id: "m1", name: "Ravi Kumar", role: "Operator" },
+    { id: "m2", name: "Anita Patel", role: "Viewer" },
+  ],
 };
 
 /**

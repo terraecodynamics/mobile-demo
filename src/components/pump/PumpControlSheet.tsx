@@ -25,6 +25,9 @@ type Props = {
   onOpenSchedule?: () => void;
   moistureEnabled?: boolean;
   moistureSubtitle?: string | null;
+  scheduleEnabled?: boolean;
+  scheduleActive?: boolean;
+  scheduleCountdown?: string | null;
 };
 
 /** Native pumpDialSize — reserve status + metrics so nothing clips */
@@ -115,10 +118,21 @@ export function PumpControlSheet({
   onOpenSchedule,
   moistureEnabled = false,
   moistureSubtitle = null,
+  scheduleEnabled = false,
+  scheduleActive = false,
+  scheduleCountdown = null,
 }: Props) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const [dialSize, setDialSize] = useState(220);
   const [autoKind, setAutoKind] = useState<"schedule" | "moisture">("schedule");
+
+  const scheduleSubtitle = scheduleActive
+    ? scheduleCountdown
+      ? `Active · ${scheduleCountdown}`
+      : "Active now"
+    : scheduleEnabled
+      ? "Armed · waiting for window"
+      : "Off · enable to run";
 
   const soilCardSubtitle =
     moistureSubtitle ||
@@ -215,8 +229,8 @@ export function PumpControlSheet({
                 <AutoCard
                   label="Schedule"
                   icon={Clock}
-                  selected={autoKind === "schedule"}
-                  subtitle="Off · enable to run"
+                  selected={autoKind === "schedule" || scheduleEnabled}
+                  subtitle={scheduleSubtitle}
                   onClick={() => {
                     setAutoKind("schedule");
                     onOpenSchedule?.();
