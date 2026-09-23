@@ -1,7 +1,7 @@
 "use client";
 
 import { PumpHomeAppBar } from "@/components/pump/PumpHomeAppBar";
-import { MapStage } from "@/components/pump/MapStage";
+import { MapStage, ALL_PUMPS_ID } from "@/components/pump/MapStage";
 import { PumpControlSheet } from "@/components/pump/PumpControlSheet";
 import { PumpPickerSheet } from "@/components/pump/PumpPickerSheet";
 import {
@@ -161,6 +161,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!pumps.length) return;
+    if (selectedId === ALL_PUMPS_ID) return;
     if (pumps.some((p) => p.id === selectedId)) return;
     setSelectedId(pumps[0].id);
   }, [pumps, selectedId]);
@@ -176,9 +177,13 @@ export default function HomePage() {
     return () => ro.disconnect();
   }, []);
 
-  const pump = useMemo(
-    () => pumps.find((p) => p.id === selectedId) || pumps[0],
-    [pumps, selectedId]
+  const showAllPumps = selectedId === ALL_PUMPS_ID;
+  const pump: DummyPump = useMemo(
+    () =>
+      showAllPumps
+        ? pumps[0]
+        : pumps.find((p) => p.id === selectedId) || pumps[0],
+    [pumps, selectedId, showAllPumps]
   );
 
   const running = runningOverride ?? pump.running;
@@ -294,10 +299,10 @@ export default function HomePage() {
     >
       <PumpHomeAppBar
         initials={dummyUser.initials}
-        deviceName={pump.model}
-        deviceSerial={pump.serial}
-        deviceNumber={pump.number}
-        running={running}
+        deviceName={showAllPumps ? "All pumps" : pump.model}
+        deviceSerial={showAllPumps ? `${pumps.length} on map` : pump.serial}
+        deviceNumber={showAllPumps ? pumps.length : pump.number}
+        running={showAllPumps ? false : running}
         unread={unread}
         onProfile={() => router.push("/profile")}
         onPicker={() => setPickerOpen(true)}
@@ -504,21 +509,35 @@ export default function HomePage() {
 
       <PutOnRentSheet
         open={rentOpen}
-        model={getPublishedForPump(pump.id)?.model ?? pump.model}
-        initialRate={getPublishedForPump(pump.id)?.ratePerDayInr ?? 700}
-        initialAvailable={getPublishedForPump(pump.id)?.available ?? true}
+        pumps={pumps.map((p) => ({
+          id: p.id,
+          model: p.model,
+          serial: p.serial,
+          number: p.number,
+        }))}
+        selectedPumpId={showAllPumps ? pumps[0]?.id : pump.id}
+        initialRate={
+          getPublishedForPump(showAllPumps ? pumps[0]?.id : pump.id)
+            ?.ratePerDayInr ?? 700
+        }
+        initialAvailable={
+          getPublishedForPump(showAllPumps ? pumps[0]?.id : pump.id)
+            ?.available ?? true
+        }
         onClose={() => {
           setRentOpen(false);
         }}
         onSaved={(payload: ListForRentPayload) => {
-          const unitLabel = `${payload.model} · ${pump.serial}`;
+          const listed =
+            pumps.find((p) => p.id === payload.pumpId) ?? pump;
+          const unitLabel = `${payload.model} · ${payload.serial}`;
           publishPumpForRent({
-            pumpId: pump.id,
+            pumpId: payload.pumpId,
             pumpName: unitLabel,
-            lat: pump.lat,
-            lng: pump.lng,
+            lat: listed.lat,
+            lng: listed.lng,
             model: payload.model,
-            serial: pump.serial,
+            serial: payload.serial,
             ratePerDayInr: payload.ratePerDayInr,
             available: payload.available,
           });
@@ -535,22 +554,6 @@ export default function HomePage() {
         open={handoffOpen}
         offer={handoffOffer}
         onClose={() => setHandoffOpen(false)}
-        onRefresh={() => {
-          if (!pump) return;
-          const rate =
-            getPublishedForPump(pump.id)?.ratePerDayInr ??
-            handoffOffer?.ratePerDayInr ??
-            700;
-          const offer = issueHandoffKey({
-            pumpId: pump.id,
-            model: handoffOffer?.model ?? pump.model,
-            serial: pump.serial,
-            ratePerDayInr: rate,
-            ownerName: dummyUser.name,
-            ownerPhone: dummyUser.mobile,
-          });
-          setHandoffOffer(offer);
-        }}
       />
 
       {rentToast ? (

@@ -123,17 +123,35 @@ export default function MyPumpPage() {
         </span>
       </div>
 
-      <div className="mx-3.5 mb-3 rounded-[18px] border px-3.5 py-3" style={{
-        background: kronis.surface,
-        borderColor: kronis.border,
-      }}>
-        <div className="flex justify-between text-[13px] font-semibold">
-          <span style={{ color: kronis.inkMuted }}>Attached</span>
-          <span style={{ color: kronis.ink }}>{rental.key}</span>
+      <div
+        className="mx-3.5 mb-3 rounded-[16px] border px-3.5 py-2.5"
+        style={{
+          background: kronis.surface,
+          borderColor: kronis.border,
+        }}
+      >
+        <div className="flex items-center gap-3 text-[13px] font-semibold">
+          <span className="shrink-0" style={{ color: kronis.inkMuted }}>
+            Attached
+          </span>
+          <span
+            className="min-w-0 flex-1 text-right font-mono tracking-normal"
+            style={{ color: kronis.ink }}
+          >
+            {rental.key}
+          </span>
         </div>
-        <div className="mt-1.5 flex justify-between text-[13px] font-semibold">
-          <span style={{ color: kronis.inkMuted }}>Rate</span>
-          <span style={{ color: kronis.ink }}>₹{rental.ratePerDayInr}/day</span>
+        <div
+          className="my-2 h-px"
+          style={{ background: kronis.divider }}
+        />
+        <div className="flex items-center gap-3 text-[13px] font-semibold">
+          <span className="shrink-0" style={{ color: kronis.inkMuted }}>
+            Rate
+          </span>
+          <span className="min-w-0 flex-1 text-right" style={{ color: kronis.ink }}>
+            ₹{rental.ratePerDayInr}/day
+          </span>
         </div>
       </div>
 

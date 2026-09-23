@@ -638,15 +638,25 @@ export function placePumpInFence(
 ): LatLng | null {
   if (!points?.length) return null;
   const center = polygonCentroid(points);
-  if (index === 0) return center;
-
   const lats = points.map((p) => p.lat);
   const lngs = points.map((p) => p.lng);
   const latSpan = Math.max(Math.max(...lats) - Math.min(...lats), 0.00001);
   const lngSpan = Math.max(Math.max(...lngs) - Math.min(...lngs), 0.00001);
+
+  // Distinct seats so markers don’t stack on the same pin
+  const offsets: [number, number][] = [
+    [0, 0],
+    [0.22, 0.18],
+    [-0.2, 0.2],
+    [0.2, -0.18],
+    [-0.22, -0.16],
+    [0, 0.28],
+    [0.28, 0],
+  ];
+  const [dLat, dLng] = offsets[index % offsets.length] ?? [0, 0];
   const alt: LatLng = {
-    lat: center.lat + Math.floor(index / 2) * latSpan * 0.08,
-    lng: center.lng + (index % 2 === 1 ? -1 : 1) * lngSpan * 0.1,
+    lat: center.lat + dLat * latSpan,
+    lng: center.lng + dLng * lngSpan,
   };
   return pointInPolygon(alt, points) ? alt : center;
 }
@@ -791,6 +801,36 @@ export function buildHomePumpsFromAssignments(
       lng: seat.lng,
       field: primary.points,
     });
+  }
+
+  // Seat every catalog pump on the farm map (All pumps / home markers).
+  // Unassigned units share the largest field so none sit off-screen.
+  if (anyAssigned && catalog.length) {
+    const seated = new Set(pumps.map((p) => p.id));
+    const primary = plots.reduce((best, p) =>
+      p.acres >= best.acres ? p : best
+    );
+    let seatIdx = pumps.length;
+    for (const meta of catalog) {
+      if (seated.has(meta.id)) continue;
+      const seat =
+        placePumpInFence(primary.points, seatIdx) ??
+        polygonCentroid(primary.points);
+      seatIdx += 1;
+      pumps.push({
+        id: meta.id,
+        name: meta.name,
+        number: meta.number,
+        online: true,
+        running: false,
+        flowLpm: 0,
+        soilPct: 62,
+        lastSeen: "just now",
+        lat: seat.lat,
+        lng: seat.lng,
+        field: primary.points,
+      });
+    }
   }
 
   if (!pumps.length) return null;

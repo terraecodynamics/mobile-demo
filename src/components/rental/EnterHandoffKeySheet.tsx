@@ -18,6 +18,8 @@ type Props = {
   onAttached: (rental: AttachedRental) => void;
 };
 
+const HINTS = ["KR007A", "KR014B", "KR021C"];
+
 export function EnterHandoffKeySheet({
   open,
   renteeName,
@@ -36,10 +38,11 @@ export function EnterHandoffKeySheet({
     setBusy(false);
   }, [open]);
 
-  const submit = () => {
+  const submit = (raw = code) => {
+    if (busy) return;
     setBusy(true);
     setError(null);
-    const result = claimHandoffKey(code, {
+    const result = claimHandoffKey(raw, {
       name: renteeName ?? "Rentee",
       phone: renteePhone ?? "",
     });
@@ -48,8 +51,8 @@ export function EnterHandoffKeySheet({
       setBusy(false);
       return;
     }
-    setBusy(false);
     onAttached(result.rental);
+    setBusy(false);
     onClose();
   };
 
@@ -57,7 +60,7 @@ export function EnterHandoffKeySheet({
     <SheetModal
       open={open}
       onClose={onClose}
-      maxHeight="55%"
+      maxHeight="62%"
       dim
       header={
         <div
@@ -69,10 +72,10 @@ export function EnterHandoffKeySheet({
       }
     >
       <p
-        className="mb-4 text-[14px] font-semibold leading-snug"
+        className="mb-3 text-[14px] font-semibold leading-snug"
         style={{ color: kronis.inkMuted }}
       >
-        Ask the owner for the unique key, then enter it here to attach the pump.
+        Enter the owner’s key (same code works in any browser).
       </p>
 
       <input
@@ -96,18 +99,38 @@ export function EnterHandoffKeySheet({
       />
 
       {error ? (
-        <div className="mb-3 text-center text-[13px] font-bold" style={{ color: "#C2410C" }}>
+        <div
+          className="mb-2 text-center text-[13px] font-bold"
+          style={{ color: "#C2410C" }}
+        >
           {error}
         </div>
       ) : (
-        <div className="mb-3 h-5" />
+        <div className="mb-2 h-5" />
       )}
+
+      <div className="mb-3 flex flex-wrap justify-center gap-1.5">
+        {HINTS.map((k) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => {
+              setCode(k);
+              setError(null);
+            }}
+            className="rounded-full px-2.5 py-1 font-mono text-[11px] font-bold active:scale-[0.98]"
+            style={{ background: "#e8eaed", color: kronis.inkMuted }}
+          >
+            {k}
+          </button>
+        ))}
+      </div>
 
       <SoftButton
         label={busy ? "…" : "Attach pump"}
         variant="orange"
         className="w-full"
-        onClick={submit}
+        onClick={() => submit()}
       />
     </SheetModal>
   );

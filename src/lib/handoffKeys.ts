@@ -1,13 +1,41 @@
-/** Owner issues a short unique key; rentee enters it to attach the pump */
+/** Owner shows a fixed key; rentee enters it in any browser to attach */
 
 import { DEMO_OWNER, DEMO_RENTEE } from "@/lib/auth";
+import { dummyPumps } from "@/data/dummy";
 import { markListingUnavailable } from "@/lib/rentListings";
 
-const OFFERS_KEY = "terraeco.demo.handoffOffers.v1";
-const ATTACHED_KEY = "terraeco.demo.attachedRentals.v1";
+const ATTACHED_KEY = "terraeco.demo.attachedRentals.v3";
 
-/** Easy to read aloud — no 0/O/1/I */
-const KEY_ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+/**
+ * Fixed attach codes — same on every browser / device.
+ * Owner “Give key” shows this; rentee types it to attach.
+ */
+const FIXED_KEYS: Record<
+  string,
+  { pumpId: string; model: string; serial: string; ratePerDayInr: number }
+> = {
+  KR007A: {
+    pumpId: "p1",
+    model: "Kronis 4",
+    serial: "KR-007",
+    ratePerDayInr: 700,
+  },
+  KR014B: {
+    pumpId: "p2",
+    model: "Kronis 4",
+    serial: "KR-014",
+    ratePerDayInr: 700,
+  },
+  KR021C: {
+    pumpId: "p3",
+    model: "Kronis 4 – Pro",
+    serial: "KR-021",
+    ratePerDayInr: 800,
+  },
+};
+
+/** Demo shortcut that always attaches pump 1 */
+export const DEMO_ATTACH_KEY = "TERRA1";
 
 export type HandoffOffer = {
   key: string;
@@ -18,7 +46,7 @@ export type HandoffOffer = {
   ownerPhone: string;
   ratePerDayInr: number;
   createdAt: string;
-  status: "open" | "claimed";
+  status: "open" | "revoked" | "claimed";
 };
 
 export type AttachedRental = {
@@ -36,52 +64,44 @@ export type AttachedRental = {
   running: boolean;
 };
 
-function loadOffers(): HandoffOffer[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = window.localStorage.getItem(OFFERS_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as HandoffOffer[];
-  } catch {
-    return [];
-  }
-}
+let memoryAttached: AttachedRental[] = [];
 
-function saveOffers(list: HandoffOffer[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(OFFERS_KEY, JSON.stringify(list));
-}
-
-function loadAttached(): AttachedRental[] {
-  if (typeof window === "undefined") return [];
+function readAttached(): AttachedRental[] {
+  if (typeof window === "undefined") return [...memoryAttached];
   try {
     const raw = window.localStorage.getItem(ATTACHED_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as AttachedRental[];
+    const disk = raw ? (JSON.parse(raw) as AttachedRental[]) : [];
+    const byId = new Map<string, AttachedRental>();
+    for (const a of disk) byId.set(a.id, a);
+    for (const a of memoryAttached) byId.set(a.id, a);
+    return Array.from(byId.values()).sort((a, b) =>
+      a.attachedAt < b.attachedAt ? 1 : -1
+    );
   } catch {
-    return [];
+    return [...memoryAttached];
   }
 }
 
-function saveAttached(list: AttachedRental[]) {
+function writeAttached(list: AttachedRental[]) {
+  memoryAttached = list;
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(ATTACHED_KEY, JSON.stringify(list));
-}
-
-function makeKey(): string {
-  const existing = new Set(loadOffers().map((o) => o.key));
-  for (let attempt = 0; attempt < 40; attempt++) {
-    let key = "";
-    for (let i = 0; i < 6; i++) {
-      key += KEY_ALPHABET[Math.floor(Math.random() * KEY_ALPHABET.length)];
-    }
-    if (!existing.has(key)) return key;
+  try {
+    window.localStorage.setItem(ATTACHED_KEY, JSON.stringify(list));
+  } catch {
+    /* ignore */
   }
-  return `K${Date.now().toString(36).slice(-5).toUpperCase()}`;
 }
 
 export function normalizeHandoffKey(raw: string): string {
   return raw.replace(/[^a-zA-Z0-9]/g, "").toUpperCase().slice(0, 6);
+}
+
+/** Fixed 6-char key for a pump id — same forever, all browsers */
+export function fixedKeyForPump(pumpId: string): string {
+  const entry = Object.entries(FIXED_KEYS).find(([, v]) => v.pumpId === pumpId);
+  if (entry) return entry[0];
+  const p = dummyPumps.find((d) => d.id === pumpId) ?? dummyPumps[0];
+  return normalizeHandoffKey(p.serial.padEnd(6, "X"));
 }
 
 export type IssueHandoffInput = {
@@ -93,44 +113,71 @@ export type IssueHandoffInput = {
   ownerPhone?: string;
 };
 
-/** Owner portal: create (or refresh) a unique key for this pump. */
+/** Owner portal: show the pump’s fixed key (works across browsers). */
 export function issueHandoffKey(input: IssueHandoffInput): HandoffOffer {
-  const list = loadOffers().filter(
-    (o) => !(o.pumpId === input.pumpId && o.status === "open")
-  );
-  const offer: HandoffOffer = {
-    key: makeKey(),
+  const key = fixedKeyForPump(input.pumpId);
+  const meta = FIXED_KEYS[key];
+  return {
+    key,
     pumpId: input.pumpId,
-    model: input.model,
-    serial: input.serial,
+    model: meta?.model ?? input.model,
+    serial: meta?.serial ?? input.serial,
     ownerName: input.ownerName ?? DEMO_OWNER.name,
     ownerPhone: input.ownerPhone ?? DEMO_OWNER.phone,
-    ratePerDayInr: input.ratePerDayInr,
+    ratePerDayInr: input.ratePerDayInr || meta?.ratePerDayInr || 700,
     createdAt: new Date().toISOString(),
     status: "open",
   };
-  list.unshift(offer);
-  saveOffers(list);
-  return offer;
 }
 
 export function getOpenOfferForPump(pumpId: string): HandoffOffer | null {
-  return (
-    loadOffers().find((o) => o.pumpId === pumpId && o.status === "open") ?? null
-  );
+  return issueHandoffKey({
+    pumpId,
+    model: dummyPumps.find((p) => p.id === pumpId)?.model ?? "Kronis 4",
+    serial: dummyPumps.find((p) => p.id === pumpId)?.serial ?? "",
+    ratePerDayInr: 700,
+  });
 }
 
-export function getOfferByKey(rawKey: string): HandoffOffer | null {
-  const key = normalizeHandoffKey(rawKey);
-  if (key.length < 4) return null;
-  return loadOffers().find((o) => o.key === key) ?? null;
+export function getLatestOpenOffer(): HandoffOffer | null {
+  return null;
 }
 
 export type ClaimResult =
   | { ok: true; rental: AttachedRental }
   | { ok: false; error: string };
 
-/** Rentee enters key → pump attaches to both. */
+function resolveOffer(key: string): HandoffOffer | null {
+  if (key === DEMO_ATTACH_KEY) {
+    const p = dummyPumps[0];
+    return {
+      key: DEMO_ATTACH_KEY,
+      pumpId: p.id,
+      model: p.model,
+      serial: p.serial,
+      ownerName: DEMO_OWNER.name,
+      ownerPhone: DEMO_OWNER.phone,
+      ratePerDayInr: 700,
+      createdAt: new Date().toISOString(),
+      status: "open",
+    };
+  }
+  const meta = FIXED_KEYS[key];
+  if (!meta) return null;
+  return {
+    key,
+    pumpId: meta.pumpId,
+    model: meta.model,
+    serial: meta.serial,
+    ownerName: DEMO_OWNER.name,
+    ownerPhone: DEMO_OWNER.phone,
+    ratePerDayInr: meta.ratePerDayInr,
+    createdAt: new Date().toISOString(),
+    status: "open",
+  };
+}
+
+/** Rentee enters fixed key (any browser) → pump attaches. */
 export function claimHandoffKey(
   rawKey: string,
   rentee?: { name: string; phone: string }
@@ -140,19 +187,21 @@ export function claimHandoffKey(
     return { ok: false, error: "Enter the 6-character key" };
   }
 
-  const offers = loadOffers();
-  const idx = offers.findIndex((o) => o.key === key);
-  if (idx < 0) return { ok: false, error: "Key not found" };
-
-  const offer = offers[idx];
-  if (offer.status === "claimed") {
-    const existing = loadAttached().find((a) => a.key === key);
-    if (existing) return { ok: true, rental: existing };
-    return { ok: false, error: "Key already used" };
+  const offer = resolveOffer(key);
+  if (!offer) {
+    return {
+      ok: false,
+      error: "Key not found — use KR007A / KR014B / KR021C",
+    };
   }
 
-  offers[idx] = { ...offer, status: "claimed" };
-  saveOffers(offers);
+  const existing = readAttached().find(
+    (a) =>
+      a.pumpId === offer.pumpId &&
+      a.renteePhone.replace(/[^\d]/g, "").slice(-10) ===
+        (rentee?.phone ?? DEMO_RENTEE.phone).replace(/[^\d]/g, "").slice(-10)
+  );
+  if (existing) return { ok: true, rental: existing };
 
   const rental: AttachedRental = {
     id: `att-${offer.pumpId}-${Date.now()}`,
@@ -169,17 +218,16 @@ export function claimHandoffKey(
     running: false,
   };
 
-  const attached = loadAttached().filter((a) => a.pumpId !== offer.pumpId);
+  const attached = readAttached().filter((a) => a.pumpId !== offer.pumpId);
   attached.unshift(rental);
-  saveAttached(attached);
-
+  writeAttached(attached);
   markListingUnavailable(offer.pumpId, offer.serial);
 
   return { ok: true, rental };
 }
 
 export function getAttachedForRentee(phone?: string): AttachedRental[] {
-  const list = loadAttached();
+  const list = readAttached();
   if (!phone) return list;
   const digits = phone.replace(/[^\d]/g, "").slice(-10);
   return list.filter(
@@ -191,15 +239,18 @@ export function getPrimaryAttached(phone?: string): AttachedRental | null {
   return getAttachedForRentee(phone)[0] ?? null;
 }
 
-export function setAttachedRunning(id: string, running: boolean): AttachedRental | null {
-  const list = loadAttached();
+export function setAttachedRunning(
+  id: string,
+  running: boolean
+): AttachedRental | null {
+  const list = readAttached();
   const idx = list.findIndex((a) => a.id === id);
   if (idx < 0) return null;
   list[idx] = { ...list[idx], running };
-  saveAttached(list);
+  writeAttached(list);
   return list[idx];
 }
 
 export function getAttachedById(id: string): AttachedRental | null {
-  return loadAttached().find((a) => a.id === id) ?? null;
+  return readAttached().find((a) => a.id === id) ?? null;
 }

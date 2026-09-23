@@ -8,7 +8,7 @@ import { dummyRentals, type RentalListing } from "@/data/dummy";
 import { getPrimaryAttached } from "@/lib/handoffKeys";
 import { getRentListings } from "@/lib/rentListings";
 import { kronis } from "@/lib/kronis";
-import { ArrowLeft, KeyRound, Phone, Plus, Search, UserRound } from "lucide-react";
+import { ArrowLeft, Gauge, KeyRound, Phone, Plus, Search, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -132,10 +132,23 @@ export default function RentalsPage() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (new URLSearchParams(window.location.search).get("attach") === "1") {
-      setEnterKeyOpen(true);
-    }
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("attach") !== "1") return;
+    setEnterKeyOpen(true);
+    // One-shot deep link — clear so Find doesn’t reopen the sheet by default
+    url.searchParams.delete("attach");
+    window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
   }, []);
+
+  const closeEnterKey = () => {
+    setEnterKeyOpen(false);
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.has("attach")) {
+      url.searchParams.delete("attach");
+      window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -159,7 +172,7 @@ export default function RentalsPage() {
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col" style={{ background: kronis.background }}>
-      <div className="relative z-20 flex items-center gap-3 px-3.5 pb-2 pt-2">
+      <div className="relative z-20 flex items-center gap-2.5 px-3.5 pb-2 pt-2">
         {isRentee ? (
           <SoftChip
             icon={UserRound}
@@ -180,34 +193,37 @@ export default function RentalsPage() {
               : `${session?.name ?? "Owner"} · manage listings`}
           </div>
         </div>
+        {isRentee ? (
+          <>
+            <SoftChip
+              icon={KeyRound}
+              onClick={() => setEnterKeyOpen(true)}
+              label="Attach key"
+              color={kronis.lime}
+            />
+            <div className="relative">
+              <SoftChip
+                icon={Gauge}
+                onClick={() => router.push("/rentals/my-pump")}
+                label="Start pump"
+                color={hasAttached ? kronis.lime : kronis.inkMuted}
+              />
+              {hasAttached ? (
+                <span
+                  className="absolute right-0.5 top-0.5 h-2 w-2 rounded-full"
+                  style={{
+                    background: kronis.lime,
+                    boxShadow: "0 0 0 1.5px #fff",
+                  }}
+                />
+              ) : null}
+            </div>
+          </>
+        ) : null}
       </div>
 
       {isRentee ? (
         <>
-          <div className="mx-3.5 mb-2 flex gap-2">
-            <button
-              type="button"
-              onClick={() => setEnterKeyOpen(true)}
-              className="flex flex-1 items-center justify-center gap-2 rounded-[14px] py-2.5 text-[13px] font-extrabold active:scale-[0.99]"
-              style={{ background: kronis.ink, color: kronis.lime }}
-            >
-              <KeyRound size={16} strokeWidth={2.4} />
-              Enter key
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/rentals/my-pump")}
-              className="flex flex-1 items-center justify-center gap-2 rounded-[14px] border py-2.5 text-[13px] font-extrabold active:scale-[0.99]"
-              style={{
-                background: kronis.surface,
-                borderColor: kronis.border,
-                color: kronis.ink,
-              }}
-            >
-              My pump
-            </button>
-          </div>
-
           <div
             className="relative mx-3.5 min-h-[220px] flex-[1.15] overflow-hidden rounded-[22px]"
             style={{
@@ -282,7 +298,7 @@ export default function RentalsPage() {
             open={enterKeyOpen}
             renteeName={session?.name}
             renteePhone={session?.phone}
-            onClose={() => setEnterKeyOpen(false)}
+            onClose={closeEnterKey}
             onAttached={() => {
               setHasAttached(true);
               setListings(getRentListings());

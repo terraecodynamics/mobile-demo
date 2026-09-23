@@ -3,18 +3,29 @@
 import { SoftButton } from "@/components/ui/SoftUi";
 import { SheetModal } from "@/components/ui/SheetModal";
 import { kronis } from "@/lib/kronis";
+import { Check } from "lucide-react";
 import { useEffect, useState } from "react";
 
-export type ListForRentPayload = {
-  ratePerDayInr: number;
+export type RentPumpOption = {
+  id: string;
   model: string;
+  serial: string;
+  number: number;
+};
+
+export type ListForRentPayload = {
+  pumpId: string;
+  model: string;
+  serial: string;
+  ratePerDayInr: number;
   available: boolean;
 };
 
 type Props = {
   open: boolean;
-  /** Kronis 4 | Kronis 4 – Pro */
-  model?: string;
+  pumps: RentPumpOption[];
+  /** Currently selected / default pump id */
+  selectedPumpId?: string;
   initialRate?: number;
   initialAvailable?: boolean;
   onClose: () => void;
@@ -23,7 +34,8 @@ type Props = {
 
 export function PutOnRentSheet({
   open,
-  model = "Kronis 4",
+  pumps,
+  selectedPumpId,
   initialRate = 700,
   initialAvailable = true,
   onClose,
@@ -31,27 +43,30 @@ export function PutOnRentSheet({
 }: Props) {
   const [rate, setRate] = useState(String(initialRate));
   const [available, setAvailable] = useState(initialAvailable);
-  const [pumpModel, setPumpModel] = useState(model);
+  const [pumpId, setPumpId] = useState(selectedPumpId ?? pumps[0]?.id ?? "");
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setRate(String(initialRate));
     setAvailable(initialAvailable);
-    setPumpModel(model);
+    setPumpId(selectedPumpId ?? pumps[0]?.id ?? "");
     setSaving(false);
-  }, [open, initialRate, initialAvailable, model]);
+  }, [open, initialRate, initialAvailable, selectedPumpId, pumps]);
 
+  const selected = pumps.find((p) => p.id === pumpId) ?? pumps[0];
   const rateNum = parseFloat(rate);
-  const canSave = Number.isFinite(rateNum) && rateNum > 0;
+  const canSave = !!selected && Number.isFinite(rateNum) && rateNum > 0;
 
   const save = () => {
-    if (!canSave) return;
+    if (!canSave || !selected) return;
     setSaving(true);
     window.setTimeout(() => {
       onSaved?.({
+        pumpId: selected.id,
+        model: selected.model,
+        serial: selected.serial,
         ratePerDayInr: rateNum,
-        model: pumpModel,
         available,
       });
       setSaving(false);
@@ -63,7 +78,7 @@ export function PutOnRentSheet({
     <SheetModal
       open={open}
       onClose={onClose}
-      maxHeight="68%"
+      maxHeight="72%"
       dim
       header={
         <div
@@ -77,7 +92,7 @@ export function PutOnRentSheet({
       <button
         type="button"
         onClick={() => setAvailable((v) => !v)}
-        className="mb-4 flex w-full items-center justify-between rounded-[16px] border px-3.5 py-3.5"
+        className="mb-3.5 flex w-full items-center justify-between rounded-[16px] border px-3.5 py-3.5"
         style={{ background: kronis.surface, borderColor: kronis.border }}
       >
         <span className="text-[15px] font-extrabold" style={{ color: kronis.ink }}>
@@ -94,22 +109,50 @@ export function PutOnRentSheet({
         </span>
       </button>
 
-      <div className="mb-4 flex gap-2">
-        {(["Kronis 4", "Kronis 4 – Pro"] as const).map((m) => {
-          const active = pumpModel === m;
+      <div
+        className="mb-2 text-[12px] font-bold uppercase tracking-[0.6px]"
+        style={{ color: kronis.inkMuted }}
+      >
+        Pump · {pumps.length}
+      </div>
+      <div className="no-scrollbar mb-4 flex max-h-[200px] flex-col gap-1.5 overflow-y-auto">
+        {pumps.map((p) => {
+          const active = p.id === selected?.id;
           return (
             <button
-              key={m}
+              key={p.id}
               type="button"
-              onClick={() => setPumpModel(m)}
-              className="flex-1 rounded-[14px] py-2.5 text-[13px] font-extrabold"
+              onClick={() => setPumpId(p.id)}
+              className="flex w-full items-center gap-3 rounded-[14px] px-3 py-3 text-left active:scale-[0.99]"
               style={{
                 background: active ? kronis.limeSoft : "#e8eaed",
-                color: active ? kronis.lime : kronis.inkMuted,
-                border: active ? `1.5px solid ${kronis.lime}` : "1.5px solid transparent",
+                border: active
+                  ? `1.5px solid ${kronis.lime}`
+                  : "1.5px solid transparent",
               }}
             >
-              {m}
+              <span className="min-w-0 flex-1">
+                <span
+                  className="block truncate text-[15px] font-extrabold"
+                  style={{ color: active ? kronis.lime : kronis.ink }}
+                >
+                  {p.model}
+                </span>
+                <span
+                  className="mt-0.5 block text-[12px] font-semibold"
+                  style={{ color: kronis.inkMuted }}
+                >
+                  {p.serial}
+                </span>
+              </span>
+              {active ? (
+                <span
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                  style={{ background: kronis.ink }}
+                >
+                  <Check size={14} color={kronis.lime} strokeWidth={3} />
+                </span>
+              ) : null}
             </button>
           );
         })}
