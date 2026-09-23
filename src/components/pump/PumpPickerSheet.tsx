@@ -9,11 +9,14 @@ import { Check, ChevronRight, LayoutGrid, Plus } from "lucide-react";
 export type PickerPump = {
   id: string;
   name: string;
+  model?: string;
+  serial?: string;
   number: number;
   online: boolean;
   running: boolean;
 };
 
+/** Matches native PumpPickerModal deviceStatus */
 function deviceStatus(device: PickerPump) {
   if (!device.online) {
     return { label: "Offline", color: kronis.inkMuted, bg: kronis.offline };
@@ -106,21 +109,31 @@ export function PumpPickerSheet({
                     className="block truncate text-[16px] font-bold"
                     style={{ color: kronis.ink }}
                   >
-                    {p.name}
+                    {p.model ?? p.name}
                   </span>
-                  <span
-                    className="mt-1 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5"
-                    style={{ background: status.bg }}
-                  >
+                  <span className="mt-1 flex flex-wrap items-center gap-1.5">
+                    {p.serial ? (
+                      <span
+                        className="text-[12px] font-semibold"
+                        style={{ color: kronis.inkMuted }}
+                      >
+                        {p.serial}
+                      </span>
+                    ) : null}
                     <span
-                      className="h-1.5 w-1.5 rounded-full"
-                      style={{ background: status.color }}
-                    />
-                    <span
-                      className="text-[11px] font-bold"
-                      style={{ color: status.color }}
+                      className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5"
+                      style={{ background: status.bg }}
                     >
-                      {status.label}
+                      <span
+                        className="h-1.5 w-1.5 rounded-full"
+                        style={{ background: status.color }}
+                      />
+                      <span
+                        className="text-[11px] font-bold"
+                        style={{ color: status.color }}
+                      >
+                        {status.label}
+                      </span>
                     </span>
                   </span>
                 </span>

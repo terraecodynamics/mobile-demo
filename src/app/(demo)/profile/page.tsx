@@ -3,7 +3,8 @@
 import { useAuth } from "@/components/auth/AuthProvider";
 import { PumpMapMarker } from "@/components/pump/PumpMapMarker";
 import { SoftChip, SoftButton } from "@/components/ui/SoftUi";
-import { dummyPumps, dummyUser, rentalListings } from "@/data/dummy";
+import { dummyPumps, dummyUser } from "@/data/dummy";
+import { getRentListings } from "@/lib/rentListings";
 import { homePathForRole } from "@/lib/auth";
 import { kronis } from "@/lib/kronis";
 import {
@@ -36,12 +37,6 @@ function maskMobile(mobile: string | undefined) {
   if (s.length < 6) return s;
   return `${s.slice(0, 4)} ${s.slice(4, 8)} ${s.slice(8, 10)}xxx`;
 }
-
-const PUMP_META: Record<string, { model: string; serial: string; power: string }> = {
-  p1: { model: "Kronis 4", serial: "KR-007", power: "Solar" },
-  p2: { model: "Kronis 4", serial: "KR-014", power: "Solar" },
-  p3: { model: "Kronis 4 – Pro", serial: "KR-021", power: "Solar" },
-};
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -103,7 +98,7 @@ export default function ProfilePage() {
   }, [fieldCount]);
 
   const nearbyAvailable = useMemo(
-    () => rentalListings.filter((l) => l.available).length,
+    () => getRentListings().filter((l) => l.available).length,
     []
   );
 
@@ -218,7 +213,7 @@ export default function ProfilePage() {
               </span>
               <span className="min-w-0 flex-1">
                 <span className="block text-[16px] font-extrabold" style={{ color: kronis.ink }}>
-                  Find pumps
+                  Find
                 </span>
                 <span className="mt-0.5 block text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
                   {nearbyAvailable} available nearby
@@ -270,10 +265,7 @@ export default function ProfilePage() {
             </div>
 
             {dummyPumps.map((p) => {
-              const meta = PUMP_META[p.id];
-              const line = meta
-                ? [meta.model, meta.serial, meta.power].join(" · ")
-                : "TerraEco pump";
+              const line = `${p.serial} · Solar`;
               return (
                 <button
                   key={p.id}
@@ -301,7 +293,7 @@ export default function ProfilePage() {
                       className="block truncate text-[16px] font-extrabold"
                       style={{ color: kronis.ink }}
                     >
-                      {p.name}
+                      {p.model}
                     </span>
                     <span
                       className="mt-0.5 block text-[12px] font-semibold leading-4"

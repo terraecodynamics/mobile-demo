@@ -12,6 +12,10 @@ import {
   WateringTimesSheet,
   type SchedulePayload,
 } from "@/components/pump/WateringTimesSheet";
+import {
+  PutOnRentSheet,
+  type ListForRentPayload,
+} from "@/components/rental/PutOnRentSheet";
 import { SoftButton, SoftChip } from "@/components/ui/SoftUi";
 import { SheetModal } from "@/components/ui/SheetModal";
 import {
@@ -21,6 +25,7 @@ import {
   dummyWeeklyStats,
   type DummyPump,
 } from "@/data/dummy";
+import { getPublishedForPump, publishPumpForRent } from "@/lib/rentListings";
 import { kronis } from "@/lib/kronis";
 import {
   buildHomePumpsFromAssignments,
@@ -72,13 +77,15 @@ export default function HomePage() {
   const [metricsOpen, setMetricsOpen] = useState(false);
   const [soilTargetOpen, setSoilTargetOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [rentOpen, setRentOpen] = useState(false);
+  const [rentToast, setRentToast] = useState<string | null>(null);
   const [moistureRule, setMoistureRule] = useState<SoilTargetPayload>({
     startBelow: 30,
     stopAbove: 60,
     isEnabled: true,
   });
   const [scheduleRule, setScheduleRule] = useState<SchedulePayload | null>(null);
-  const [mode, setMode] = useState<"manual" | "auto">("manual");
+  const [mode, setMode] = useState<"manual" | "auto" | "rental">("manual");
   const [timerMinutes, setTimerMinutes] = useState(0);
   const [remainingMinutes, setRemainingMinutes] = useState<number | null>(null);
   const [muted, setMuted] = useState(false);
@@ -125,17 +132,30 @@ export default function HomePage() {
     [geoTick]
   );
 
+  /** All catalog pumps (online + offline); geofence only updates map seat/field */
   const pumps: DummyPump[] = useMemo(() => {
-    if (geofenceScene?.pumps?.length) return geofenceScene.pumps;
-    return dummyPumps;
+    const geoById = new Map(
+      (geofenceScene?.pumps ?? []).map((p) => [p.id, p] as const)
+    );
+    return dummyPumps.map((d) => {
+      const geo = geoById.get(d.id);
+      if (!geo) return d;
+      return {
+        ...d,
+        lat: geo.lat,
+        lng: geo.lng,
+        field: geo.field?.length ? geo.field : d.field,
+      };
+    });
   }, [geofenceScene]);
 
   const fenceFields = geofenceScene?.fences;
 
   useEffect(() => {
-    if (!geofenceScene?.pumps?.length) return;
-    setSelectedId(geofenceScene.pumps[0].id);
-  }, [geofenceScene]);
+    if (!pumps.length) return;
+    if (pumps.some((p) => p.id === selectedId)) return;
+    setSelectedId(pumps[0].id);
+  }, [pumps, selectedId]);
 
   useEffect(() => {
     const el = stageRef.current;
@@ -265,7 +285,8 @@ export default function HomePage() {
     >
       <PumpHomeAppBar
         initials={dummyUser.initials}
-        deviceName={pump.name}
+        deviceName={pump.model}
+        deviceSerial={pump.serial}
         deviceNumber={pump.number}
         running={running}
         unread={unread}
@@ -352,7 +373,7 @@ export default function HomePage() {
               onMetrics={() => setMetricsOpen(true)}
               onOpenSoilMoisture={() => setSoilTargetOpen(true)}
               onOpenSchedule={() => setScheduleOpen(true)}
-              onOpenRentals={() => router.push("/rentals")}
+              onOpenRentals={() => setRentOpen(true)}
               moistureEnabled={moistureRule.isEnabled}
               moistureSubtitle={
                 moistureRule.isEnabled
@@ -370,6 +391,8 @@ export default function HomePage() {
         pumps={pumps.map((p) => ({
           id: p.id,
           name: p.name,
+          model: p.model,
+          serial: p.serial,
           number: p.number,
           online: p.online,
           running: p.id === selectedId ? running : p.running,
@@ -447,6 +470,44 @@ export default function HomePage() {
         onClose={() => setScheduleOpen(false)}
         onSaved={(payload) => setScheduleRule(payload)}
       />
+
+      <PutOnRentSheet
+        open={rentOpen}
+        model={getPublishedForPump(pump.id)?.model ?? pump.model}
+        initialRate={getPublishedForPump(pump.id)?.ratePerDayInr ?? 700}
+        initialAvailable={getPublishedForPump(pump.id)?.available ?? true}
+        onClose={() => {
+          setRentOpen(false);
+          if (mode === "rental") setMode("manual");
+        }}
+        onSaved={(payload: ListForRentPayload) => {
+          const unitLabel = `${payload.model} · ${pump.serial}`;
+          publishPumpForRent({
+            pumpId: pump.id,
+            pumpName: unitLabel,
+            lat: pump.lat,
+            lng: pump.lng,
+            model: payload.model,
+            serial: pump.serial,
+            ratePerDayInr: payload.ratePerDayInr,
+            available: payload.available,
+          });
+          setRentToast(
+            payload.available ? `Listed · ${unitLabel}` : `Unlisted · ${unitLabel}`
+          );
+          window.setTimeout(() => setRentToast(null), 2400);
+          setMode("manual");
+        }}
+      />
+
+      {rentToast ? (
+        <div
+          className="pointer-events-none absolute inset-x-4 bottom-6 z-40 rounded-2xl px-4 py-3 text-center text-[13px] font-bold text-white shadow-lg"
+          style={{ background: "rgba(23,26,18,0.92)" }}
+        >
+          {rentToast}
+        </div>
+      ) : null}
     </div>
   );
 }

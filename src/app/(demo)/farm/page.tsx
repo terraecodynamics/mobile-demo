@@ -1927,11 +1927,19 @@ export default function FarmPage() {
                         compact
                       />
                     </span>
-                    <span
-                      className="min-w-0 flex-1 truncate text-[14px] font-bold"
-                      style={{ color: kronis.ink }}
-                    >
-                      {p.name}
+                    <span className="min-w-0 flex-1">
+                      <span
+                        className="block truncate text-[14px] font-bold"
+                        style={{ color: kronis.ink }}
+                      >
+                        {p.model}
+                      </span>
+                      <span
+                        className="mt-0.5 block text-[11px] font-semibold"
+                        style={{ color: kronis.inkMuted }}
+                      >
+                        {p.serial}
+                      </span>
                     </span>
                     {checked ? (
                       <Check size={20} color={kronis.ink} strokeWidth={2.5} />

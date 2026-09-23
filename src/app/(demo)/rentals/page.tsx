@@ -3,11 +3,12 @@
 import { useAuth } from "@/components/auth/AuthProvider";
 import { RentalDiscoverMap } from "@/components/rental/RentalDiscoverMap";
 import { SoftChip, SoftRaised, SoftButton } from "@/components/ui/SoftUi";
-import { dummyRentals, rentalListings, type RentalListing } from "@/data/dummy";
+import { dummyRentals, type RentalListing } from "@/data/dummy";
+import { getRentListings } from "@/lib/rentListings";
 import { kronis } from "@/lib/kronis";
 import { ArrowLeft, Phone, Plus, Search, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const statusColor = {
   ACTIVE: kronis.lime,
@@ -51,9 +52,10 @@ function ListingCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="truncate font-extrabold" style={{ color: kronis.ink }}>
-              {listing.pumpName}
+              {listing.model}
             </div>
             <div className="mt-0.5 truncate text-sm" style={{ color: kronis.inkMuted }}>
+              {listing.serial ? `${listing.serial} · ` : null}
               {listing.ownerName} · {listing.village}
             </div>
           </div>
@@ -70,7 +72,7 @@ function ListingCard({
 
         <div className="mt-2.5 flex items-center justify-between gap-2">
           <div className="text-sm" style={{ color: kronis.inkMuted }}>
-            {listing.model} · {listing.distanceKm.toFixed(1)} km
+            {listing.distanceKm.toFixed(1)} km
           </div>
           <div className="font-extrabold" style={{ color: kronis.ink }}>
             ₹{listing.ratePerDayInr}
@@ -105,24 +107,36 @@ export default function RentalsPage() {
   const { session } = useAuth();
   const isRentee = session?.role === "rentee";
 
+  const [listings, setListings] = useState<RentalListing[]>([]);
   const [query, setQuery] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(
-    rentalListings.find((l) => l.available)?.id ?? rentalListings[0]?.id ?? null
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [phone, setPhone] = useState("");
 
+  useEffect(() => {
+    const list = getRentListings();
+    setListings(list);
+    setSelectedId(
+      (prev) =>
+        prev ??
+        list.find((l) => l.available)?.id ??
+        list[0]?.id ??
+        null
+    );
+  }, []);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return rentalListings;
-    return rentalListings.filter(
+    if (!q) return listings;
+    return listings.filter(
       (l) =>
         l.pumpName.toLowerCase().includes(q) ||
         l.village.toLowerCase().includes(q) ||
         l.ownerName.toLowerCase().includes(q) ||
-        l.model.toLowerCase().includes(q)
+        l.model.toLowerCase().includes(q) ||
+        (l.serial ?? "").toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, listings]);
 
   const selected = filtered.find((l) => l.id === selectedId) ?? filtered[0] ?? null;
 
@@ -146,11 +160,11 @@ export default function RentalsPage() {
         )}
         <div className="min-w-0 flex-1">
           <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
-            {isRentee ? "Find pumps" : "My rentals"}
+            {isRentee ? "Find" : "My rentals"}
           </div>
           <div className="truncate text-xs" style={{ color: kronis.inkMuted }}>
             {isRentee
-              ? `${session?.name ?? "Rentee"} · nearby map`
+              ? `${session?.name ?? "Rentee"} · nearby`
               : `${session?.name ?? "Owner"} · manage listings`}
           </div>
         </div>
@@ -185,7 +199,7 @@ export default function RentalsPage() {
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search village or pump…"
+                  placeholder="Search village…"
                   className="min-w-0 flex-1 bg-transparent text-[14px] outline-none"
                   style={{ color: kronis.ink }}
                 />
@@ -213,7 +227,7 @@ export default function RentalsPage() {
                 className="rounded-[18px] px-4 py-8 text-center text-sm font-semibold"
                 style={{ color: kronis.inkMuted, background: "#e8eaed" }}
               >
-                No pumps match “{query}”
+                No matches for “{query}”
               </div>
             ) : (
               filtered.map((listing) => (

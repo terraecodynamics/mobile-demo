@@ -605,7 +605,7 @@ export function buildHomeGeofenceScene(basePump?: {
     })),
     pump: {
       id: basePump?.id ?? "p1",
-      name: basePump?.name ?? "Test Pump 007",
+      name: basePump?.name ?? "Kronis 4 · KR-007",
       number: 1,
       online: true,
       running: false,

@@ -1,15 +1,16 @@
 "use client";
 
 import { NeoModeButton } from "@/components/ui/NeoModeButton";
+import { SoftButton } from "@/components/ui/SoftUi";
 import { PumpDial } from "@/components/pump/PumpDial";
 import { MetricsPill } from "@/components/pump/MetricsPill";
 import { kronis } from "@/lib/kronis";
-import { Clock, Droplets, Pencil } from "lucide-react";
+import { CalendarDays, Clock, Droplets, Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type Props = {
-  mode: "manual" | "auto";
-  onModeChange: (m: "manual" | "auto") => void;
+  mode: "manual" | "auto" | "rental";
+  onModeChange: (m: "manual" | "auto" | "rental") => void;
   statusTitle: string;
   statusSubtitle: string;
   timerMinutes: number;
@@ -176,8 +177,11 @@ export function PumpControlSheet({
         <NeoModeButton
           label="Rental"
           icon="calendar"
-          selected={false}
-          onClick={() => onOpenRentals?.()}
+          selected={mode === "rental"}
+          onClick={() => {
+            onModeChange("rental");
+            onOpenRentals?.();
+          }}
           compact
         />
       </div>
@@ -235,6 +239,26 @@ export function PumpControlSheet({
                 onToggle={onToggle}
                 onTimerChange={onTimerChange}
               />
+            ) : mode === "rental" ? (
+              <div className="flex w-full max-w-[300px] flex-col items-center gap-3 self-center px-2 py-2 text-center">
+                <span
+                  className="flex h-14 w-14 items-center justify-center rounded-2xl"
+                  style={{ background: kronis.limeSoft }}
+                >
+                  <CalendarDays size={28} color={kronis.lime} strokeWidth={2.1} />
+                </span>
+                <div>
+                  <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
+                    List for rent
+                  </div>
+                </div>
+                <SoftButton
+                  label="List"
+                  variant="orange"
+                  className="w-full"
+                  onClick={() => onOpenRentals?.()}
+                />
+              </div>
             ) : (
               <div className="flex w-full max-w-[320px] items-stretch gap-3 self-center py-1">
                 <AutoCard
