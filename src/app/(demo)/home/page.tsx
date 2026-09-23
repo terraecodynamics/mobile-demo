@@ -352,6 +352,7 @@ export default function HomePage() {
               onMetrics={() => setMetricsOpen(true)}
               onOpenSoilMoisture={() => setSoilTargetOpen(true)}
               onOpenSchedule={() => setScheduleOpen(true)}
+              onOpenRentals={() => router.push("/rentals")}
               moistureEnabled={moistureRule.isEnabled}
               moistureSubtitle={
                 moistureRule.isEnabled

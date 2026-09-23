@@ -25,6 +25,22 @@ export type DummyRental = {
   amountInr: number;
 };
 
+/** Pumps listed for rent on the map (rentee discovery) */
+export type RentalListing = {
+  id: string;
+  pumpName: string;
+  ownerName: string;
+  ownerPhone: string;
+  village: string;
+  ratePerDayInr: number;
+  /** Kronis product model, e.g. Kronis 4 / Kronis 4 – Pro */
+  model: string;
+  available: boolean;
+  lat: number;
+  lng: number;
+  distanceKm: number;
+};
+
 export type DummyNotification = {
   id: string;
   title: string;
@@ -140,6 +156,75 @@ export const dummyRentals: DummyRental[] = [
     endDate: "2026-10-02",
     status: "UPCOMING",
     amountInr: 4200,
+  },
+];
+
+/** Nearby geo-tagged pumps available to rent (rentee map) */
+export const rentalListings: RentalListing[] = [
+  {
+    id: "rl1",
+    pumpName: "Test Pump 007",
+    ownerName: "Terra Demo",
+    ownerPhone: "+919876543210",
+    village: "Puri · Green Valley",
+    ratePerDayInr: 700,
+    model: "Kronis 4",
+    available: true,
+    lat: 19.884193,
+    lng: 86.02015,
+    distanceKm: 0.2,
+  },
+  {
+    id: "rl2",
+    pumpName: "North Field Pump",
+    ownerName: "Bikash Nayak",
+    ownerPhone: "+919887766554",
+    village: "Balukhanda",
+    ratePerDayInr: 550,
+    model: "Kronis 4",
+    available: true,
+    lat: 19.883856,
+    lng: 86.01971,
+    distanceKm: 0.4,
+  },
+  {
+    id: "rl3",
+    pumpName: "Canal Pump",
+    ownerName: "Sunita Das",
+    ownerPhone: "+919012344556",
+    village: "Gop",
+    ratePerDayInr: 800,
+    model: "Kronis 4 – Pro",
+    available: false,
+    lat: 19.88355,
+    lng: 86.02005,
+    distanceKm: 0.6,
+  },
+  {
+    id: "rl4",
+    pumpName: "River Bend Pump",
+    ownerName: "Pradeep Mohanty",
+    ownerPhone: "+919445566778",
+    village: "Konark road",
+    ratePerDayInr: 650,
+    model: "Kronis 4",
+    available: true,
+    lat: 19.8819,
+    lng: 86.0224,
+    distanceKm: 1.1,
+  },
+  {
+    id: "rl5",
+    pumpName: "East Plot Pump",
+    ownerName: "Meena Sahoo",
+    ownerPhone: "+919778899001",
+    village: "Satapada side",
+    ratePerDayInr: 500,
+    model: "Kronis 4 – Pro",
+    available: true,
+    lat: 19.8862,
+    lng: 86.0178,
+    distanceKm: 1.4,
   },
 ];
 

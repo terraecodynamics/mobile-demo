@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 type Props = {
   label: string;
-  icon?: "power" | "flash";
+  icon?: "power" | "flash" | "calendar";
   selected?: boolean;
   onClick?: () => void;
   compact?: boolean;
@@ -125,6 +125,26 @@ export function NeoModeButton({
                   stroke={ink}
                   strokeWidth={2}
                   strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              </svg>
+            ) : icon === "calendar" ? (
+              <svg width={iconPx} height={iconPx} viewBox="0 0 24 24" className="shrink-0">
+                <rect
+                  x="3.5"
+                  y="5"
+                  width="17"
+                  height="15"
+                  rx="2.5"
+                  fill="none"
+                  stroke={ink}
+                  strokeWidth={2}
+                />
+                <path
+                  d="M8 3.5v3.5M16 3.5v3.5M3.5 10h17"
+                  fill="none"
+                  stroke={ink}
+                  strokeWidth={2}
                   strokeLinecap="round"
                 />
               </svg>

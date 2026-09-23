@@ -23,6 +23,7 @@ type Props = {
   onMetrics?: () => void;
   onOpenSoilMoisture?: () => void;
   onOpenSchedule?: () => void;
+  onOpenRentals?: () => void;
   moistureEnabled?: boolean;
   moistureSubtitle?: string | null;
   scheduleEnabled?: boolean;
@@ -116,6 +117,7 @@ export function PumpControlSheet({
   onMetrics,
   onOpenSoilMoisture,
   onOpenSchedule,
+  onOpenRentals,
   moistureEnabled = false,
   moistureSubtitle = null,
   scheduleEnabled = false,
@@ -155,19 +157,28 @@ export function PumpControlSheet({
       className="flex h-full min-h-0 flex-col"
       style={{ background: kronis.background }}
     >
-      {/* Mode row — clip raised shadows so they don't cover status */}
-      <div className="relative z-[3] flex shrink-0 gap-3 overflow-hidden px-3 pb-1 pt-3">
+      {/* Mode row — Manual · Automatic · Rental */}
+      <div className="relative z-[3] flex shrink-0 gap-2 overflow-hidden px-2.5 pb-1 pt-3">
         <NeoModeButton
           label="Manual"
           icon="power"
           selected={mode === "manual"}
           onClick={() => onModeChange("manual")}
+          compact
         />
         <NeoModeButton
           label="Automatic"
           icon="flash"
           selected={mode === "auto"}
           onClick={() => onModeChange("auto")}
+          compact
+        />
+        <NeoModeButton
+          label="Rental"
+          icon="calendar"
+          selected={false}
+          onClick={() => onOpenRentals?.()}
+          compact
         />
       </div>
 
