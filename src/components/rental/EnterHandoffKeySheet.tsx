@@ -60,8 +60,9 @@ export function EnterHandoffKeySheet({
     <SheetModal
       open={open}
       onClose={onClose}
-      maxHeight="62%"
-      dim
+      height="100%"
+      maxHeight="100%"
+      className="min-h-0 rounded-t-[22px]"
       header={
         <div
           className="text-[22px] font-extrabold tracking-[-0.3px]"
@@ -71,67 +72,71 @@ export function EnterHandoffKeySheet({
         </div>
       }
     >
-      <p
-        className="mb-3 text-[14px] font-semibold leading-snug"
-        style={{ color: kronis.inkMuted }}
-      >
-        Enter the owner’s key (same code works in any browser).
-      </p>
-
-      <input
-        value={code}
-        onChange={(e) => {
-          setCode(normalizeHandoffKey(e.target.value));
-          setError(null);
-        }}
-        maxLength={6}
-        autoCapitalize="characters"
-        autoCorrect="off"
-        spellCheck={false}
-        placeholder="······"
-        className="mb-2 w-full rounded-xl border-0 px-3 py-4 text-center font-mono text-[28px] font-extrabold tracking-[0.35em] outline-none"
-        style={{
-          background: kronis.background,
-          color: kronis.ink,
-          boxShadow:
-            "inset 2px 2px 6px rgba(163,177,198,0.3), inset -1px -1px 4px rgba(255,255,255,0.9)",
-        }}
-      />
-
-      {error ? (
-        <div
-          className="mb-2 text-center text-[13px] font-bold"
-          style={{ color: "#C2410C" }}
+      <div className="flex min-h-0 flex-1 flex-col">
+        <p
+          className="mb-3 text-[14px] font-semibold leading-snug"
+          style={{ color: kronis.inkMuted }}
         >
-          {error}
-        </div>
-      ) : (
-        <div className="mb-2 h-5" />
-      )}
+          Enter the owner’s key (same code works in any browser).
+        </p>
 
-      <div className="mb-3 flex flex-wrap justify-center gap-1.5">
-        {HINTS.map((k) => (
-          <button
-            key={k}
-            type="button"
-            onClick={() => {
-              setCode(k);
-              setError(null);
-            }}
-            className="rounded-full px-2.5 py-1 font-mono text-[11px] font-bold active:scale-[0.98]"
-            style={{ background: "#e8eaed", color: kronis.inkMuted }}
+        <input
+          value={code}
+          onChange={(e) => {
+            setCode(normalizeHandoffKey(e.target.value));
+            setError(null);
+          }}
+          maxLength={6}
+          autoCapitalize="characters"
+          autoCorrect="off"
+          spellCheck={false}
+          placeholder="······"
+          className="mb-2 w-full rounded-xl border-0 px-3 py-4 text-center font-mono text-[28px] font-extrabold tracking-[0.35em] outline-none"
+          style={{
+            background: kronis.background,
+            color: kronis.ink,
+            boxShadow:
+              "inset 2px 2px 6px rgba(163,177,198,0.3), inset -1px -1px 4px rgba(255,255,255,0.9)",
+          }}
+        />
+
+        {error ? (
+          <div
+            className="mb-2 text-center text-[13px] font-bold"
+            style={{ color: "#C2410C" }}
           >
-            {k}
-          </button>
-        ))}
-      </div>
+            {error}
+          </div>
+        ) : (
+          <div className="mb-2 h-5" />
+        )}
 
-      <SoftButton
-        label={busy ? "…" : "Attach pump"}
-        variant="orange"
-        className="w-full"
-        onClick={() => submit()}
-      />
+        <div className="mb-3 flex flex-wrap justify-center gap-1.5">
+          {HINTS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => {
+                setCode(k);
+                setError(null);
+              }}
+              className="rounded-full px-2.5 py-1 font-mono text-[11px] font-bold active:scale-[0.98]"
+              style={{ background: "#e8eaed", color: kronis.inkMuted }}
+            >
+              {k}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-auto">
+          <SoftButton
+            label={busy ? "…" : "Attach pump"}
+            variant="orange"
+            className="w-full"
+            onClick={() => submit()}
+          />
+        </div>
+      </div>
     </SheetModal>
   );
 }

@@ -199,14 +199,14 @@ export default function RentalsPage() {
               icon={KeyRound}
               onClick={() => setEnterKeyOpen(true)}
               label="Attach key"
-              color={kronis.lime}
+              color={kronis.ink}
             />
             <div className="relative">
               <SoftChip
                 icon={Gauge}
                 onClick={() => router.push("/rentals/my-pump")}
                 label="Start pump"
-                color={hasAttached ? kronis.lime : kronis.inkMuted}
+                color={kronis.ink}
               />
               {hasAttached ? (
                 <span
@@ -273,38 +273,40 @@ export default function RentalsPage() {
             </div>
           </div>
 
-          <div className="no-scrollbar mt-3 min-h-0 flex-1 space-y-2.5 overflow-y-auto px-3.5 pb-6">
-            {filtered.length === 0 ? (
-              <div
-                className="rounded-[18px] px-4 py-8 text-center text-sm font-semibold"
-                style={{ color: kronis.inkMuted, background: "#e8eaed" }}
-              >
-                No matches for “{query}”
-              </div>
-            ) : (
-              filtered.map((listing) => (
-                <ListingCard
-                  key={listing.id}
-                  listing={listing}
-                  selected={listing.id === selected?.id}
-                  onSelect={() => setSelectedId(listing.id)}
-                  onCall={() => callPhone(listing.ownerPhone)}
-                />
-              ))
-            )}
-          </div>
+          <div className="relative mt-3 min-h-0 flex-1">
+            <div className="no-scrollbar h-full space-y-2.5 overflow-y-auto px-3.5 pb-6">
+              {filtered.length === 0 ? (
+                <div
+                  className="rounded-[18px] px-4 py-8 text-center text-sm font-semibold"
+                  style={{ color: kronis.inkMuted, background: "#e8eaed" }}
+                >
+                  No matches for “{query}”
+                </div>
+              ) : (
+                filtered.map((listing) => (
+                  <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    selected={listing.id === selected?.id}
+                    onSelect={() => setSelectedId(listing.id)}
+                    onCall={() => callPhone(listing.ownerPhone)}
+                  />
+                ))
+              )}
+            </div>
 
-          <EnterHandoffKeySheet
-            open={enterKeyOpen}
-            renteeName={session?.name}
-            renteePhone={session?.phone}
-            onClose={closeEnterKey}
-            onAttached={() => {
-              setHasAttached(true);
-              setListings(getRentListings());
-              router.push("/rentals/my-pump");
-            }}
-          />
+            <EnterHandoffKeySheet
+              open={enterKeyOpen}
+              renteeName={session?.name}
+              renteePhone={session?.phone}
+              onClose={closeEnterKey}
+              onAttached={() => {
+                setHasAttached(true);
+                setListings(getRentListings());
+                router.push("/rentals/my-pump");
+              }}
+            />
+          </div>
         </>
       ) : (
         <>
