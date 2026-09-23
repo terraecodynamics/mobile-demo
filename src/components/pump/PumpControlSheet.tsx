@@ -1,15 +1,16 @@
 "use client";
 
 import { NeoModeButton } from "@/components/ui/NeoModeButton";
+import { SoftButton } from "@/components/ui/SoftUi";
 import { PumpDial } from "@/components/pump/PumpDial";
 import { MetricsPill } from "@/components/pump/MetricsPill";
 import { kronis } from "@/lib/kronis";
-import { Clock, Droplets, Pencil } from "lucide-react";
+import { CalendarDays, Clock, Droplets, Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type Props = {
-  mode: "manual" | "auto";
-  onModeChange: (m: "manual" | "auto") => void;
+  mode: "manual" | "auto" | "rental";
+  onModeChange: (m: "manual" | "auto" | "rental") => void;
   statusTitle: string;
   statusSubtitle: string;
   timerMinutes: number;
@@ -23,6 +24,9 @@ type Props = {
   onMetrics?: () => void;
   onOpenSoilMoisture?: () => void;
   onOpenSchedule?: () => void;
+  onOpenRentals?: () => void;
+  /** Show / generate unique handoff key for rentee */
+  onOpenHandoffKey?: () => void;
   moistureEnabled?: boolean;
   moistureSubtitle?: string | null;
   scheduleEnabled?: boolean;
@@ -116,6 +120,8 @@ export function PumpControlSheet({
   onMetrics,
   onOpenSoilMoisture,
   onOpenSchedule,
+  onOpenRentals,
+  onOpenHandoffKey,
   moistureEnabled = false,
   moistureSubtitle = null,
   scheduleEnabled = false,
@@ -155,61 +161,79 @@ export function PumpControlSheet({
       className="flex h-full min-h-0 flex-col"
       style={{ background: kronis.background }}
     >
-      {/* Mode row — clip raised shadows so they don't cover status */}
-      <div className="relative z-[3] flex shrink-0 gap-3 overflow-hidden px-3 pb-1 pt-3">
+      {/* Mode row — Manual · Automatic · Rental */}
+      <div
+        className="relative z-[3] flex shrink-0 gap-2 overflow-hidden px-2.5 pb-1.5 pt-3"
+        style={{ background: kronis.background }}
+      >
         <NeoModeButton
           label="Manual"
           icon="power"
           selected={mode === "manual"}
           onClick={() => onModeChange("manual")}
+          compact
         />
         <NeoModeButton
           label="Automatic"
           icon="flash"
           selected={mode === "auto"}
           onClick={() => onModeChange("auto")}
+          compact
+        />
+        <NeoModeButton
+          label="Rental"
+          icon="calendar"
+          selected={mode === "rental"}
+          onClick={() => onModeChange("rental")}
+          compact
         />
       </div>
 
       <div
         ref={bodyRef}
         className="relative z-[1] flex min-h-0 flex-1 flex-col px-5"
-        style={{ paddingBottom: 12, gap: 10 }}
+        style={{
+          background: kronis.background,
+          paddingBottom: mode === "rental" ? 8 : 12,
+          gap: mode === "rental" ? 8 : 10,
+        }}
       >
-        {/* Status — always fully visible (native statusBlock) */}
-        <div
-          className="relative z-[4] shrink-0 px-2 text-center"
-          style={{ paddingTop: 4, paddingBottom: 2 }}
-        >
+        {/* Status — skip pump start copy in rental (avoids overlap with rent UI) */}
+        {mode !== "rental" ? (
           <div
-            className="font-bold tracking-[-0.3px] transition-colors duration-300"
-            style={{
-              fontSize: 22,
-              lineHeight: 1.15,
-              color: running ? kronis.lime : kronis.ink,
-            }}
+            className="relative z-[4] shrink-0 px-2 text-center"
+            style={{ paddingTop: 4, paddingBottom: 2, background: kronis.background }}
           >
-            {statusTitle}
+            <div
+              className="font-bold tracking-[-0.3px] transition-colors duration-300"
+              style={{
+                fontSize: 22,
+                lineHeight: 1.15,
+                color: running ? kronis.lime : kronis.ink,
+              }}
+            >
+              {statusTitle}
+            </div>
+            <div
+              className="font-semibold transition-opacity duration-200"
+              style={{
+                marginTop: 2,
+                marginBottom: 0,
+                fontSize: 13,
+                lineHeight: 1.25,
+                color: "#555B4E",
+              }}
+            >
+              {statusSubtitle}
+            </div>
           </div>
-          <div
-            className="font-semibold transition-opacity duration-200"
-            style={{
-              marginTop: 2,
-              marginBottom: 0,
-              fontSize: 13,
-              lineHeight: 1.25,
-              color: "#555B4E",
-            }}
-          >
-            {statusSubtitle}
-          </div>
-        </div>
+        ) : null}
 
-        {/* Dial / auto cards — crossfade like native mode switch */}
-        <div className="relative z-[2] flex min-h-0 flex-1 items-center justify-center overflow-visible">
+        {/* Dial / auto / rental — clip; no scroll bar */}
+        <div className="relative z-[2] flex min-h-0 flex-1 items-center justify-center overflow-hidden">
           <div
             key={mode}
-            className="flex w-full items-center justify-center"
+            className="flex h-full max-h-full w-full items-center justify-center overflow-hidden"
             style={{
               animation: "kronis-mode-in 280ms cubic-bezier(0.22, 1.2, 0.36, 1) both",
             }}
@@ -224,6 +248,41 @@ export function PumpControlSheet({
                 onToggle={onToggle}
                 onTimerChange={onTimerChange}
               />
+            ) : mode === "rental" ? (
+              <div
+                className="flex w-full max-w-[300px] flex-col items-center gap-2.5 self-center px-2 py-1 text-center"
+                style={{ background: kronis.background }}
+              >
+                <span
+                  className="flex h-11 w-11 items-center justify-center rounded-2xl"
+                  style={{ background: kronis.limeSoft }}
+                >
+                  <CalendarDays size={22} color={kronis.lime} strokeWidth={2.1} />
+                </span>
+                <div>
+                  <div className="text-[16px] font-extrabold" style={{ color: kronis.ink }}>
+                    Rent a pump
+                  </div>
+                  <div
+                    className="mt-0.5 text-[12px] font-semibold"
+                    style={{ color: kronis.inkMuted }}
+                  >
+                    List it, then give the key to the rentee
+                  </div>
+                </div>
+                <SoftButton
+                  label="List for rent"
+                  variant="orange"
+                  className="w-full"
+                  onClick={() => onOpenRentals?.()}
+                />
+                <SoftButton
+                  label="Give key"
+                  variant="ink"
+                  className="w-full"
+                  onClick={() => onOpenHandoffKey?.()}
+                />
+              </div>
             ) : (
               <div className="flex w-full max-w-[320px] items-stretch gap-3 self-center py-1">
                 <AutoCard
@@ -251,7 +310,13 @@ export function PumpControlSheet({
           </div>
         </div>
 
-        <div className="relative z-[2] shrink-0 pt-1">
+        <div
+          className="relative z-[5] shrink-0 pt-2"
+          style={{
+            background: kronis.background,
+            boxShadow: `0 -10px 16px ${kronis.background}`,
+          }}
+        >
           <MetricsPill
             flow={flow}
             soil={soil}

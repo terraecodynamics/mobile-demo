@@ -21,6 +21,8 @@ type Props = {
   children: ReactNode;
   header?: ReactNode;
   maxHeight?: string;
+  /** Fixed sheet height (use when the card should stay tall even with short content) */
+  height?: string;
   className?: string;
   /** Soft scrim — native SoilTarget has none; home pickers use a light dim */
   dim?: boolean;
@@ -38,6 +40,7 @@ export function SheetModal({
   children,
   header,
   maxHeight = "85%",
+  height,
   className = "",
   dim = false,
   dragEnabled = true,
@@ -169,6 +172,7 @@ export function SheetModal({
         style={{
           background: kronis.background,
           maxHeight,
+          height,
           boxShadow: "0 -4px 12px rgba(0,0,0,0.12)",
           willChange: "transform",
           transform: "translate3d(0, 100%, 0)",

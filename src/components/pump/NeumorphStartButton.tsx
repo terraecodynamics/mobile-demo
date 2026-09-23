@@ -66,6 +66,8 @@ export function NeumorphStartButton({
         height: wellSize,
         borderRadius: wellSize / 2,
         background: NEO_SURFACE,
+        // Well ring must not block the timer thumb — only the face is clickable
+        pointerEvents: "none",
       }}
     >
       {/* Outer recessed ring */}
@@ -130,6 +132,8 @@ export function NeumorphStartButton({
           height: faceDim,
           borderRadius: faceR,
           overflow: running ? "hidden" : "visible",
+          pointerEvents: "auto",
+          cursor: disabled ? "default" : "pointer",
           background: running
             ? "linear-gradient(145deg, #FFC266 0%, #FF6B35 48%, #E04E1C 100%)"
             : "linear-gradient(145deg, #f5f6f8 0%, #eceef1 48%, #e2e5ea 100%)",

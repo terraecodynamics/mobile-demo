@@ -24,7 +24,10 @@ function SwitchArrows() {
 
 type Props = {
   initials: string;
+  /** Product model, e.g. Kronis 4 */
   deviceName: string;
+  /** Unique pump serial number */
+  deviceSerial?: string;
   deviceNumber: number;
   running?: boolean;
   unread?: number;
@@ -36,6 +39,7 @@ type Props = {
 export function PumpHomeAppBar({
   initials,
   deviceName,
+  deviceSerial,
   deviceNumber,
   running = false,
   unread = 0,
@@ -85,11 +89,21 @@ export function PumpHomeAppBar({
         <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden">
           <PumpMapMarker number={deviceNumber} selected={false} compact isRunning={running} />
         </span>
-        <span
-          className="relative min-w-0 flex-1 truncate text-left text-[15px] font-extrabold"
-          style={{ color: kronis.ink }}
-        >
-          {deviceName}
+        <span className="relative min-w-0 flex-1 text-left">
+          <span
+            className="block truncate text-[15px] font-extrabold leading-tight"
+            style={{ color: kronis.ink }}
+          >
+            {deviceName}
+          </span>
+          {deviceSerial ? (
+            <span
+              className="mt-0.5 block truncate text-[11px] font-semibold leading-tight"
+              style={{ color: kronis.inkMuted }}
+            >
+              {deviceSerial}
+            </span>
+          ) : null}
         </span>
         <span className="relative shrink-0">
           <SwitchArrows />

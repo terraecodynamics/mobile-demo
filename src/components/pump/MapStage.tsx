@@ -21,7 +21,11 @@ import { Fill, Stroke, Style } from "ol/style";
 import type { Map as OlMap } from "ol";
 import { defaults as defaultInteractions } from "ol/interaction/defaults";
 import MouseWheelZoom from "ol/interaction/MouseWheelZoom";
+import { createEmpty, extend, isEmpty } from "ol/extent";
 import { createSatelliteSource, SATELLITE_FIT_ZOOM, SATELLITE_MAX_ZOOM } from "@/lib/mapTiles";
+
+/** Special picker / map focus: show every pump at once */
+export const ALL_PUMPS_ID = "__all__";
 
 /** Pump body sits left of the SVG center (spray canvas on the right) */
 const PUMP_MARKER_OFFSET_X = Math.round(
@@ -80,6 +84,7 @@ export function MapStage({
   const list = pumps ?? [];
   const fences = fenceFields;
   const useGeofences = (fences?.length ?? 0) > 0;
+  const showAll = selectedId === ALL_PUMPS_ID;
 
   const mapHostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<OlMap | null>(null);
@@ -89,10 +94,30 @@ export function MapStage({
   const onSelectRef = useRef(onSelectPump);
   onSelectRef.current = onSelectPump;
   const [mapReady, setMapReady] = useState(0);
+  /** After All-pumps initial framing, never re-fit until selection changes */
+  const framedAllRef = useRef(false);
+  const listRef = useRef(list);
+  listRef.current = list;
+  const sheetHRef = useRef(sheetHeight);
+  sheetHRef.current = sheetHeight;
+  /** Re-frame All when pump pins move (e.g. geofence seats load) */
+  const pinsKey = list.map((p) => `${p.id}:${p.lat.toFixed(5)},${p.lng.toFixed(5)}`).join("|");
+  const lastPinsKeyRef = useRef<string>("");
+
+  useEffect(() => {
+    framedAllRef.current = false;
+  }, [mapReady]);
+
+  useEffect(() => {
+    if (pinsKey !== lastPinsKeyRef.current) {
+      lastPinsKeyRef.current = pinsKey;
+      if (showAll) framedAllRef.current = false;
+    }
+  }, [pinsKey, showAll]);
 
   const centerPump = useMemo(
-    () => list.find((p) => p.id === selectedId) || list[0],
-    [list, selectedId]
+    () => (showAll ? null : list.find((p) => p.id === selectedId) || list[0]),
+    [list, selectedId, showAll]
   );
 
   useEffect(() => {
@@ -136,11 +161,9 @@ export function MapStage({
       }).extend([
         new MouseWheelZoom({
           useAnchor: true,
-          // Trackpad/wheel gesture window — higher = smoother continuous zoom
-          timeout: 160,
-          // Animate discrete mouse-wheel ticks
-          duration: 280,
-          maxDelta: 1,
+          timeout: 80,
+          duration: 0,
+          maxDelta: 2,
           constrainResolution: false,
         }),
       ]),
@@ -148,8 +171,16 @@ export function MapStage({
 
     // Prefer GPU-composited pan/zoom
     map.getViewport().style.willChange = "transform";
+    map.getViewport().style.touchAction = "none";
     mapRef.current = map;
     setMapReady((n) => n + 1);
+
+    // Let the user interrupt any fit animation (wheel / pinch / drag)
+    const cancelFitAnim = () => {
+      map.getView().cancelAnimations();
+    };
+    map.getViewport().addEventListener("wheel", cancelFitAnim, { passive: true });
+    map.on("pointerdrag", cancelFitAnim);
 
     // Wheel zoom works without an extra click-to-focus
     host.tabIndex = 0;
@@ -159,6 +190,8 @@ export function MapStage({
 
     return () => {
       ro.disconnect();
+      map.getViewport().removeEventListener("wheel", cancelFitAnim);
+      map.un("pointerdrag", cancelFitAnim);
       Object.entries(overlaysRef.current).forEach(([id, o]) => {
         map.removeOverlay(o);
         const root = rootsRef.current[id];
@@ -200,24 +233,28 @@ export function MapStage({
         geometry: new Polygon([ring]),
         pumpId: p.id,
       });
-      feature.setStyle(fieldStyle(p.id === selectedId));
+      feature.setStyle(fieldStyle(showAll || p.id === selectedId));
       source.addFeature(feature);
     });
-  }, [list, selectedId, mapReady, fences, useGeofences]);
+  }, [list, selectedId, mapReady, fences, useGeofences, showAll]);
 
   useEffect(() => {
     if (!mapReady) return;
     const map = mapRef.current;
     if (!map) return;
 
-    const active = new Set(list.map((p) => p.id));
+    /** All pumps → every pin; single select → only that pump on the map */
+    const visible = showAll
+      ? list
+      : list.filter((p) => p.id === selectedId);
+    const active = new Set(visible.map((p) => p.id));
 
-    list.forEach((p) => {
-      const isSel = p.id === selectedId;
+    visible.forEach((p) => {
+      const isSel = showAll || p.id === selectedId;
       let overlay = overlaysRef.current[p.id];
       if (!overlay) {
         const el = document.createElement("div");
-        el.className = "pointer-events-auto cursor-pointer drop-shadow-lg";
+        el.className = "cursor-pointer drop-shadow-lg";
         el.setAttribute("role", "button");
         el.tabIndex = 0;
         el.setAttribute("aria-label", p.name);
@@ -231,16 +268,20 @@ export function MapStage({
           element: el,
           positioning: "center-center",
           offset: [PUMP_MARKER_OFFSET_X, 0],
-          stopEvent: true,
+          stopEvent: !showAll,
         });
         overlaysRef.current[p.id] = overlay;
         map.addOverlay(overlay);
+      } else {
+        overlay.set("stopEvent", !showAll);
       }
+      const el = overlay.getElement();
+      if (el) el.style.pointerEvents = "auto";
       rootsRef.current[p.id]?.render(
         <PumpMapMarker
           number={p.number}
           selected={isSel}
-          isRunning={isSel && running}
+          isRunning={showAll ? p.running : isSel && running}
         />
       );
       overlay.setPosition(fromLonLat([p.lng, p.lat]));
@@ -250,46 +291,133 @@ export function MapStage({
       if (active.has(id)) return;
       const o = overlaysRef.current[id];
       const root = rootsRef.current[id];
-      if (o) map.removeOverlay(o);
+      if (o) {
+        o.setPosition(undefined);
+        map.removeOverlay(o);
+      }
       delete overlaysRef.current[id];
       delete rootsRef.current[id];
       if (root) void Promise.resolve().then(() => root.unmount());
     });
-  }, [list, selectedId, running, mapReady]);
+  }, [list, selectedId, running, mapReady, showAll]);
 
+  // All pumps = free zoom range; single pump keeps tighter farm zoom.
+  useEffect(() => {
+    if (!mapReady) return;
+    const view = mapRef.current?.getView();
+    if (!view) return;
+    if (showAll) {
+      view.setMinZoom(5);
+      view.setMaxZoom(SATELLITE_MAX_ZOOM);
+      view.setConstrainResolution(false);
+    } else {
+      view.setMinZoom(12);
+      view.setMaxZoom(SATELLITE_MAX_ZOOM);
+    }
+  }, [showAll, mapReady]);
+
+  // Fit map once when selection changes — then free zoom/pan (esp. All pumps).
   useEffect(() => {
     if (!mapReady) return;
     const map = mapRef.current;
-    const pump = centerPump;
-    if (!map || !pump?.field?.length) return;
-
-    // Zoom to the pump's farm boundary (primary field), not the whole multi-field spread
-    const ring = pump.field.map((pt) => fromLonLat([pt.lng, pt.lat]));
-    if (ring.length) ring.push(ring[0]);
-    const extent = new Polygon([ring]).getExtent();
-    const pumpCenter = fromLonLat([pump.lng, pump.lat]);
-
+    if (!map) return;
     const view = map.getView();
+
+    if (showAll) {
+      const id = requestAnimationFrame(() => {
+        // Frame once per All-pumps visit (set inside rAF so Strict Mode remount still fits)
+        if (framedAllRef.current) return;
+        framedAllRef.current = true;
+
+        map.updateSize();
+        const sz = map.getSize();
+        if (!sz || sz[1] < 80) return;
+
+        const pumps = listRef.current;
+        const sheetPx = Number.isFinite(sheetHRef.current)
+          ? Math.max(0, sheetHRef.current)
+          : 320;
+
+        const extent = createEmpty();
+        pumps.forEach((p) => {
+          const c = fromLonLat([p.lng, p.lat]);
+          extend(extent, [c[0], c[1], c[0], c[1]]);
+          if (p.field?.length) {
+            const ring = p.field.map((pt) => fromLonLat([pt.lng, pt.lat]));
+            if (ring.length) {
+              ring.push(ring[0]);
+              extend(extent, new Polygon([ring]).getExtent());
+            }
+          }
+        });
+        if (isEmpty(extent)) return;
+
+        const w = extent[2] - extent[0];
+        const h = extent[3] - extent[1];
+        const padX = Math.max(w * 0.4, 36);
+        const padY = Math.max(h * 0.4, 36);
+        const padded: [number, number, number, number] = [
+          extent[0] - padX,
+          extent[1] - padY,
+          extent[2] + padX,
+          extent[3] + padY,
+        ];
+
+        const allPadTop = 56;
+        const allPadSide = 44;
+        const allPadBottom = Math.min(
+          sheetPx + 36,
+          Math.max(sheetPx, sz[1] * 0.52)
+        );
+
+        view.cancelAnimations();
+        // Free zoom for All pumps only — no fixed lock after this framing
+        view.setMinZoom(5);
+        view.setMaxZoom(SATELLITE_MAX_ZOOM);
+        view.setConstrainResolution(false);
+        view.fit(padded, {
+          size: sz,
+          padding: [allPadTop, allPadSide, allPadBottom, allPadSide],
+          // Overview start only — user can zoom freely past this after
+          duration: 380,
+        });
+      });
+      return () => cancelAnimationFrame(id);
+    }
+
+    // Left All mode — allow framing again next time
+    framedAllRef.current = false;
+
+    const pump = centerPump;
+    if (!pump?.field?.length) return;
+
     const id = requestAnimationFrame(() => {
       map.updateSize();
       const sz = map.getSize();
       if (!sz || sz[1] < 80) return;
 
-      const sheetPx = Number.isFinite(sheetHeight) ? Math.max(0, sheetHeight) : 320;
+      const sheetPx = Number.isFinite(sheetHRef.current)
+        ? Math.max(0, sheetHRef.current)
+        : 320;
       const padTop = 28;
       const padSide = 28;
-      // Leave map band above the sheet; keep field comfortably framed
       const padBottom = Math.min(sheetPx + 8, Math.max(0, sz[1] - padTop - 140));
 
+      const ring = pump.field.map((pt) => fromLonLat([pt.lng, pt.lat]));
+      if (ring.length) ring.push(ring[0]);
+      const extent = new Polygon([ring]).getExtent();
+      const pumpCenter = fromLonLat([pump.lng, pump.lat]);
+
+      view.cancelAnimations();
+      view.setMinZoom(12);
+      view.setMaxZoom(SATELLITE_MAX_ZOOM);
       view.fit(extent, {
         size: sz,
         padding: [padTop, padSide, padBottom, padSide],
-        // Geofence plots are small — allow tighter zoom than default demo fences
         maxZoom: useGeofences ? Math.min(SATELLITE_MAX_ZOOM, 19.4) : SATELLITE_FIT_ZOOM,
         duration: 0,
       });
 
-      // Pin the pump in the visual center of the visible map band (above sheet)
       const resolution = view.getResolution() ?? 1;
       const yBias = ((padBottom - padTop) / 2) * resolution;
       view.animate({
@@ -299,7 +427,7 @@ export function MapStage({
     });
 
     return () => cancelAnimationFrame(id);
-  }, [centerPump?.id, centerPump?.lat, centerPump?.lng, sheetHeight, mapReady, useGeofences]);
+  }, [showAll, centerPump?.id, mapReady, useGeofences, pinsKey]);
 
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#2a3328" }}>

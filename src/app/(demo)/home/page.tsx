@@ -1,7 +1,7 @@
 "use client";
 
 import { PumpHomeAppBar } from "@/components/pump/PumpHomeAppBar";
-import { MapStage } from "@/components/pump/MapStage";
+import { MapStage, ALL_PUMPS_ID } from "@/components/pump/MapStage";
 import { PumpControlSheet } from "@/components/pump/PumpControlSheet";
 import { PumpPickerSheet } from "@/components/pump/PumpPickerSheet";
 import {
@@ -12,6 +12,12 @@ import {
   WateringTimesSheet,
   type SchedulePayload,
 } from "@/components/pump/WateringTimesSheet";
+import {
+  PutOnRentSheet,
+  type ListForRentPayload,
+} from "@/components/rental/PutOnRentSheet";
+import { HandoffKeySheet } from "@/components/rental/HandoffKeySheet";
+import { ActiveRenteesSheet } from "@/components/rental/ActiveRenteesSheet";
 import { SoftButton, SoftChip } from "@/components/ui/SoftUi";
 import { SheetModal } from "@/components/ui/SheetModal";
 import {
@@ -21,6 +27,12 @@ import {
   dummyWeeklyStats,
   type DummyPump,
 } from "@/data/dummy";
+import { getPublishedForPump, publishPumpForRent } from "@/lib/rentListings";
+import {
+  getOpenOfferForPump,
+  issueHandoffKey,
+  type HandoffOffer,
+} from "@/lib/handoffKeys";
 import { kronis } from "@/lib/kronis";
 import {
   buildHomePumpsFromAssignments,
@@ -52,6 +64,17 @@ function sheetHeightFor(stageH: number) {
   return Math.min(sheet, Math.max(240, usable - mapReserve));
 }
 
+/** Select-pump picker only — a bit taller than the control sheet */
+function pickerSheetHeightFor(stageH: number) {
+  const usable = Math.max(1, stageH);
+  const mapReserve = 110;
+  let sheet: number;
+  if (usable < 600) sheet = Math.round(usable * 0.68);
+  else if (usable < 700) sheet = Math.round(usable * 0.64);
+  else sheet = Math.min(Math.round(usable * 0.6), usable - 120);
+  return Math.min(sheet, Math.max(260, usable - mapReserve));
+}
+
 function formatRemaining(mins: number) {
   const h = Math.floor(mins / 60);
   const m = Math.round(mins % 60);
@@ -72,13 +95,18 @@ export default function HomePage() {
   const [metricsOpen, setMetricsOpen] = useState(false);
   const [soilTargetOpen, setSoilTargetOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [rentOpen, setRentOpen] = useState(false);
+  const [activeRenteesOpen, setActiveRenteesOpen] = useState(false);
+  const [handoffOpen, setHandoffOpen] = useState(false);
+  const [handoffOffer, setHandoffOffer] = useState<HandoffOffer | null>(null);
+  const [rentToast, setRentToast] = useState<string | null>(null);
   const [moistureRule, setMoistureRule] = useState<SoilTargetPayload>({
     startBelow: 30,
     stopAbove: 60,
     isEnabled: true,
   });
   const [scheduleRule, setScheduleRule] = useState<SchedulePayload | null>(null);
-  const [mode, setMode] = useState<"manual" | "auto">("manual");
+  const [mode, setMode] = useState<"manual" | "auto" | "rental">("manual");
   const [timerMinutes, setTimerMinutes] = useState(0);
   const [remainingMinutes, setRemainingMinutes] = useState<number | null>(null);
   const [muted, setMuted] = useState(false);
@@ -125,17 +153,31 @@ export default function HomePage() {
     [geoTick]
   );
 
+  /** All catalog pumps (online + offline); geofence only updates map seat/field */
   const pumps: DummyPump[] = useMemo(() => {
-    if (geofenceScene?.pumps?.length) return geofenceScene.pumps;
-    return dummyPumps;
+    const geoById = new Map(
+      (geofenceScene?.pumps ?? []).map((p) => [p.id, p] as const)
+    );
+    return dummyPumps.map((d) => {
+      const geo = geoById.get(d.id);
+      if (!geo) return d;
+      return {
+        ...d,
+        lat: geo.lat,
+        lng: geo.lng,
+        field: geo.field?.length ? geo.field : d.field,
+      };
+    });
   }, [geofenceScene]);
 
   const fenceFields = geofenceScene?.fences;
 
   useEffect(() => {
-    if (!geofenceScene?.pumps?.length) return;
-    setSelectedId(geofenceScene.pumps[0].id);
-  }, [geofenceScene]);
+    if (!pumps.length) return;
+    if (selectedId === ALL_PUMPS_ID) return;
+    if (pumps.some((p) => p.id === selectedId)) return;
+    setSelectedId(pumps[0].id);
+  }, [pumps, selectedId]);
 
   useEffect(() => {
     const el = stageRef.current;
@@ -148,15 +190,21 @@ export default function HomePage() {
     return () => ro.disconnect();
   }, []);
 
-  const pump = useMemo(
-    () => pumps.find((p) => p.id === selectedId) || pumps[0],
-    [pumps, selectedId]
+  const showAllPumps = selectedId === ALL_PUMPS_ID;
+  const pump: DummyPump = useMemo(
+    () =>
+      showAllPumps
+        ? pumps[0]
+        : pumps.find((p) => p.id === selectedId) || pumps[0],
+    [pumps, selectedId, showAllPumps]
   );
 
   const running = runningOverride ?? pump.running;
   const offline = !pump.online;
   const unread = dummyNotifications.filter((n) => n.unread).length;
   const sheetH = sheetHeightFor(stageH);
+  const pickerSheetH = pickerSheetHeightFor(stageH);
+  const controlSheetH = mode === "rental" ? Math.min(stageH - 120, sheetH + 36) : sheetH;
 
   const displayFlow =
     flowOverride != null
@@ -265,9 +313,10 @@ export default function HomePage() {
     >
       <PumpHomeAppBar
         initials={dummyUser.initials}
-        deviceName={pump.name}
-        deviceNumber={pump.number}
-        running={running}
+        deviceName={showAllPumps ? "All pumps" : pump.model}
+        deviceSerial={showAllPumps ? `${pumps.length} on map` : pump.serial}
+        deviceNumber={showAllPumps ? pumps.length : pump.number}
+        running={showAllPumps ? false : running}
         unread={unread}
         onProfile={() => router.push("/profile")}
         onPicker={() => setPickerOpen(true)}
@@ -281,7 +330,7 @@ export default function HomePage() {
           running={running}
           muted={muted}
           onMute={handleMute}
-          onRentals={() => router.push("/rentals")}
+          onRentals={() => setActiveRenteesOpen(true)}
           onSelectPump={(id) => {
             setSelectedId(id);
             setRunningOverride(null);
@@ -291,7 +340,7 @@ export default function HomePage() {
             setPowerLoading(false);
             toggleLock.current = false;
           }}
-          sheetHeight={sheetH}
+          sheetHeight={controlSheetH}
           fenceFields={fenceFields}
         />
 
@@ -301,7 +350,7 @@ export default function HomePage() {
         */}
         <div
           className="pointer-events-auto absolute right-3.5 z-30"
-          style={{ bottom: Math.max(52, sheetH + 18) }}
+          style={{ bottom: Math.max(52, controlSheetH + 18) }}
         >
           <SoftChip
             icon={Expand}
@@ -315,7 +364,7 @@ export default function HomePage() {
         <div
           className="absolute bottom-0 left-0 right-0 z-20"
           style={{
-            height: sheetH,
+            height: controlSheetH,
             borderTopLeftRadius: 36,
             borderTopRightRadius: 36,
             borderBottomLeftRadius: 28,
@@ -325,7 +374,10 @@ export default function HomePage() {
             overflow: "hidden",
           }}
         >
-          <div className="flex h-full min-h-0 flex-col overflow-hidden">
+          <div
+            className="flex h-full min-h-0 flex-col overflow-hidden"
+            style={{ background: kronis.background }}
+          >
             <PumpControlSheet
               mode={mode}
               onModeChange={setMode}
@@ -352,6 +404,26 @@ export default function HomePage() {
               onMetrics={() => setMetricsOpen(true)}
               onOpenSoilMoisture={() => setSoilTargetOpen(true)}
               onOpenSchedule={() => setScheduleOpen(true)}
+              onOpenRentals={() => setRentOpen(true)}
+              onOpenHandoffKey={() => {
+                const published = getPublishedForPump(pump.id);
+                const existing = getOpenOfferForPump(pump.id);
+                if (existing) {
+                  setHandoffOffer(existing);
+                  setHandoffOpen(true);
+                  return;
+                }
+                const offer = issueHandoffKey({
+                  pumpId: pump.id,
+                  model: published?.model ?? pump.model,
+                  serial: pump.serial,
+                  ratePerDayInr: published?.ratePerDayInr ?? 700,
+                  ownerName: dummyUser.name,
+                  ownerPhone: dummyUser.mobile,
+                });
+                setHandoffOffer(offer);
+                setHandoffOpen(true);
+              }}
               moistureEnabled={moistureRule.isEnabled}
               moistureSubtitle={
                 moistureRule.isEnabled
@@ -369,12 +441,14 @@ export default function HomePage() {
         pumps={pumps.map((p) => ({
           id: p.id,
           name: p.name,
+          model: p.model,
+          serial: p.serial,
           number: p.number,
           online: p.online,
           running: p.id === selectedId ? running : p.running,
         }))}
         selectedId={selectedId}
-        sheetHeight={sheetH}
+        sheetHeight={pickerSheetH}
         onSelect={(id) => {
           setSelectedId(id);
           setRunningOverride(null);
@@ -446,6 +520,70 @@ export default function HomePage() {
         onClose={() => setScheduleOpen(false)}
         onSaved={(payload) => setScheduleRule(payload)}
       />
+
+      <ActiveRenteesSheet
+        open={activeRenteesOpen}
+        onClose={() => setActiveRenteesOpen(false)}
+        onManageAll={() => router.push("/rentals")}
+      />
+
+      <PutOnRentSheet
+        open={rentOpen}
+        pumps={pumps.map((p) => ({
+          id: p.id,
+          model: p.model,
+          serial: p.serial,
+          number: p.number,
+        }))}
+        selectedPumpId={showAllPumps ? pumps[0]?.id : pump.id}
+        initialRate={
+          getPublishedForPump(showAllPumps ? pumps[0]?.id : pump.id)
+            ?.ratePerDayInr ?? 700
+        }
+        initialAvailable={
+          getPublishedForPump(showAllPumps ? pumps[0]?.id : pump.id)
+            ?.available ?? true
+        }
+        onClose={() => {
+          setRentOpen(false);
+        }}
+        onSaved={(payload: ListForRentPayload) => {
+          const listed =
+            pumps.find((p) => p.id === payload.pumpId) ?? pump;
+          const unitLabel = `${payload.model} · ${payload.serial}`;
+          publishPumpForRent({
+            pumpId: payload.pumpId,
+            pumpName: unitLabel,
+            lat: listed.lat,
+            lng: listed.lng,
+            model: payload.model,
+            serial: payload.serial,
+            ratePerDayInr: payload.ratePerDayInr,
+            available: payload.available,
+          });
+          setRentToast(
+            payload.available
+              ? `Listed · ${unitLabel}`
+              : `Unlisted · ${unitLabel}`
+          );
+          window.setTimeout(() => setRentToast(null), 2400);
+        }}
+      />
+
+      <HandoffKeySheet
+        open={handoffOpen}
+        offer={handoffOffer}
+        onClose={() => setHandoffOpen(false)}
+      />
+
+      {rentToast ? (
+        <div
+          className="pointer-events-none absolute inset-x-4 bottom-6 z-40 rounded-2xl px-4 py-3 text-center text-[13px] font-bold text-white shadow-lg"
+          style={{ background: "rgba(23,26,18,0.92)" }}
+        >
+          {rentToast}
+        </div>
+      ) : null}
     </div>
   );
 }

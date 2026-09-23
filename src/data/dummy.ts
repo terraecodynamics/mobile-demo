@@ -2,7 +2,12 @@
 
 export type DummyPump = {
   id: string;
+  /** Display label: model · serial (for one-line contexts) */
   name: string;
+  /** Product model: Kronis 4 | Kronis 4 – Pro */
+  model: "Kronis 4" | "Kronis 4 – Pro";
+  /** Unique Serial No for this pump unit */
+  serial: string;
   number: number;
   online: boolean;
   running: boolean;
@@ -23,6 +28,24 @@ export type DummyRental = {
   endDate: string;
   status: "ACTIVE" | "COMPLETED" | "UPCOMING";
   amountInr: number;
+};
+
+/** Pumps listed for rent on the map (rentee discovery) */
+export type RentalListing = {
+  id: string;
+  pumpName: string;
+  ownerName: string;
+  ownerPhone: string;
+  village: string;
+  ratePerDayInr: number;
+  /** Kronis product model, e.g. Kronis 4 / Kronis 4 – Pro */
+  model: string;
+  /** Unique Serial No for this unit */
+  serial: string;
+  available: boolean;
+  lat: number;
+  lng: number;
+  distanceKm: number;
 };
 
 export type DummyNotification = {
@@ -56,7 +79,9 @@ export const dummyUser = {
 export const dummyPumps: DummyPump[] = [
   {
     id: "p1",
-    name: "Test Pump 007",
+    name: "Kronis 4 · KR-007",
+    model: "Kronis 4",
+    serial: "KR-007",
     number: 1,
     online: true,
     running: false,
@@ -74,7 +99,9 @@ export const dummyPumps: DummyPump[] = [
   },
   {
     id: "p2",
-    name: "North Field Pump",
+    name: "Kronis 4 · KR-014",
+    model: "Kronis 4",
+    serial: "KR-014",
     number: 2,
     online: true,
     running: true,
@@ -92,7 +119,9 @@ export const dummyPumps: DummyPump[] = [
   },
   {
     id: "p3",
-    name: "Canal Pump",
+    name: "Kronis 4 – Pro · KR-021",
+    model: "Kronis 4 – Pro",
+    serial: "KR-021",
     number: 3,
     online: false,
     running: false,
@@ -113,7 +142,7 @@ export const dummyPumps: DummyPump[] = [
 export const dummyRentals: DummyRental[] = [
   {
     id: "r1",
-    pumpName: "Test Pump 007",
+    pumpName: "Kronis 4 · KR-007",
     renteePhone: "+91 91234 56780",
     renteeName: "Ramesh Kumar",
     startDate: "2026-09-20",
@@ -123,7 +152,7 @@ export const dummyRentals: DummyRental[] = [
   },
   {
     id: "r2",
-    pumpName: "North Field Pump",
+    pumpName: "Kronis 4 · KR-014",
     renteePhone: "+91 99887 66554",
     renteeName: "Sita Devi",
     startDate: "2026-09-10",
@@ -132,8 +161,18 @@ export const dummyRentals: DummyRental[] = [
     amountInr: 2800,
   },
   {
+    id: "r2b",
+    pumpName: "Kronis 4 · KR-007",
+    renteePhone: "+91 98765 43210",
+    renteeName: "Vikram Singh",
+    startDate: "2026-09-01",
+    endDate: "2026-09-07",
+    status: "COMPLETED",
+    amountInr: 4900,
+  },
+  {
     id: "r3",
-    pumpName: "Canal Pump",
+    pumpName: "Kronis 4 – Pro · KR-021",
     renteePhone: "+91 90123 44556",
     renteeName: "Ajay Patel",
     startDate: "2026-09-28",
@@ -143,11 +182,85 @@ export const dummyRentals: DummyRental[] = [
   },
 ];
 
+/** Nearby geo-tagged pumps available to rent (rentee map) */
+export const rentalListings: RentalListing[] = [
+  {
+    id: "rl1",
+    pumpName: "Kronis 4 · KR-007",
+    ownerName: "Terra Demo",
+    ownerPhone: "+919876543210",
+    village: "Puri · Green Valley",
+    ratePerDayInr: 700,
+    model: "Kronis 4",
+    serial: "KR-007",
+    available: true,
+    lat: 19.884193,
+    lng: 86.02015,
+    distanceKm: 0.2,
+  },
+  {
+    id: "rl2",
+    pumpName: "Kronis 4 · KR-108",
+    ownerName: "Bikash Nayak",
+    ownerPhone: "+919887766554",
+    village: "Balukhanda",
+    ratePerDayInr: 550,
+    model: "Kronis 4",
+    serial: "KR-108",
+    available: true,
+    lat: 19.883856,
+    lng: 86.01971,
+    distanceKm: 0.4,
+  },
+  {
+    id: "rl3",
+    pumpName: "Kronis 4 – Pro · KR-221",
+    ownerName: "Sunita Das",
+    ownerPhone: "+919012344556",
+    village: "Gop",
+    ratePerDayInr: 800,
+    model: "Kronis 4 – Pro",
+    serial: "KR-221",
+    available: false,
+    lat: 19.88355,
+    lng: 86.02005,
+    distanceKm: 0.6,
+  },
+  {
+    id: "rl4",
+    pumpName: "Kronis 4 · KR-134",
+    ownerName: "Pradeep Mohanty",
+    ownerPhone: "+919445566778",
+    village: "Konark road",
+    ratePerDayInr: 650,
+    model: "Kronis 4",
+    serial: "KR-134",
+    available: true,
+    lat: 19.8819,
+    lng: 86.0224,
+    distanceKm: 1.1,
+  },
+  {
+    id: "rl5",
+    pumpName: "Kronis 4 – Pro · KR-305",
+    ownerName: "Meena Sahoo",
+    ownerPhone: "+919778899001",
+    village: "Satapada side",
+    ratePerDayInr: 500,
+    model: "Kronis 4 – Pro",
+    serial: "KR-305",
+    available: true,
+    lat: 19.8862,
+    lng: 86.0178,
+    distanceKm: 1.4,
+  },
+];
+
 export const dummyNotifications: DummyNotification[] = [
   {
     id: "n1",
-    title: "Rental expired: Test Pump 007",
-    body: "Test Pump 007 (test-007) rented to Rahul has expired. Please update status to make it available for rent.",
+    title: "Rental expired: Kronis 4 · KR-007",
+    body: "Kronis 4 · KR-007 rented to Rahul has expired. Please update status to make it available for rent.",
     time: "1 day ago",
     section: "TODAY",
     unread: true,
@@ -156,7 +269,7 @@ export const dummyNotifications: DummyNotification[] = [
   {
     id: "n2",
     title: "New Rental Created",
-    body: "A new rental has been created for Test Pump 007",
+    body: "A new rental has been created for Kronis 4 · KR-007",
     time: "3 days ago",
     section: "SEPTEMBER 18, 2026",
     unread: true,
@@ -165,7 +278,7 @@ export const dummyNotifications: DummyNotification[] = [
   {
     id: "n3",
     title: "New Rental Created",
-    body: "A new rental has been created for Test Pump 007",
+    body: "A new rental has been created for Kronis 4 · KR-014",
     time: "3 days ago",
     section: "SEPTEMBER 18, 2026",
     unread: true,
@@ -174,7 +287,7 @@ export const dummyNotifications: DummyNotification[] = [
   {
     id: "n4",
     title: "Movement Alert",
-    body: "Test Pump 007 — Movement alert: device moved outside the geofence (13085m from center, limit 10m).",
+    body: "Kronis 4 · KR-007 — Movement alert: device moved outside the geofence (13085m from center, limit 10m).",
     time: "2 weeks ago",
     section: "SEPTEMBER 8, 2026",
     unread: true,
@@ -183,7 +296,7 @@ export const dummyNotifications: DummyNotification[] = [
   {
     id: "n5",
     title: "Theft Alarm",
-    body: "Test Pump 007 — Theft alarm triggered near the farm boundary. Check device location immediately.",
+    body: "Kronis 4 · KR-007 — Theft alarm triggered near the farm boundary. Check device location immediately.",
     time: "2 weeks ago",
     section: "SEPTEMBER 8, 2026",
     unread: true,
@@ -192,7 +305,7 @@ export const dummyNotifications: DummyNotification[] = [
   {
     id: "n6",
     title: "Pump went offline",
-    body: "Canal Pump lost connection. Last seen 2 minutes ago.",
+    body: "Kronis 4 – Pro · KR-021 lost connection. Last seen 2 minutes ago.",
     time: "2 weeks ago",
     section: "SEPTEMBER 8, 2026",
     unread: false,
@@ -210,7 +323,7 @@ export const dummyNotifications: DummyNotification[] = [
   {
     id: "n8",
     title: "Soil moisture low",
-    body: "North Field Pump soil at 41%. Consider starting a timed irrigation run.",
+    body: "Kronis 4 · KR-014 soil at 41%. Consider starting a timed irrigation run.",
     time: "3 weeks ago",
     section: "AUGUST 28, 2026",
     unread: false,
@@ -219,7 +332,7 @@ export const dummyNotifications: DummyNotification[] = [
   {
     id: "n9",
     title: "Rental started",
-    body: "Ramesh Kumar · Test Pump 007 · ₹3,500 · ends Sep 25.",
+    body: "Ramesh Kumar · Kronis 4 · KR-007 · ₹3,500 · ends Sep 25.",
     time: "1 month ago",
     section: "AUGUST 20, 2026",
     unread: true,
@@ -228,7 +341,7 @@ export const dummyNotifications: DummyNotification[] = [
   {
     id: "n10",
     title: "Geofence assigned",
-    body: "Pump 1 was assigned to Field 1 geofence on your farm map.",
+    body: "Kronis 4 · KR-007 was assigned to Field 1 geofence on your farm map.",
     time: "1 month ago",
     section: "AUGUST 20, 2026",
     unread: true,
@@ -237,7 +350,7 @@ export const dummyNotifications: DummyNotification[] = [
   {
     id: "n11",
     title: "Flow sensor update",
-    body: "Test Pump 007 reported 0 L/min while stopped — sensor healthy.",
+    body: "Kronis 4 · KR-007 reported 0 L/min while stopped — sensor healthy.",
     time: "1 month ago",
     section: "AUGUST 15, 2026",
     unread: true,
