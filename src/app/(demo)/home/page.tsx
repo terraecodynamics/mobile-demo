@@ -16,6 +16,7 @@ import {
   PutOnRentSheet,
   type ListForRentPayload,
 } from "@/components/rental/PutOnRentSheet";
+import { HandoffKeySheet } from "@/components/rental/HandoffKeySheet";
 import { SoftButton, SoftChip } from "@/components/ui/SoftUi";
 import { SheetModal } from "@/components/ui/SheetModal";
 import {
@@ -26,6 +27,11 @@ import {
   type DummyPump,
 } from "@/data/dummy";
 import { getPublishedForPump, publishPumpForRent } from "@/lib/rentListings";
+import {
+  getOpenOfferForPump,
+  issueHandoffKey,
+  type HandoffOffer,
+} from "@/lib/handoffKeys";
 import { kronis } from "@/lib/kronis";
 import {
   buildHomePumpsFromAssignments,
@@ -78,6 +84,8 @@ export default function HomePage() {
   const [soilTargetOpen, setSoilTargetOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [rentOpen, setRentOpen] = useState(false);
+  const [handoffOpen, setHandoffOpen] = useState(false);
+  const [handoffOffer, setHandoffOffer] = useState<HandoffOffer | null>(null);
   const [rentToast, setRentToast] = useState<string | null>(null);
   const [moistureRule, setMoistureRule] = useState<SoilTargetPayload>({
     startBelow: 30,
@@ -177,6 +185,7 @@ export default function HomePage() {
   const offline = !pump.online;
   const unread = dummyNotifications.filter((n) => n.unread).length;
   const sheetH = sheetHeightFor(stageH);
+  const controlSheetH = mode === "rental" ? Math.min(stageH - 120, sheetH + 36) : sheetH;
 
   const displayFlow =
     flowOverride != null
@@ -312,7 +321,7 @@ export default function HomePage() {
             setPowerLoading(false);
             toggleLock.current = false;
           }}
-          sheetHeight={sheetH}
+          sheetHeight={controlSheetH}
           fenceFields={fenceFields}
         />
 
@@ -322,7 +331,7 @@ export default function HomePage() {
         */}
         <div
           className="pointer-events-auto absolute right-3.5 z-30"
-          style={{ bottom: Math.max(52, sheetH + 18) }}
+          style={{ bottom: Math.max(52, controlSheetH + 18) }}
         >
           <SoftChip
             icon={Expand}
@@ -336,7 +345,7 @@ export default function HomePage() {
         <div
           className="absolute bottom-0 left-0 right-0 z-20"
           style={{
-            height: sheetH,
+            height: controlSheetH,
             borderTopLeftRadius: 36,
             borderTopRightRadius: 36,
             borderBottomLeftRadius: 28,
@@ -346,7 +355,10 @@ export default function HomePage() {
             overflow: "hidden",
           }}
         >
-          <div className="flex h-full min-h-0 flex-col overflow-hidden">
+          <div
+            className="flex h-full min-h-0 flex-col overflow-hidden"
+            style={{ background: kronis.background }}
+          >
             <PumpControlSheet
               mode={mode}
               onModeChange={setMode}
@@ -374,6 +386,25 @@ export default function HomePage() {
               onOpenSoilMoisture={() => setSoilTargetOpen(true)}
               onOpenSchedule={() => setScheduleOpen(true)}
               onOpenRentals={() => setRentOpen(true)}
+              onOpenHandoffKey={() => {
+                const published = getPublishedForPump(pump.id);
+                const existing = getOpenOfferForPump(pump.id);
+                if (existing) {
+                  setHandoffOffer(existing);
+                  setHandoffOpen(true);
+                  return;
+                }
+                const offer = issueHandoffKey({
+                  pumpId: pump.id,
+                  model: published?.model ?? pump.model,
+                  serial: pump.serial,
+                  ratePerDayInr: published?.ratePerDayInr ?? 700,
+                  ownerName: dummyUser.name,
+                  ownerPhone: dummyUser.mobile,
+                });
+                setHandoffOffer(offer);
+                setHandoffOpen(true);
+              }}
               moistureEnabled={moistureRule.isEnabled}
               moistureSubtitle={
                 moistureRule.isEnabled
@@ -478,7 +509,6 @@ export default function HomePage() {
         initialAvailable={getPublishedForPump(pump.id)?.available ?? true}
         onClose={() => {
           setRentOpen(false);
-          if (mode === "rental") setMode("manual");
         }}
         onSaved={(payload: ListForRentPayload) => {
           const unitLabel = `${payload.model} · ${pump.serial}`;
@@ -493,10 +523,33 @@ export default function HomePage() {
             available: payload.available,
           });
           setRentToast(
-            payload.available ? `Listed · ${unitLabel}` : `Unlisted · ${unitLabel}`
+            payload.available
+              ? `Listed · ${unitLabel}`
+              : `Unlisted · ${unitLabel}`
           );
           window.setTimeout(() => setRentToast(null), 2400);
-          setMode("manual");
+        }}
+      />
+
+      <HandoffKeySheet
+        open={handoffOpen}
+        offer={handoffOffer}
+        onClose={() => setHandoffOpen(false)}
+        onRefresh={() => {
+          if (!pump) return;
+          const rate =
+            getPublishedForPump(pump.id)?.ratePerDayInr ??
+            handoffOffer?.ratePerDayInr ??
+            700;
+          const offer = issueHandoffKey({
+            pumpId: pump.id,
+            model: handoffOffer?.model ?? pump.model,
+            serial: pump.serial,
+            ratePerDayInr: rate,
+            ownerName: dummyUser.name,
+            ownerPhone: dummyUser.mobile,
+          });
+          setHandoffOffer(offer);
         }}
       />
 

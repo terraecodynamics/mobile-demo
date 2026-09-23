@@ -15,6 +15,8 @@ import {
 import {
   ArrowLeft,
   ChevronRight,
+  Gauge,
+  KeyRound,
   MapPinned,
   Phone,
   Plus,
@@ -217,6 +219,52 @@ export default function ProfilePage() {
                 </span>
                 <span className="mt-0.5 block text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
                   {nearbyAvailable} available nearby
+                </span>
+              </span>
+              <ChevronRight size={22} color={kronis.inkMuted} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => router.push("/rentals?attach=1")}
+              className="mb-2.5 flex w-full items-center gap-3 rounded-[18px] border px-3.5 py-3.5 text-left active:scale-[0.99]"
+              style={{ background: kronis.surface, borderColor: kronis.border }}
+            >
+              <span
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px]"
+                style={{ background: "#FFF0E8" }}
+              >
+                <KeyRound size={20} color={kronis.lime} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[16px] font-extrabold" style={{ color: kronis.ink }}>
+                  Enter key
+                </span>
+                <span className="mt-0.5 block text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
+                  Attach pump from owner
+                </span>
+              </span>
+              <ChevronRight size={22} color={kronis.inkMuted} />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => router.push("/rentals/my-pump")}
+              className="mb-2.5 flex w-full items-center gap-3 rounded-[18px] border px-3.5 py-3.5 text-left active:scale-[0.99]"
+              style={{ background: kronis.surface, borderColor: kronis.border }}
+            >
+              <span
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px]"
+                style={{ background: kronis.limeSoft }}
+              >
+                <Gauge size={20} color={kronis.lime} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-[16px] font-extrabold" style={{ color: kronis.ink }}>
+                  My pump
+                </span>
+                <span className="mt-0.5 block text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
+                  Start after attach
                 </span>
               </span>
               <ChevronRight size={22} color={kronis.inkMuted} />

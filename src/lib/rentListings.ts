@@ -71,3 +71,17 @@ export function publishPumpForRent(input: ListForRentInput): RentalListing {
 export function getPublishedForPump(pumpId: string): RentalListing | null {
   return load().find((l) => l.id === `owner-${pumpId}`) ?? null;
 }
+
+/** After rentee claims handoff key — listing no longer available */
+export function markListingUnavailable(pumpId: string, serial?: string): void {
+  const list = load();
+  let changed = false;
+  const next = list.map((l) => {
+    if (l.id === `owner-${pumpId}` || (serial && l.serial === serial)) {
+      changed = true;
+      return { ...l, available: false };
+    }
+    return l;
+  });
+  if (changed) save(next);
+}

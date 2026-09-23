@@ -1,12 +1,14 @@
 "use client";
 
 import { useAuth } from "@/components/auth/AuthProvider";
+import { EnterHandoffKeySheet } from "@/components/rental/EnterHandoffKeySheet";
 import { RentalDiscoverMap } from "@/components/rental/RentalDiscoverMap";
 import { SoftChip, SoftRaised, SoftButton } from "@/components/ui/SoftUi";
 import { dummyRentals, type RentalListing } from "@/data/dummy";
+import { getPrimaryAttached } from "@/lib/handoffKeys";
 import { getRentListings } from "@/lib/rentListings";
 import { kronis } from "@/lib/kronis";
-import { ArrowLeft, Phone, Plus, Search, UserRound } from "lucide-react";
+import { ArrowLeft, KeyRound, Phone, Plus, Search, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -112,6 +114,8 @@ export default function RentalsPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
   const [phone, setPhone] = useState("");
+  const [enterKeyOpen, setEnterKeyOpen] = useState(false);
+  const [hasAttached, setHasAttached] = useState(false);
 
   useEffect(() => {
     const list = getRentListings();
@@ -123,6 +127,14 @@ export default function RentalsPage() {
         list[0]?.id ??
         null
     );
+    setHasAttached(!!getPrimaryAttached(session?.phone));
+  }, [session?.phone]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (new URLSearchParams(window.location.search).get("attach") === "1") {
+      setEnterKeyOpen(true);
+    }
   }, []);
 
   const filtered = useMemo(() => {
@@ -172,6 +184,30 @@ export default function RentalsPage() {
 
       {isRentee ? (
         <>
+          <div className="mx-3.5 mb-2 flex gap-2">
+            <button
+              type="button"
+              onClick={() => setEnterKeyOpen(true)}
+              className="flex flex-1 items-center justify-center gap-2 rounded-[14px] py-2.5 text-[13px] font-extrabold active:scale-[0.99]"
+              style={{ background: kronis.ink, color: kronis.lime }}
+            >
+              <KeyRound size={16} strokeWidth={2.4} />
+              Enter key
+            </button>
+            <button
+              type="button"
+              onClick={() => router.push("/rentals/my-pump")}
+              className="flex flex-1 items-center justify-center gap-2 rounded-[14px] border py-2.5 text-[13px] font-extrabold active:scale-[0.99]"
+              style={{
+                background: kronis.surface,
+                borderColor: kronis.border,
+                color: kronis.ink,
+              }}
+            >
+              My pump
+            </button>
+          </div>
+
           <div
             className="relative mx-3.5 min-h-[220px] flex-[1.15] overflow-hidden rounded-[22px]"
             style={{
@@ -241,6 +277,18 @@ export default function RentalsPage() {
               ))
             )}
           </div>
+
+          <EnterHandoffKeySheet
+            open={enterKeyOpen}
+            renteeName={session?.name}
+            renteePhone={session?.phone}
+            onClose={() => setEnterKeyOpen(false)}
+            onAttached={() => {
+              setHasAttached(true);
+              setListings(getRentListings());
+              router.push("/rentals/my-pump");
+            }}
+          />
         </>
       ) : (
         <>

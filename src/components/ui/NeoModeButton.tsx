@@ -14,6 +14,7 @@ type Props = {
 /**
  * Soft-UI rect mode button — matches the HTML notification-button reference:
  * outer inset well → raised ::before face → inner recessed cup.
+ * Hold (mouse/touch): face pushes in; release restores raised / selected dark.
  */
 export function NeoModeButton({
   label,
@@ -24,6 +25,7 @@ export function NeoModeButton({
 }: Props) {
   const hostRef = useRef<HTMLButtonElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
+  const [pressed, setPressed] = useState(false);
 
   const outerH = compact ? 64 : 72;
   /** HTML: height 180 → radius 38 */
@@ -50,6 +52,8 @@ export function NeoModeButton({
     return () => ro.disconnect();
   }, []);
 
+  const release = () => setPressed(false);
+
   const ow = size.w;
   const oh = size.h || outerH;
   const raisedW = ow > 0 ? Math.max(0, ow - outerPad * 2) : 0;
@@ -64,20 +68,52 @@ export function NeoModeButton({
   const ink = selected ? kronis.lime : "#858b9c";
   const iconPx = compact ? 15 : 17;
 
+  /** While held: deeper well + face sunk (inset). On release: raised again. */
+  const outerShadow = pressed
+    ? selected
+      ? "inset 9px 10px 18px rgba(40,44,48,0.45), inset -4px -4px 10px rgba(255,255,255,0.08)"
+      : "inset 9px 10px 18px rgba(100,108,122,0.32), inset -5px -5px 12px rgba(255,255,255,0.55)"
+    : selected
+      ? "inset 7px 8px 16px rgba(60,64,70,0.28), inset -6px -6px 14px rgba(255,255,255,0.2)"
+      : "inset 7px 8px 16px rgba(126,134,149,0.18), inset -8px -8px 17px rgba(255,255,255,0.78)";
+
+  const faceBg = selected
+    ? "linear-gradient(145deg, #3A3F36 0%, #1E221A 45%, #10140E 100%)"
+    : "linear-gradient(145deg, #f3f4f5 0%, #ececee 45%, #e1e2e5 100%)";
+
+  const faceShadow = pressed
+    ? selected
+      ? "inset 5px 6px 12px rgba(0,0,0,0.55), inset -2px -2px 6px rgba(255,255,255,0.04)"
+      : "inset 6px 7px 14px rgba(94,102,117,0.35), inset -3px -3px 8px rgba(255,255,255,0.7)"
+    : selected
+      ? "5px 6px 12px rgba(0,0,0,0.28), -2px -2px 8px rgba(255,255,255,0.1)"
+      : "12px 16px 22px rgba(94,102,117,0.30), 4px 6px 10px rgba(116,123,137,0.12), -8px -8px 18px rgba(255,255,255,0.85)";
+
+  const faceTransform = pressed
+    ? "translateY(1.5px) scale(0.97)"
+    : "translateY(0) scale(1)";
+
   return (
     <button
       ref={hostRef}
       type="button"
       onClick={onClick}
-      className="relative flex flex-1 items-center justify-center overflow-hidden active:scale-[0.985]"
+      onPointerDown={(e) => {
+        if (e.button !== 0 && e.pointerType === "mouse") return;
+        setPressed(true);
+      }}
+      onPointerUp={release}
+      onPointerCancel={release}
+      onPointerLeave={release}
+      onBlur={release}
+      className="relative flex flex-1 items-center justify-center overflow-hidden"
       style={{
         height: outerH,
         borderRadius: outerR,
         background: "#d9dee7",
-        /* HTML .notification-button outer inset */
-        boxShadow: selected
-          ? "inset 7px 8px 16px rgba(60,64,70,0.28), inset -6px -6px 14px rgba(255,255,255,0.2)"
-          : "inset 7px 8px 16px rgba(126,134,149,0.18), inset -8px -8px 17px rgba(255,255,255,0.78)",
+        boxShadow: outerShadow,
+        transition: "box-shadow 120ms ease",
+        touchAction: "manipulation",
       }}
     >
       {raisedW > 0 ? (
@@ -89,16 +125,14 @@ export function NeoModeButton({
             width: raisedW,
             height: raisedH,
             borderRadius: raisedR,
-            /* HTML ::before raised surface — selected = dark press */
-            background: selected
-              ? "linear-gradient(145deg, #3A3F36 0%, #1E221A 45%, #10140E 100%)"
-              : "linear-gradient(145deg, #f3f4f5 0%, #ececee 45%, #e1e2e5 100%)",
+            background: faceBg,
             border: selected
               ? "1px solid rgba(255,255,255,0.2)"
               : "1px solid rgba(255,255,255,0.7)",
-            boxShadow: selected
-              ? "5px 6px 12px rgba(0,0,0,0.28), -2px -2px 8px rgba(255,255,255,0.1)"
-              : "12px 16px 22px rgba(94,102,117,0.30), 4px 6px 10px rgba(116,123,137,0.12), -8px -8px 18px rgba(255,255,255,0.85)",
+            boxShadow: faceShadow,
+            transform: faceTransform,
+            transition:
+              "box-shadow 120ms ease, transform 120ms cubic-bezier(0.22, 1, 0.36, 1)",
           }}
         >
           <span
@@ -111,10 +145,14 @@ export function NeoModeButton({
               border: selected
                 ? "1px solid rgba(255,255,255,0.12)"
                 : "1px solid rgba(255,255,255,0.72)",
-              /* HTML .icon-circle recessed */
-              boxShadow: selected
-                ? "inset 4px 5px 10px rgba(0,0,0,0.4), inset -2px -2px 6px rgba(255,255,255,0.06)"
-                : "inset 4px 5px 9px rgba(116,123,136,0.14), inset -4px -4px 9px rgba(255,255,255,0.72)",
+              boxShadow: pressed
+                ? selected
+                  ? "inset 5px 6px 11px rgba(0,0,0,0.5), inset -1px -1px 4px rgba(255,255,255,0.04)"
+                  : "inset 5px 6px 10px rgba(116,123,136,0.22), inset -3px -3px 8px rgba(255,255,255,0.65)"
+                : selected
+                  ? "inset 4px 5px 10px rgba(0,0,0,0.4), inset -2px -2px 6px rgba(255,255,255,0.06)"
+                  : "inset 4px 5px 9px rgba(116,123,136,0.14), inset -4px -4px 9px rgba(255,255,255,0.72)",
+              transition: "box-shadow 120ms ease",
             }}
           >
             {icon === "flash" ? (
