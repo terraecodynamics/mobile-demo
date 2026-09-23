@@ -85,3 +85,17 @@ export function markListingUnavailable(pumpId: string, serial?: string): void {
   });
   if (changed) save(next);
 }
+
+/** Rentee stops rent — listing can show as available again */
+export function markListingAvailable(pumpId: string, serial?: string): void {
+  const list = load();
+  let changed = false;
+  const next = list.map((l) => {
+    if (l.id === `owner-${pumpId}` || (serial && l.serial === serial)) {
+      changed = true;
+      return { ...l, available: true };
+    }
+    return l;
+  });
+  if (changed) save(next);
+}

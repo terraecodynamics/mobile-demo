@@ -49,9 +49,11 @@ export function PumpDial({
   const wellPad = Math.max(8, Math.min(desiredPad, Math.floor((maxWell - btnSize) / 2)));
   const wellSize = Math.min(btnSize + wellPad * 2, maxWell);
   const grooveR = r + size * (4 / 224);
-  const deadZone = Math.max(size * (70 / 224), wellSize / 2 + 6);
+  /** Keep Start button only — leave the timer ring free to drag */
+  const deadZone = wellSize / 2 + 4;
 
   const svgRef = useRef<SVGSVGElement>(null);
+  const draggingRef = useRef(false);
   const [dragging, setDragging] = useState(false);
 
   const minutes = Math.max(0, Math.min(MAX_MIN, timerMinutes));
@@ -142,22 +144,32 @@ export function PumpDial({
         height={canvas}
         viewBox={`0 0 ${canvas} ${canvas}`}
         className="absolute inset-0 touch-none"
+        style={{ cursor: dragging ? "grabbing" : "grab", touchAction: "none" }}
         onPointerDown={(e) => {
           if (running || offline || powerLoading) return;
           const rect = e.currentTarget.getBoundingClientRect();
           const dx = e.clientX - (rect.left + rect.width / 2);
           const dy = e.clientY - (rect.top + rect.height / 2);
           if (Math.hypot(dx, dy) < deadZone) return;
+          draggingRef.current = true;
           setDragging(true);
           e.currentTarget.setPointerCapture(e.pointerId);
+          e.preventDefault();
           setFromPointer(e.clientX, e.clientY);
         }}
         onPointerMove={(e) => {
-          if (!dragging) return;
+          if (!draggingRef.current) return;
+          e.preventDefault();
           setFromPointer(e.clientX, e.clientY);
         }}
-        onPointerUp={() => setDragging(false)}
-        onPointerCancel={() => setDragging(false)}
+        onPointerUp={() => {
+          draggingRef.current = false;
+          setDragging(false);
+        }}
+        onPointerCancel={() => {
+          draggingRef.current = false;
+          setDragging(false);
+        }}
       >
         <defs>
           <linearGradient id="dialProgress" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -213,7 +225,9 @@ export function PumpDial({
         ) : null}
 
         {showHandle ? (
-          <g>
+          <g style={{ pointerEvents: "none" }}>
+            {/* Larger invisible hit target for the thumb */}
+            <circle cx={handle.x} cy={handle.y} r={28} fill="transparent" />
             <circle cx={handle.x} cy={handle.y} r={16} fill="rgba(255,107,53,0.18)" />
             <circle
               cx={handle.x}
@@ -254,12 +268,13 @@ export function PumpDial({
       </svg>
 
       <div
-        className="absolute z-[6]"
+        className="absolute z-[6] flex items-center justify-center"
         style={{
           top: (canvas - wellSize) / 2,
           left: (canvas - wellSize) / 2,
           width: wellSize,
           height: wellSize,
+          pointerEvents: "none",
         }}
       >
         <NeumorphStartButton

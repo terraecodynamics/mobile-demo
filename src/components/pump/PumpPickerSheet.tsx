@@ -58,7 +58,8 @@ export function PumpPickerSheet({
     <SheetModal
       open={open}
       onClose={onClose}
-      maxHeight={sheetHeight ? `${sheetHeight}px` : "55%"}
+      height={sheetHeight ? `${sheetHeight}px` : "62%"}
+      maxHeight={sheetHeight ? `${sheetHeight}px` : "62%"}
       header={
         <div
           className="px-1 text-[22px] font-extrabold tracking-[-0.3px]"

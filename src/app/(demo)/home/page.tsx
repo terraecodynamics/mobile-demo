@@ -17,6 +17,7 @@ import {
   type ListForRentPayload,
 } from "@/components/rental/PutOnRentSheet";
 import { HandoffKeySheet } from "@/components/rental/HandoffKeySheet";
+import { ActiveRenteesSheet } from "@/components/rental/ActiveRenteesSheet";
 import { SoftButton, SoftChip } from "@/components/ui/SoftUi";
 import { SheetModal } from "@/components/ui/SheetModal";
 import {
@@ -63,6 +64,17 @@ function sheetHeightFor(stageH: number) {
   return Math.min(sheet, Math.max(240, usable - mapReserve));
 }
 
+/** Select-pump picker only — a bit taller than the control sheet */
+function pickerSheetHeightFor(stageH: number) {
+  const usable = Math.max(1, stageH);
+  const mapReserve = 110;
+  let sheet: number;
+  if (usable < 600) sheet = Math.round(usable * 0.68);
+  else if (usable < 700) sheet = Math.round(usable * 0.64);
+  else sheet = Math.min(Math.round(usable * 0.6), usable - 120);
+  return Math.min(sheet, Math.max(260, usable - mapReserve));
+}
+
 function formatRemaining(mins: number) {
   const h = Math.floor(mins / 60);
   const m = Math.round(mins % 60);
@@ -84,6 +96,7 @@ export default function HomePage() {
   const [soilTargetOpen, setSoilTargetOpen] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [rentOpen, setRentOpen] = useState(false);
+  const [activeRenteesOpen, setActiveRenteesOpen] = useState(false);
   const [handoffOpen, setHandoffOpen] = useState(false);
   const [handoffOffer, setHandoffOffer] = useState<HandoffOffer | null>(null);
   const [rentToast, setRentToast] = useState<string | null>(null);
@@ -190,6 +203,7 @@ export default function HomePage() {
   const offline = !pump.online;
   const unread = dummyNotifications.filter((n) => n.unread).length;
   const sheetH = sheetHeightFor(stageH);
+  const pickerSheetH = pickerSheetHeightFor(stageH);
   const controlSheetH = mode === "rental" ? Math.min(stageH - 120, sheetH + 36) : sheetH;
 
   const displayFlow =
@@ -316,7 +330,7 @@ export default function HomePage() {
           running={running}
           muted={muted}
           onMute={handleMute}
-          onRentals={() => router.push("/rentals")}
+          onRentals={() => setActiveRenteesOpen(true)}
           onSelectPump={(id) => {
             setSelectedId(id);
             setRunningOverride(null);
@@ -434,7 +448,7 @@ export default function HomePage() {
           running: p.id === selectedId ? running : p.running,
         }))}
         selectedId={selectedId}
-        sheetHeight={sheetH}
+        sheetHeight={pickerSheetH}
         onSelect={(id) => {
           setSelectedId(id);
           setRunningOverride(null);
@@ -505,6 +519,12 @@ export default function HomePage() {
         initial={scheduleRule}
         onClose={() => setScheduleOpen(false)}
         onSaved={(payload) => setScheduleRule(payload)}
+      />
+
+      <ActiveRenteesSheet
+        open={activeRenteesOpen}
+        onClose={() => setActiveRenteesOpen(false)}
+        onManageAll={() => router.push("/rentals")}
       />
 
       <PutOnRentSheet

@@ -6,6 +6,7 @@ import { PumpDial } from "@/components/pump/PumpDial";
 import {
   getPrimaryAttached,
   setAttachedRunning,
+  stopAttachedRent,
   type AttachedRental,
 } from "@/lib/handoffKeys";
 import { kronis } from "@/lib/kronis";
@@ -28,6 +29,7 @@ export default function MyPumpPage() {
   const [rental, setRental] = useState<AttachedRental | null>(null);
   const [timerMinutes, setTimerMinutes] = useState(0);
   const [powerLoading, setPowerLoading] = useState(false);
+  const [confirmStop, setConfirmStop] = useState(false);
   const lock = useRef(false);
 
   useEffect(() => {
@@ -50,6 +52,18 @@ export default function MyPumpPage() {
       setPowerLoading(false);
       lock.current = false;
     }, 420);
+  };
+
+  const endRent = () => {
+    if (!rental) return;
+    if (running) {
+      setAttachedRunning(rental.id, false);
+      playPumpStopSound();
+    }
+    stopAttachedRent(rental.id);
+    setRental(null);
+    setConfirmStop(false);
+    router.push("/rentals");
   };
 
   if (!rental) {
@@ -155,7 +169,7 @@ export default function MyPumpPage() {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 pb-8">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-4 pb-4">
         <div
           className="mb-4 text-center text-[15px] font-extrabold"
           style={{ color: kronis.ink }}
@@ -182,6 +196,53 @@ export default function MyPumpPage() {
         >
           Tap the dial to start or stop. This pump is onboarded to your rental.
         </p>
+      </div>
+
+      <div className="shrink-0 px-3.5 pb-5 pt-1">
+        {confirmStop ? (
+          <div
+            className="rounded-[16px] px-3 py-3"
+            style={{
+              background: "#eef1f5",
+              boxShadow:
+                "inset 2px 2px 5px rgba(163,177,198,0.28), inset -1px -1px 4px rgba(255,255,255,0.85)",
+            }}
+          >
+            <div
+              className="mb-2.5 text-center text-[13px] font-extrabold"
+              style={{ color: kronis.ink }}
+            >
+              Stop rent and detach this pump?
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="flex h-11 flex-1 items-center justify-center rounded-[12px] text-[13px] font-extrabold active:scale-[0.98]"
+                style={{ background: "#fff", color: kronis.inkMuted }}
+                onClick={() => setConfirmStop(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="flex h-11 flex-1 items-center justify-center rounded-[12px] text-[13px] font-extrabold text-white active:scale-[0.98]"
+                style={{
+                  background: `linear-gradient(145deg, ${kronis.lime}, ${kronis.limeDark})`,
+                }}
+                onClick={endRent}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        ) : (
+          <SoftButton
+            label="Stop Rent"
+            variant="ink"
+            className="w-full"
+            onClick={() => setConfirmStop(true)}
+          />
+        )}
       </div>
     </div>
   );

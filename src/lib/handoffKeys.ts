@@ -2,7 +2,7 @@
 
 import { DEMO_OWNER, DEMO_RENTEE } from "@/lib/auth";
 import { dummyPumps } from "@/data/dummy";
-import { markListingUnavailable } from "@/lib/rentListings";
+import { markListingUnavailable, markListingAvailable } from "@/lib/rentListings";
 
 const ATTACHED_KEY = "terraeco.demo.attachedRentals.v3";
 
@@ -253,4 +253,18 @@ export function setAttachedRunning(
 
 export function getAttachedById(id: string): AttachedRental | null {
   return readAttached().find((a) => a.id === id) ?? null;
+}
+
+export function getAllAttached(): AttachedRental[] {
+  return readAttached();
+}
+
+/** Rentee ends the rental — detach pump from this browser */
+export function stopAttachedRent(id: string): boolean {
+  const list = readAttached();
+  const found = list.find((a) => a.id === id);
+  if (!found) return false;
+  writeAttached(list.filter((a) => a.id !== id));
+  markListingAvailable(found.pumpId, found.serial);
+  return true;
 }

@@ -161,6 +161,16 @@ export const dummyRentals: DummyRental[] = [
     amountInr: 2800,
   },
   {
+    id: "r2b",
+    pumpName: "Kronis 4 · KR-007",
+    renteePhone: "+91 98765 43210",
+    renteeName: "Vikram Singh",
+    startDate: "2026-09-01",
+    endDate: "2026-09-07",
+    status: "COMPLETED",
+    amountInr: 4900,
+  },
+  {
     id: "r3",
     pumpName: "Kronis 4 – Pro · KR-021",
     renteePhone: "+91 90123 44556",

@@ -92,27 +92,22 @@ export function SoftRaised({
 }: SoftRaisedProps) {
   const Comp = onClick ? "button" : "div";
   const isPill = radius >= 999;
+  const r = isPill ? 9999 : radius;
   return (
     <Comp
       type={onClick ? "button" : undefined}
       onClick={onClick}
       className={`relative text-left transition-transform ${onClick ? "active:scale-[0.985]" : ""} ${className}`}
       style={{
-        borderRadius: isPill ? 9999 : radius,
-        // Keep pill shadows visible; clip only squared cards
-        overflow: isPill ? "visible" : "hidden",
+        borderRadius: r,
+        background: "linear-gradient(145deg, #f1f2f3 0%, #e8e9eb 48%, #dfe1e4 100%)",
+        border: "1px solid rgba(255,255,255,0.72)",
+        boxShadow:
+          "4px 6px 12px rgba(102,109,122,0.22), -3px -3px 8px rgba(255,255,255,0.85)",
+        // Keep soft corners — clipping cuts badge/edge highlights
+        overflow: "visible",
       }}
     >
-      <span
-        className="absolute inset-0 overflow-hidden"
-        style={{
-          borderRadius: isPill ? 9999 : radius,
-          background: "linear-gradient(145deg, #f1f2f3 0%, #e8e9eb 48%, #dfe1e4 100%)",
-          border: "1px solid rgba(255,255,255,0.72)",
-          boxShadow:
-            "4px 6px 12px rgba(102,109,122,0.22), -3px -3px 8px rgba(255,255,255,0.85)",
-        }}
-      />
       <span
         className="pointer-events-none absolute inset-x-[10%] top-0 h-[40%]"
         style={{
