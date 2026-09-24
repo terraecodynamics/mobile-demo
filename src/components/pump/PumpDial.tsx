@@ -24,7 +24,8 @@ type Props = {
 };
 
 /**
- * Kronis dial — exact geometry/visuals from native PumpDial.js
+ * Kronis dial — geometry from native PumpDial.js.
+ * Pointer math must undo PhoneShell CSS scale (getBoundingClientRect is visual).
  */
 export function PumpDial({
   size = 260,
@@ -40,7 +41,6 @@ export function PumpDial({
   const cx = edgePad + size / 2;
   const cy = edgePad + size / 2;
   const r = size * (96 / 224);
-  /** Native 58/224 — bumped a little so Start reads larger */
   const buttonRadius = size * (66 / 224);
   const btnSize = Math.round(buttonRadius * 2);
   const trackInner = r - 10;
@@ -49,10 +49,10 @@ export function PumpDial({
   const wellPad = Math.max(8, Math.min(desiredPad, Math.floor((maxWell - btnSize) / 2)));
   const wellSize = Math.min(btnSize + wellPad * 2, maxWell);
   const grooveR = r + size * (4 / 224);
-  /** Keep Start button only — leave the timer ring free to drag */
-  const deadZone = wellSize / 2 + 4;
+  /** Leave Start free — slightly inside well edge so the thumb at r is easy to grab */
+  const deadZone = wellSize / 2 + 2;
 
-  const svgRef = useRef<SVGSVGElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const [dragging, setDragging] = useState(false);
 
@@ -111,14 +111,20 @@ export function PumpDial({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fillDeg, cx, cy, r]);
 
-  const setFromPointer = (clientX: number, clientY: number) => {
-    if (running || offline || powerLoading) return;
-    const el = svgRef.current;
-    if (!el) return;
+  /** Local CSS px relative to dial center (undo parent transform: scale) */
+  const localFromClient = (clientX: number, clientY: number) => {
+    const el = rootRef.current;
+    if (!el) return { x: 0, y: 0, d: 0 };
     const rect = el.getBoundingClientRect();
-    const x = clientX - rect.left - rect.width / 2;
-    const y = clientY - rect.top - rect.height / 2;
-    if (Math.hypot(x, y) < deadZone) return;
+    const sx = rect.width / canvas || 1;
+    const sy = rect.height / canvas || 1;
+    const x = (clientX - rect.left) / sx - canvas / 2;
+    const y = (clientY - rect.top) / sy - canvas / 2;
+    return { x, y, d: Math.hypot(x, y) };
+  };
+
+  const setFromLocal = (x: number, y: number) => {
+    if (running || offline || powerLoading) return;
     let deg = (Math.atan2(y, x) * 180) / Math.PI + 90;
     if (deg > 180) deg -= 360;
     const clamped = Math.max(-SWEEP / 2, Math.min(SWEEP / 2, deg));
@@ -127,10 +133,17 @@ export function PumpDial({
     onTimerChange(m);
   };
 
+  const endDrag = () => {
+    draggingRef.current = false;
+    setDragging(false);
+  };
+
   const progress = arcPath(-SWEEP / 2, fillDeg);
+  const canDrag = !running && !offline && !powerLoading;
 
   return (
     <div
+      ref={rootRef}
       className="relative mx-auto overflow-visible"
       style={{
         width: canvas,
@@ -139,37 +152,11 @@ export function PumpDial({
       }}
     >
       <svg
-        ref={svgRef}
         width={canvas}
         height={canvas}
         viewBox={`0 0 ${canvas} ${canvas}`}
-        className="absolute inset-0 touch-none"
-        style={{ cursor: dragging ? "grabbing" : "grab", touchAction: "none" }}
-        onPointerDown={(e) => {
-          if (running || offline || powerLoading) return;
-          const rect = e.currentTarget.getBoundingClientRect();
-          const dx = e.clientX - (rect.left + rect.width / 2);
-          const dy = e.clientY - (rect.top + rect.height / 2);
-          if (Math.hypot(dx, dy) < deadZone) return;
-          draggingRef.current = true;
-          setDragging(true);
-          e.currentTarget.setPointerCapture(e.pointerId);
-          e.preventDefault();
-          setFromPointer(e.clientX, e.clientY);
-        }}
-        onPointerMove={(e) => {
-          if (!draggingRef.current) return;
-          e.preventDefault();
-          setFromPointer(e.clientX, e.clientY);
-        }}
-        onPointerUp={() => {
-          draggingRef.current = false;
-          setDragging(false);
-        }}
-        onPointerCancel={() => {
-          draggingRef.current = false;
-          setDragging(false);
-        }}
+        className="pointer-events-none absolute inset-0"
+        aria-hidden
       >
         <defs>
           <linearGradient id="dialProgress" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -179,7 +166,6 @@ export function PumpDial({
           </linearGradient>
         </defs>
 
-        {/* Soft groove (the curvy recess under ticks) */}
         <path
           d={arcPath(-SWEEP / 2, SWEEP / 2, grooveR)}
           fill="none"
@@ -225,9 +211,7 @@ export function PumpDial({
         ) : null}
 
         {showHandle ? (
-          <g style={{ pointerEvents: "none" }}>
-            {/* Larger invisible hit target for the thumb */}
-            <circle cx={handle.x} cy={handle.y} r={28} fill="transparent" />
+          <g>
             <circle cx={handle.x} cy={handle.y} r={16} fill="rgba(255,107,53,0.18)" />
             <circle
               cx={handle.x}
@@ -265,6 +249,49 @@ export function PumpDial({
         >
           8h
         </text>
+      </svg>
+
+      {/* SVG donut hit-target (hole over Start) — masks don’t affect pointer hit-testing */}
+      <svg
+        width={canvas}
+        height={canvas}
+        viewBox={`0 0 ${canvas} ${canvas}`}
+        className="absolute inset-0 z-[8] touch-none select-none"
+        style={{
+          cursor: canDrag ? (dragging ? "grabbing" : "grab") : "default",
+          touchAction: "none",
+        }}
+        onPointerDown={(e) => {
+          if (!canDrag) return;
+          if (e.button !== 0 && e.pointerType === "mouse") return;
+          const { x, y, d } = localFromClient(e.clientX, e.clientY);
+          if (d < deadZone) return;
+          draggingRef.current = true;
+          setDragging(true);
+          try {
+            e.currentTarget.setPointerCapture(e.pointerId);
+          } catch {
+            /* ignore */
+          }
+          e.preventDefault();
+          e.stopPropagation();
+          setFromLocal(x, y);
+        }}
+        onPointerMove={(e) => {
+          if (!draggingRef.current) return;
+          e.preventDefault();
+          const { x, y } = localFromClient(e.clientX, e.clientY);
+          setFromLocal(x, y);
+        }}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+      >
+        <path
+          fill="transparent"
+          fillRule="evenodd"
+          d={`M0 0H${canvas}V${canvas}H0Z M${canvas / 2} ${canvas / 2} m-${deadZone} 0 a${deadZone} ${deadZone} 0 1 0 ${deadZone * 2} 0 a${deadZone} ${deadZone} 0 1 0 -${deadZone * 2} 0`}
+          style={{ pointerEvents: "fill" }}
+        />
       </svg>
 
       <div

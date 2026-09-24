@@ -49,21 +49,15 @@ export function PumpHomeAppBar({
 }: Props) {
   return (
     <header
-      className="relative z-30 flex items-center gap-2.5 overflow-hidden px-3.5 pb-3 pt-2"
+      className="relative z-30 flex items-center gap-2.5 px-3.5 pb-4"
       style={{
-        background: "linear-gradient(180deg, #F4F7FA 0%, #E0E5EC 55%, #D5DDE8 100%)",
-        borderBottom: "1px solid rgba(23,26,18,0.08)",
+        background:
+          "linear-gradient(180deg, #ffffff 0%, #ffffff 42%, rgba(255,255,255,0.72) 72%, rgba(255,255,255,0) 100%)",
+        // Cover PhoneShell status strip (desktop pt-10 / mobile safe-area)
+        marginTop: "calc(-1 * var(--shell-top-inset, 2.5rem))",
+        paddingTop: "calc(var(--shell-top-inset, 2.5rem) + 0.5rem)",
       }}
     >
-      <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[55%]"
-        style={{ background: "rgba(255,255,255,0.35)" }}
-      />
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px]"
-        style={{ background: "rgba(255,255,255,0.5)" }}
-      />
-
       <SoftChip onClick={onProfile} label="Profile" color={kronis.ink}>
         <span className="text-[13px] font-bold" style={{ color: kronis.ink }}>
           {initials}
@@ -77,9 +71,9 @@ export function PumpHomeAppBar({
         style={{
           borderRadius: 22,
           background: "linear-gradient(180deg, #FFFFFF 0%, #F4F5F0 50%, #E6E8E1 100%)",
-          border: "2px solid rgba(255,255,255,0.95)",
+          border: `2.5px solid ${kronis.lime}`,
           boxShadow:
-            "0 0 0 3px rgba(255,107,53,0.35), 5px 6px 12px rgba(102,109,122,0.28), -3px -3px 8px rgba(255,255,255,0.9)",
+            "5px 6px 12px rgba(102,109,122,0.28), -3px -3px 8px rgba(255,255,255,0.9)",
         }}
       >
         <span
