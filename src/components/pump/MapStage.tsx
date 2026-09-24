@@ -443,7 +443,6 @@ export function MapStage({
               ? "sunny"
               : "cloudy"
         }
-        temperature={dummyWeather.temperature}
         place="Field"
         sheetHeight={sheetHeight}
       />
