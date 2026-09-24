@@ -368,7 +368,7 @@ export const dummyNotifications: DummyNotification[] = [
 ];
 
 export const dummyWeather = {
-  condition: "Rain" as const,
+  condition: "Rain" as "Rain" | "Sunny" | "Cloudy",
   temperature: 28,
   humidity: 72,
   label: "Light rain",

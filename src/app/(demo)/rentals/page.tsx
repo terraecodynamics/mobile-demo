@@ -10,7 +10,7 @@ import { getRentListings } from "@/lib/rentListings";
 import { kronis } from "@/lib/kronis";
 import { ArrowLeft, Gauge, KeyRound, Phone, Plus, Search, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const statusColor = {
   ACTIVE: kronis.lime,
@@ -31,14 +31,17 @@ function ListingCard({
   selected,
   onSelect,
   onCall,
+  cardRef,
 }: {
   listing: RentalListing;
   selected: boolean;
   onSelect: () => void;
   onCall: () => void;
+  cardRef?: (el: HTMLDivElement | null) => void;
 }) {
   return (
     <div
+      ref={cardRef}
       role="button"
       tabIndex={0}
       onClick={onSelect}
@@ -116,6 +119,8 @@ export default function RentalsPage() {
   const [phone, setPhone] = useState("");
   const [enterKeyOpen, setEnterKeyOpen] = useState(false);
   const [hasAttached, setHasAttached] = useState(false);
+  const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const skipScrollRef = useRef(true);
 
   useEffect(() => {
     const list = getRentListings();
@@ -164,6 +169,20 @@ export default function RentalsPage() {
   }, [query, listings]);
 
   const selected = filtered.find((l) => l.id === selectedId) ?? filtered[0] ?? null;
+
+  // Map pin → scroll that listing card into view
+  useEffect(() => {
+    if (!selectedId) return;
+    if (skipScrollRef.current) {
+      skipScrollRef.current = false;
+      return;
+    }
+    const el = cardRefs.current[selectedId];
+    if (!el) return;
+    window.requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+    });
+  }, [selectedId]);
 
   const total = useMemo(
     () => dummyRentals.reduce((s, r) => s + r.amountInr, 0),
@@ -235,7 +254,10 @@ export default function RentalsPage() {
               listings={filtered}
               selectedId={selected?.id ?? null}
               myLocation={MY_LOCATION}
-              onSelect={(id) => setSelectedId(id)}
+              onSelect={(id) => {
+                skipScrollRef.current = false;
+                setSelectedId(id);
+              }}
             />
 
             <div className="absolute left-3 right-3 top-3 z-10">
@@ -288,6 +310,9 @@ export default function RentalsPage() {
                     key={listing.id}
                     listing={listing}
                     selected={listing.id === selected?.id}
+                    cardRef={(el) => {
+                      cardRefs.current[listing.id] = el;
+                    }}
                     onSelect={() => setSelectedId(listing.id)}
                     onCall={() => callPhone(listing.ownerPhone)}
                   />
