@@ -73,6 +73,9 @@ const analysisStyle = new Style({
   stroke: new Stroke({ color: "#1E6BFF", width: 2, lineDash: [7, 5] }),
 });
 
+/** Hide analysis ring during Kronis AI loading overlay */
+const hiddenAnalysisStyle = new Style({});
+
 /** Yellow circular fence ring (shown after Confirm in playback) */
 const geofenceCircleStyle = new Style({
   fill: new Fill({ color: "rgba(245,197,24,0.10)" }),
@@ -279,9 +282,13 @@ export default function FarmPage() {
     const analysis = analysisFeatRef.current;
     if (!analysis) return;
     analysis.setGeometry(analysisCircleGeom(pin.lat, pin.lng, radiusM));
+    // Hide blue analysis ring while Kronis AI overlay is up
+    if (aiDetecting) {
+      analysis.setStyle(hiddenAnalysisStyle);
+      return;
+    }
     // Playback after Confirm: yellow fence circle; otherwise blue analysis ring
-    const showFence =
-      !collectMode && confirmedRef.current && !aiDetecting;
+    const showFence = !collectMode && confirmedRef.current;
     analysis.setStyle(showFence ? geofenceCircleStyle : analysisStyle);
   }, [pin.lat, pin.lng, radiusM, collectMode, confirmed, aiDetecting]);
 
@@ -1380,18 +1387,10 @@ export default function FarmPage() {
                   animation: "ai-orbit 1.35s linear infinite",
                 }}
               />
-              <span
-                className="absolute inset-[22px] rounded-full"
-                style={{
-                  border: "1.5px dashed rgba(255,255,255,0.28)",
-                  animation: "ai-orbit 4.2s linear infinite reverse",
-                }}
-              />
               <div
                 className="relative flex items-center justify-center"
                 style={{
                   animation: "ai-logo-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
-                  filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.35))",
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1401,7 +1400,13 @@ export default function FarmPage() {
                   width={88}
                   height={32}
                   draggable={false}
-                  style={{ display: "block", width: 88, height: "auto" }}
+                  style={{
+                    display: "block",
+                    width: 88,
+                    height: "auto",
+                    filter:
+                      "brightness(0) invert(1) drop-shadow(0 4px 14px rgba(0,0,0,0.45))",
+                  }}
                 />
               </div>
             </div>
