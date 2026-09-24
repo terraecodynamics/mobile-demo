@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { kronis } from "@/lib/kronis";
 import { KronisSplash } from "@/components/ui/KronisSplash";
 
@@ -72,13 +72,16 @@ export function PhoneShell({ children }: { children: React.ReactNode }) {
     return (
       <div
         className="relative flex h-dvh max-h-dvh w-full flex-col overflow-hidden"
-        style={{
-          background: kronis.background,
-          paddingTop: "env(safe-area-inset-top)",
-          paddingBottom: "env(safe-area-inset-bottom)",
-          paddingLeft: "env(safe-area-inset-left)",
-          paddingRight: "env(safe-area-inset-right)",
-        }}
+        style={
+          {
+            background: kronis.background,
+            paddingTop: "env(safe-area-inset-top)",
+            paddingBottom: "env(safe-area-inset-bottom)",
+            paddingLeft: "env(safe-area-inset-left)",
+            paddingRight: "env(safe-area-inset-right)",
+            "--shell-top-inset": "env(safe-area-inset-top, 0px)",
+          } as CSSProperties
+        }
       >
         <div className="relative z-[1] flex min-h-0 flex-1 flex-col overflow-hidden">
           {booted ? children : null}
@@ -117,7 +120,10 @@ export function PhoneShell({ children }: { children: React.ReactNode }) {
           }}
         >
           <div className="pointer-events-none absolute left-1/2 top-2.5 z-50 h-[26px] w-[110px] -translate-x-1/2 rounded-full bg-[#1a1d22]" />
-          <div className="relative z-[1] flex min-h-0 flex-1 flex-col overflow-hidden pt-10">
+          <div
+            className="relative z-[1] flex min-h-0 flex-1 flex-col overflow-hidden pt-10"
+            style={{ "--shell-top-inset": "2.5rem" } as CSSProperties}
+          >
             {booted ? children : null}
           </div>
           {!booted ? (

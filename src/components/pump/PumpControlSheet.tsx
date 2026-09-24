@@ -229,11 +229,11 @@ export function PumpControlSheet({
           </div>
         ) : null}
 
-        {/* Dial / auto / rental — clip; no scroll bar */}
-        <div className="relative z-[2] flex min-h-0 flex-1 items-center justify-center overflow-hidden">
+        {/* Dial / auto / rental — visible overflow so thumb isn’t clipped */}
+        <div className="relative z-[2] flex min-h-0 flex-1 items-center justify-center overflow-visible">
           <div
             key={mode}
-            className="flex h-full max-h-full w-full items-center justify-center overflow-hidden"
+            className="flex h-full max-h-full w-full items-center justify-center overflow-visible"
             style={{
               animation: "kronis-mode-in 280ms cubic-bezier(0.22, 1.2, 0.36, 1) both",
             }}

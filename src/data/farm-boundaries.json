@@ -7,7 +7,7 @@
     "name": "Puri Green Valley Farm",
     "analysisAcres": 2.94
   },
-  "radiusAcres": 0.05,
+  "radiusAcres": 2.36,
   "analysisRadius": {
     "center": {
       "x": 0.535,
@@ -10228,6 +10228,46 @@
             [
               0.547,
               0.368
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "radiusAcres": 2.36,
+      "fieldIds": [
+        "field_07"
+      ],
+      "boundaries": [
+        {
+          "id": "field_07",
+          "name": "Field 7",
+          "crop": "Paddy",
+          "color": "#F5C518",
+          "polygon": [
+            [
+              0.5,
+              0.429
+            ],
+            [
+              0.578,
+              0.447
+            ],
+            [
+              0.622,
+              0.457
+            ],
+            [
+              0.602,
+              0.536
+            ],
+            [
+              0.515,
+              0.507
+            ],
+            [
+              0.486,
+              0.499
             ]
           ]
         }

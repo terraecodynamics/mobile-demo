@@ -73,6 +73,9 @@ const analysisStyle = new Style({
   stroke: new Stroke({ color: "#1E6BFF", width: 2, lineDash: [7, 5] }),
 });
 
+/** Hide analysis ring during Kronis AI loading overlay */
+const hiddenAnalysisStyle = new Style({});
+
 /** Yellow circular fence ring (shown after Confirm in playback) */
 const geofenceCircleStyle = new Style({
   fill: new Fill({ color: "rgba(245,197,24,0.10)" }),
@@ -279,9 +282,13 @@ export default function FarmPage() {
     const analysis = analysisFeatRef.current;
     if (!analysis) return;
     analysis.setGeometry(analysisCircleGeom(pin.lat, pin.lng, radiusM));
+    // Hide blue analysis ring while Kronis AI overlay is up
+    if (aiDetecting) {
+      analysis.setStyle(hiddenAnalysisStyle);
+      return;
+    }
     // Playback after Confirm: yellow fence circle; otherwise blue analysis ring
-    const showFence =
-      !collectMode && confirmedRef.current && !aiDetecting;
+    const showFence = !collectMode && confirmedRef.current;
     analysis.setStyle(showFence ? geofenceCircleStyle : analysisStyle);
   }, [pin.lat, pin.lng, radiusM, collectMode, confirmed, aiDetecting]);
 
@@ -1327,80 +1334,108 @@ export default function FarmPage() {
         </div>
         {aiDetecting ? (
           <div
-            className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center"
+            className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center px-6"
             style={{
               background:
-                "radial-gradient(ellipse at center, rgba(10,14,12,0.12) 0%, rgba(10,14,12,0.52) 72%)",
+                "radial-gradient(ellipse at center, rgba(10,14,12,0.08) 0%, rgba(10,14,12,0.48) 75%)",
             }}
           >
             <style>{`
-              @keyframes ai-scan-pulse {
-                0% { transform: scale(0.72); opacity: 0.9; }
-                70% { transform: scale(1.35); opacity: 0.12; }
-                100% { transform: scale(1.45); opacity: 0; }
+              @keyframes ai-ring {
+                0% { transform: scale(0.78); opacity: 0.55; }
+                100% { transform: scale(1.55); opacity: 0; }
               }
-              @keyframes ai-scan-spin {
+              @keyframes ai-orbit {
                 to { transform: rotate(360deg); }
               }
+              @keyframes ai-logo-in {
+                0% { opacity: 0; transform: scale(0.88); }
+                100% { opacity: 1; transform: scale(1); }
+              }
               @keyframes ai-bar {
-                0% { width: 18%; }
-                50% { width: 78%; }
-                100% { width: 92%; }
+                0% { transform: scaleX(0.14); }
+                55% { transform: scaleX(0.72); }
+                100% { transform: scaleX(0.94); }
+              }
+              @keyframes ai-step-fade {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.72; }
               }
             `}</style>
-            <div className="relative mb-5 flex h-28 w-28 items-center justify-center">
+
+            <div className="relative mb-6 flex h-[148px] w-[148px] items-center justify-center">
               <span
                 className="absolute inset-0 rounded-full"
                 style={{
-                  border: `2px solid ${kronis.lime}`,
-                  animation: "ai-scan-pulse 1.6s ease-out infinite",
+                  border: "1.5px solid rgba(236,83,51,0.45)",
+                  animation: "ai-ring 2.1s ease-out infinite",
                 }}
               />
               <span
-                className="absolute inset-2 rounded-full"
+                className="absolute inset-0 rounded-full"
+                style={{
+                  border: "1.5px solid rgba(236,83,51,0.28)",
+                  animation: "ai-ring 2.1s ease-out 0.7s infinite",
+                }}
+              />
+              <span
+                className="absolute inset-[10px] rounded-full"
                 style={{
                   border: "2px solid transparent",
-                  borderTopColor: kronis.lime,
-                  borderRightColor: kronis.limeDark,
-                  animation: "ai-scan-spin 1.1s linear infinite",
+                  borderTopColor: "#EC5333",
+                  borderRightColor: "rgba(236,83,51,0.35)",
+                  animation: "ai-orbit 1.35s linear infinite",
                 }}
               />
-              <span
-                className="relative flex h-[58px] w-[58px] flex-col items-center justify-center rounded-2xl"
+              <div
+                className="relative flex items-center justify-center"
                 style={{
-                  background: `linear-gradient(145deg, ${kronis.lime}, ${kronis.limeDark})`,
-                  boxShadow: "4px 6px 14px rgba(230,57,70,0.45)",
+                  animation: "ai-logo-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
                 }}
               >
-                <span className="text-[18px] font-black leading-none tracking-tight text-white">
-                  K
-                </span>
-                <span className="mt-0.5 text-[8px] font-extrabold uppercase tracking-[0.16em] text-white/90">
-                  AI
-                </span>
-              </span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/kronis-logo.svg"
+                  alt="Kronis"
+                  width={88}
+                  height={32}
+                  draggable={false}
+                  style={{
+                    display: "block",
+                    width: 88,
+                    height: "auto",
+                    filter:
+                      "brightness(0) invert(1) drop-shadow(0 4px 14px rgba(0,0,0,0.45))",
+                  }}
+                />
+              </div>
             </div>
+
             <div
-              className="mx-8 max-w-[280px] rounded-2xl px-4 py-3.5 text-center"
+              className="w-full max-w-[268px] rounded-[22px] px-5 py-4 text-center"
               style={{
                 background: "rgba(18,22,20,0.86)",
                 boxShadow: "0 8px 24px rgba(0,0,0,0.35)",
               }}
             >
               <div
-                className="text-[12px] font-extrabold tracking-[0.04em]"
-                style={{ color: kronis.lime }}
+                className="text-[11px] font-extrabold uppercase tracking-[0.14em]"
+                style={{ color: "#EC5333" }}
               >
                 Kronis AI
               </div>
-              <div className="mt-1 text-[13px] font-semibold text-white">
+              <div
+                className="mt-1.5 text-[14px] font-semibold leading-snug text-white"
+                style={{ animation: "ai-step-fade 2.4s ease-in-out infinite" }}
+              >
                 {AI_STEPS[Math.min(aiStep, AI_STEPS.length - 1)]}
               </div>
-              <div className="mx-auto mt-3 h-1.5 w-full max-w-[180px] overflow-hidden rounded-full bg-white/15">
+              <div className="mx-auto mt-3.5 h-[3px] w-full max-w-[168px] overflow-hidden rounded-full bg-white/15">
                 <div
-                  className="h-full rounded-full"
+                  className="h-full origin-left rounded-full"
                   style={{
-                    background: `linear-gradient(90deg, ${kronis.lime}, ${kronis.limeDark})`,
+                    width: "100%",
+                    background: "linear-gradient(90deg, #EC5333, #ff8a5c)",
                     animation: "ai-bar 2.8s ease-in-out forwards",
                   }}
                 />

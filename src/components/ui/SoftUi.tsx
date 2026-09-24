@@ -17,6 +17,9 @@ type SoftChipProps = {
   style?: React.CSSProperties;
   /** Flat chip for dark map overlays — no white halo glow */
   flat?: boolean;
+  /** Solid single-color face (matches page bar chrome) */
+  solid?: boolean;
+  solidColor?: string;
 };
 
 /** Exact SkeuomorphicChip: raised face + recessed cup */
@@ -30,6 +33,8 @@ export function SoftChip({
   label,
   style,
   flat = false,
+  solid = false,
+  solidColor = NEO,
 }: SoftChipProps) {
   const cup = Math.round(size * 0.62);
   const s = size / 48;
@@ -50,10 +55,14 @@ export function SoftChip({
         className="absolute inset-0 transition-opacity group-active:opacity-20"
         style={{
           borderRadius: size / 2,
-          background: "linear-gradient(145deg, #f1f2f3 0%, #e8e9eb 45%, #dfe1e4 100%)",
-          boxShadow: flat
-            ? "0 2px 6px rgba(0,0,0,0.28)"
-            : `${darkOff}px ${darkOff + 2}px ${darkBlur}px rgba(102,109,122,0.34), ${-lightOff}px ${-lightOff}px ${darkBlur}px rgba(255,255,255,0.9)`,
+          background: solid
+            ? solidColor
+            : "linear-gradient(145deg, #f1f2f3 0%, #e8e9eb 45%, #dfe1e4 100%)",
+          boxShadow: solid
+            ? "2px 3px 8px rgba(102,109,122,0.16)"
+            : flat
+              ? "0 2px 6px rgba(0,0,0,0.28)"
+              : `${darkOff}px ${darkOff + 2}px ${darkBlur}px rgba(102,109,122,0.34), ${-lightOff}px ${-lightOff}px ${darkBlur}px rgba(255,255,255,0.9)`,
         }}
       />
       {/* Recessed cup */}
@@ -63,10 +72,12 @@ export function SoftChip({
           width: cup,
           height: cup,
           borderRadius: cup / 2,
-          background: NEO,
-          boxShadow: flat
-            ? "inset 1px 1px 2px rgba(120,125,135,0.2)"
-            : "inset 3px 3px 7px rgba(150,155,165,0.28), inset -3px -3px 7px rgba(255,255,255,0.75)",
+          background: solid ? solidColor : NEO,
+          boxShadow: solid
+            ? "inset 1.5px 1.5px 3px rgba(120,125,135,0.18)"
+            : flat
+              ? "inset 1px 1px 2px rgba(120,125,135,0.2)"
+              : "inset 3px 3px 7px rgba(150,155,165,0.28), inset -3px -3px 7px rgba(255,255,255,0.75)",
         }}
       >
         {Icon ? <Icon size={Math.round(size * 0.42)} color={color} strokeWidth={2.1} /> : children}
