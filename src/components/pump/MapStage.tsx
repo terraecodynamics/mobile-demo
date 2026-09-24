@@ -1,7 +1,9 @@
 "use client";
 
 import { SoftChip } from "@/components/ui/SoftUi";
+import { WeatherAtmosphere } from "@/components/weather/WeatherAtmosphere";
 import { kronis } from "@/lib/kronis";
+import { dummyWeather } from "@/data/dummy";
 import type { DummyPump } from "@/data/dummy";
 import { PumpMapMarker, MARKER_WIDTH_SELECTED } from "@/components/pump/PumpMapMarker";
 import { CalendarClock, Volume2, VolumeX } from "lucide-react";
@@ -432,6 +434,19 @@ export function MapStage({
   return (
     <div className="absolute inset-0 overflow-hidden" style={{ background: "#2a3328" }}>
       <div ref={mapHostRef} className="absolute inset-0" />
+
+      <WeatherAtmosphere
+        initial={
+          dummyWeather.condition === "Rain"
+            ? "rain"
+            : dummyWeather.condition === "Sunny"
+              ? "sunny"
+              : "cloudy"
+        }
+        temperature={dummyWeather.temperature}
+        place="Field"
+        sheetHeight={sheetHeight}
+      />
 
       {/* Map overlay chips — wrappers must be absolute (SoftChip itself is relative) */}
       <div className="pointer-events-auto absolute left-3.5 top-3.5 z-[40]">
