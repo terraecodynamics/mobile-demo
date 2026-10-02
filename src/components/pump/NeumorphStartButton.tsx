@@ -54,10 +54,18 @@ export function NeumorphStartButton({
   const label = offline ? "Offline" : running ? "Stop" : "Start";
   const disabled = Boolean(loading || offline);
 
+  const activate = () => {
+    if (disabled) return;
+    onClick();
+  };
+
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        activate();
+      }}
       disabled={disabled}
       aria-label={label}
       className="group relative overflow-visible active:[&_.neo-face]:translate-y-[4px] active:[&_.neo-face]:scale-[0.9]"
@@ -124,7 +132,16 @@ export function NeumorphStartButton({
 
       {/* Raised face */}
       <span
+        role="presentation"
         className="neo-face absolute z-[2] flex items-center justify-center transition-transform duration-75"
+        onPointerDown={(e) => {
+          // Own the tap so the dial drag layer never steals it
+          e.stopPropagation();
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          activate();
+        }}
         style={{
           top: pad,
           left: pad,

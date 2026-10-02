@@ -156,13 +156,14 @@ export function SoftButton({
 
   const release = () => setPressed(false);
 
+  // Same neumorphic dual-shadow language for all variants (colors stay distinct)
   const idleShadow = isSoft
     ? "4px 5px 10px rgba(102,109,122,0.22), -3px -3px 8px rgba(255,255,255,0.85)"
-    : "0 6px 14px rgba(10,12,8,0.35)";
+    : "5px 6px 12px rgba(102,109,122,0.28), -3px -3px 8px rgba(255,255,255,0.8)";
 
   const pressedShadow = isSoft
     ? "inset 4px 5px 10px rgba(102,109,122,0.28), inset -2px -2px 6px rgba(255,255,255,0.75)"
-    : "inset 4px 5px 12px rgba(0,0,0,0.45), inset -2px -2px 6px rgba(255,255,255,0.08)";
+    : "inset 4px 5px 12px rgba(0,0,0,0.28), inset -2px -2px 6px rgba(255,255,255,0.22)";
 
   return (
     <button
@@ -187,6 +188,9 @@ export function SoftButton({
           : variant === "orange"
             ? `linear-gradient(145deg, ${kronis.lime}, ${kronis.limeDark})`
             : "linear-gradient(145deg, #2C3026, #1C2018, #12150F)",
+        border: isSoft
+          ? "1px solid rgba(255,255,255,0.72)"
+          : "1px solid rgba(255,255,255,0.28)",
         boxShadow: pressed ? pressedShadow : idleShadow,
         transform: pressed ? "translateY(1.5px) scale(0.985)" : "translateY(0) scale(1)",
         transition:
@@ -194,8 +198,17 @@ export function SoftButton({
         touchAction: "manipulation",
       }}
     >
-      {Icon ? <Icon size={isPill ? 14 : 18} /> : null}
-      {label}
+      <span
+        className="pointer-events-none absolute inset-x-[10%] top-0 h-[42%]"
+        style={{
+          borderRadius: isPill ? "9999px 9999px 14px 14px" : "14px 14px 0 0",
+          background: isSoft
+            ? "rgba(255,255,255,0.35)"
+            : "rgba(255,255,255,0.18)",
+        }}
+      />
+      {Icon ? <Icon size={isPill ? 14 : 18} className="relative" /> : null}
+      <span className="relative">{label}</span>
     </button>
   );
 }
