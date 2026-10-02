@@ -25,7 +25,8 @@ type Props = {
 
 /**
  * Kronis dial — geometry from native PumpDial.js.
- * Pointer math must undo PhoneShell CSS scale (getBoundingClientRect is visual).
+ * Pointer math undoes PhoneShell CSS scale (getBoundingClientRect is visual).
+ * Start sits above the drag layer so power toggle always receives taps.
  */
 export function PumpDial({
   size = 260,
@@ -49,8 +50,8 @@ export function PumpDial({
   const wellPad = Math.max(8, Math.min(desiredPad, Math.floor((maxWell - btnSize) / 2)));
   const wellSize = Math.min(btnSize + wellPad * 2, maxWell);
   const grooveR = r + size * (4 / 224);
-  /** Leave Start free — slightly inside well edge so the thumb at r is easy to grab */
-  const deadZone = wellSize / 2 + 2;
+  /** Ring-only — Start face sits on top and owns the center */
+  const deadZone = Math.max(btnSize / 2 + 6, wellSize / 2 - 4);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
@@ -251,12 +252,9 @@ export function PumpDial({
         </text>
       </svg>
 
-      {/* SVG donut hit-target (hole over Start) — masks don’t affect pointer hit-testing */}
-      <svg
-        width={canvas}
-        height={canvas}
-        viewBox={`0 0 ${canvas} ${canvas}`}
-        className="absolute inset-0 z-[8] touch-none select-none"
+      {/* Drag ring — under Start so power button always wins center taps */}
+      <div
+        className="absolute inset-0 z-[5] touch-none select-none"
         style={{
           cursor: canDrag ? (dragging ? "grabbing" : "grab") : "default",
           touchAction: "none",
@@ -285,17 +283,11 @@ export function PumpDial({
         }}
         onPointerUp={endDrag}
         onPointerCancel={endDrag}
-      >
-        <path
-          fill="transparent"
-          fillRule="evenodd"
-          d={`M0 0H${canvas}V${canvas}H0Z M${canvas / 2} ${canvas / 2} m-${deadZone} 0 a${deadZone} ${deadZone} 0 1 0 ${deadZone * 2} 0 a${deadZone} ${deadZone} 0 1 0 -${deadZone * 2} 0`}
-          style={{ pointerEvents: "fill" }}
-        />
-      </svg>
+      />
 
+      {/* Start / Stop — above drag layer */}
       <div
-        className="absolute z-[6] flex items-center justify-center"
+        className="absolute z-[10] flex items-center justify-center"
         style={{
           top: (canvas - wellSize) / 2,
           left: (canvas - wellSize) / 2,
