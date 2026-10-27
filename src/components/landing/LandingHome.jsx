@@ -9,7 +9,6 @@ import {
   BarChart3,
   Play,
   Settings,
-  Shield,
   Sun,
   Wifi,
   Activity,
@@ -27,6 +26,7 @@ import KronisFarmSection from '@/components/landing/KronisFarmSection';
 import TerraecoHero from '@/components/landing/TerraecoHero';
 import TwoSolutionsSection from '@/components/landing/TwoSolutionsSection';
 import SunToSoilSection from '@/components/landing/SunToSoilSection';
+import KronisCompareSection from '@/components/landing/KronisCompareSection';
 import { preferNativeLandingScroll } from '@/lib/landingMotion';
 
 if (typeof window !== 'undefined') {
@@ -871,6 +871,11 @@ export default function LandingHome() {
         </div>
       </section>
 
+      <KronisCompareSection
+        dmSansFamily={dmSans.style.fontFamily}
+        scrollToSection={scrollToSection}
+      />
+
       {/* CTA Section - TerraEco IoT Platform */}
       <section id="resources" className="flex min-h-0 items-center bg-black py-12 sm:py-16 md:min-h-screen md:py-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center w-full">
@@ -905,11 +910,15 @@ export default function LandingHome() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="sm:col-span-2 lg:col-span-1">
-              <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-r from-red-600 to-red-500 rounded-lg flex items-center justify-center">
-                  <Shield className="text-white text-lg sm:text-xl" />
-                </div>
-                <span className="text-xl sm:text-2xl font-bold">Kronis</span>
+              <div className="mb-4 sm:mb-6">
+                <Image
+                  src="/kronis-logo.svg"
+                  alt="Kronis"
+                  width={140}
+                  height={51}
+                  className="h-8 w-auto object-contain object-left sm:h-10"
+                  style={{ filter: 'brightness(0) invert(1)' }}
+                />
               </div>
               <p className="text-sm sm:text-base text-gray-400 leading-relaxed mb-6 sm:mb-8">
                 Powering the future of sustainable agriculture with solar-powered irrigation systems and intelligent IoT technology. 
@@ -943,7 +952,7 @@ export default function LandingHome() {
           </div>
           <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 sm:mt-8">
             <p className="text-gray-400 text-xs sm:text-sm text-center sm:text-left">
-              © 2025 TerraEco. All rights reserved.
+              © {new Date().getFullYear()} TerraEco. All rights reserved.
             </p>
             <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
               <button className="text-gray-400 hover:text-white transition-colors text-xs sm:text-sm">Privacy Policy</button>
