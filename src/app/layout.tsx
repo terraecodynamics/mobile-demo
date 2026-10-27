@@ -33,7 +33,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} antialiased`}>
+    <html lang="en" className={`${geistSans.variable} antialiased`} data-scroll-behavior="smooth">
       <body suppressHydrationWarning>
         {children}
       </body>

@@ -52,7 +52,7 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
   return (
     <section
       id="product"
-      className="relative box-border h-[100vh] max-h-[100vh] min-h-0 overflow-x-hidden overflow-y-hidden pt-16 sm:pt-20 md:pt-24"
+      className="relative box-border min-h-0 overflow-x-clip overflow-y-visible px-0 py-10 sm:py-12 md:h-[100vh] md:max-h-[100vh] md:overflow-hidden md:py-0 md:pt-24"
       style={{ fontFamily: dmSansFamily, backgroundColor: '#0a1410' }}
     >
       {/* Fill padding-top so page bg never peeks through */}
@@ -128,14 +128,14 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
         />
       </div>
 
-      <div className="relative z-10 mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col px-3 pb-8 pt-4 sm:px-5 sm:pb-10 sm:pt-5 md:px-6 md:pb-12 lg:px-8">
-        {/* Line 1 left, line 2 right — same wrapper as nav + body */}
+      <div className="relative z-10 mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col px-4 pb-6 pt-2 sm:px-5 sm:pb-10 sm:pt-5 md:px-6 md:pb-12 lg:px-8">
+        {/* Line 1 left, line 2 right — stacked on mobile so words never split */}
         <h1
-          className="pointer-events-none absolute inset-x-0 top-0 z-[1] flex w-full min-w-0 flex-col items-stretch gap-0 px-1 font-black uppercase tracking-[-0.045em] sm:px-2 sm:tracking-[-0.04em] md:tracking-[-0.035em]"
+          className="pointer-events-none relative z-[2] mb-4 flex w-full min-w-0 flex-col items-stretch gap-0 font-black uppercase tracking-[-0.03em] md:absolute md:inset-x-0 md:top-0 md:mb-0 md:px-2 md:tracking-[-0.035em]"
           style={{ filter: 'drop-shadow(0 1px 12px rgba(0,0,0,0.25))' }}
         >
           <span
-            className="mt-2 block max-w-full text-left leading-[0.92] text-[clamp(1.35rem,min(7.2vw_9vmin),6.25rem)] [overflow-wrap:anywhere] max-[360px]:whitespace-normal max-[360px]:leading-[0.95] whitespace-nowrap sm:mt-3 sm:text-[clamp(1.85rem,min(8vw_10vmin),6.9rem)] md:mt-4 md:text-[clamp(2.15rem,7.4vw,7.25rem)] lg:text-[clamp(2.45rem,6.6vw,7.75rem)] xl:text-[clamp(2.5rem,6.2vw,7.75rem)]"
+            className="block max-w-full text-left text-[clamp(1.85rem,10vw,2.85rem)] leading-[0.95] sm:text-[clamp(1.85rem,min(8vw_10vmin),6.9rem)] md:mt-4 md:whitespace-nowrap md:text-[clamp(2.15rem,7.4vw,7.25rem)] lg:text-[clamp(2.45rem,6.6vw,7.75rem)] xl:text-[clamp(2.5rem,6.2vw,7.75rem)]"
             style={{
               background: 'radial-gradient(circle closest-corner at 50% 50%, #ffffff, #fff6)',
               backgroundClip: 'text',
@@ -144,10 +144,13 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
               color: 'transparent',
             }}
           >
-            Precision&nbsp;Agriculture
+            Precision
+            <br className="md:hidden" />
+            <span className="hidden md:inline"> </span>
+            Agriculture
           </span>
           <span
-            className="-mt-0.5 block w-full max-w-full text-right leading-[0.88] text-[clamp(1.55rem,min(8vw_10vmin),6.75rem)] [overflow-wrap:anywhere] max-[360px]:whitespace-normal max-[360px]:leading-[0.92] whitespace-nowrap sm:-mt-1 sm:text-[clamp(2.1rem,min(8.8vw_11vmin),7.35rem)] md:-mt-2 md:text-[clamp(2.45rem,8vw,7.85rem)] lg:text-[clamp(2.75rem,7.2vw,8.5rem)] xl:text-[clamp(2.85rem,6.8vw,8.5rem)]"
+            className="mt-1 block w-full max-w-full text-right text-[clamp(1.85rem,10vw,2.85rem)] leading-[0.95] sm:text-[clamp(2.1rem,min(8.8vw_11vmin),7.35rem)] md:-mt-2 md:whitespace-nowrap md:text-[clamp(2.45rem,8vw,7.85rem)] lg:text-[clamp(2.75rem,7.2vw,8.5rem)] xl:text-[clamp(2.85rem,6.8vw,8.5rem)]"
             style={{
               background: 'radial-gradient(circle closest-corner at 50% 50%, #ffffff, #fff6)',
               backgroundClip: 'text',
@@ -160,17 +163,17 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
           </span>
         </h1>
 
-        <div className="relative z-[5] flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pt-[clamp(4.5rem,24vw,10rem)] sm:gap-8 sm:pt-[clamp(5.25rem,20vw,10rem)] sm:[scrollbar-width:thin] md:gap-9 md:pt-[clamp(5.75rem,16vw,10rem)] lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:overflow-y-visible lg:pt-4 lg:pb-10 xl:gap-8 2xl:gap-10">
+        <div className="relative z-[5] flex min-h-0 flex-1 flex-col gap-5 overflow-visible pt-1 sm:gap-8 md:gap-9 md:overflow-y-auto md:pt-[clamp(5.75rem,16vw,10rem)] lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:overflow-y-visible lg:pt-4 lg:pb-10 xl:gap-8 2xl:gap-10">
         {/* Product + hotspots — title sits above in page box; pump draws over title via z-10 */}
         <div className="relative flex min-w-0 flex-1 items-start justify-center self-start">
-          <div className="relative w-full max-w-[min(94vw,400px)] sm:max-w-[min(90vw,440px)] lg:max-w-none">
+          <div className="relative mx-auto w-full max-w-[18rem] sm:max-w-[22rem] md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-[32rem]">
             <Image
               src="/pump-prototype-black.png"
               alt="TerraEco solar irrigation system"
               width={700}
               height={700}
               priority
-              className="relative z-10 mx-auto h-auto w-full max-w-[min(100%,15rem)] object-contain sm:max-w-[22rem] md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-[32rem]"
+              className="relative z-10 mx-auto h-auto w-full object-contain"
             />
             {HOTSPOTS.map((h) => (
               <div
@@ -202,12 +205,12 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
         </div>
 
         {/* Right column: flush right, lower so it clears the headline */}
-        <div className="mx-auto mt-6 flex w-full max-w-lg flex-col gap-4 self-stretch sm:mt-8 sm:max-w-xl sm:gap-5 md:mt-10 lg:ml-auto lg:mt-14 lg:w-[min(100%,23rem)] lg:max-w-none lg:shrink-0 lg:self-end lg:pb-5 xl:mt-16 xl:w-96">
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:gap-4">
+        <div className="mx-auto mt-2 flex w-full max-w-lg flex-col gap-4 self-stretch sm:mt-8 sm:max-w-xl sm:gap-5 md:mt-10 lg:ml-auto lg:mt-14 lg:w-[min(100%,23rem)] lg:max-w-none lg:shrink-0 lg:self-end lg:pb-5 xl:mt-16 xl:w-96">
+          <div className="flex flex-row items-center gap-3 sm:items-start sm:gap-4">
             <button
               type="button"
               onClick={() => scrollToSection('platform')}
-              className="group relative w-full max-w-[10.25rem] shrink-0 overflow-hidden rounded-xl border border-emerald-500/20 bg-[#0e1a15]/90 text-left shadow-lg backdrop-blur-sm transition hover:border-orange-500/40 sm:max-w-[11rem]"
+              className="group relative w-[7.5rem] shrink-0 overflow-hidden rounded-xl border border-emerald-500/20 bg-[#0e1a15]/90 text-left shadow-lg backdrop-blur-sm transition hover:border-orange-500/40 sm:w-full sm:max-w-[11rem]"
             >
               <div className="relative aspect-[4/3] w-full">
                 <Image
@@ -225,7 +228,7 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
               <span className="sr-only">Watch platform overview</span>
             </button>
 
-            <p className="w-full min-w-0 flex-1 text-center text-[12.5px] leading-snug text-white/85 sm:text-left sm:text-[13px] md:text-sm">
+            <p className="min-w-0 flex-1 text-left text-[12px] leading-snug text-white/85 sm:text-[13px] md:text-sm">
               <span className="font-semibold text-white">Experience</span> reliable solar irrigation,
               real-time telemetry, and smooth remote control.{' '}
               <span className="text-white/55">Solutions tailored for modern farms.</span>

@@ -64,7 +64,7 @@ export default function TwoSolutionsSection({ dmSansFamily, scrollToSection }) {
       className="relative isolate w-full overflow-hidden bg-[#07080a]"
       style={{ fontFamily: dmSansFamily }}
     >
-      <div className="mx-auto grid min-h-[100svh] w-full max-w-[1600px] grid-cols-1 lg:grid-cols-[minmax(240px,0.9fr)_1.15fr_1.15fr]">
+      <div className="mx-auto grid min-h-0 w-full max-w-[1600px] grid-cols-1 lg:min-h-[100svh] lg:grid-cols-[minmax(240px,0.9fr)_1.15fr_1.15fr]">
         {/* Left copy */}
         <div className="relative z-10 flex flex-col justify-between border-b border-white/10 px-6 py-12 sm:px-8 lg:border-b-0 lg:border-r lg:border-white/10 lg:px-10 lg:py-14 xl:px-12">
           <div>
@@ -97,7 +97,7 @@ export default function TwoSolutionsSection({ dmSansFamily, scrollToSection }) {
                   key={link.id}
                   type="button"
                   onClick={() => setActiveLeft(link.id)}
-                  className={`group flex w-full max-w-[11rem] items-center justify-between border-b pb-2 text-left text-sm transition ${
+                  className={`group flex w-full max-w-none items-center justify-between border-b pb-2 text-left text-sm transition lg:max-w-[11rem] ${
                     active
                       ? 'border-amber-400/80 text-white'
                       : 'border-white/15 text-white/45 hover:border-white/35 hover:text-white/80'
