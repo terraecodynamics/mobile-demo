@@ -22,8 +22,10 @@ body {
 html:not(.app-shell) {
   height: auto;
   min-height: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-x: clip;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: none;
 }
 
 #smooth-wrapper {
@@ -40,10 +42,26 @@ html:not(.app-shell) body {
   overflow: visible;
   scroll-behavior: smooth;
 }
-@media (max-width: 768px) and (hover: none) and (pointer: coarse) {
+@media (max-width: 1023px), (hover: none) and (pointer: coarse) {
   html:not(.app-shell),
   html:not(.app-shell) body {
     scroll-behavior: auto;
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  html:not(.app-shell) #smooth-wrapper,
+  html:not(.app-shell) #smooth-content {
+    height: auto !important;
+    min-height: 0;
+    overflow: visible !important;
+    transform: none !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-page {
+    overflow-x: clip;
   }
 }
 

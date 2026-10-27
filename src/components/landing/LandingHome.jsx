@@ -27,6 +27,7 @@ import KronisFarmSection from '@/components/landing/KronisFarmSection';
 import TerraecoHero from '@/components/landing/TerraecoHero';
 import TwoSolutionsSection from '@/components/landing/TwoSolutionsSection';
 import SunToSoilSection from '@/components/landing/SunToSoilSection';
+import { preferNativeLandingScroll } from '@/lib/landingMotion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -50,6 +51,7 @@ export default function LandingHome() {
   const smootherRef = useRef(null);
 
   useEffect(() => {
+    if (preferNativeLandingScroll()) return undefined;
     const refresh = () => ScrollTrigger.refresh();
     const t1 = window.setTimeout(refresh, 160);
     const t2 = window.setTimeout(refresh, 700);
@@ -86,10 +88,7 @@ export default function LandingHome() {
   }, []);
 
   useLayoutEffect(() => {
-    const isMobileDevice =
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
-      ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-    if (isMobileDevice) return undefined;
+    if (preferNativeLandingScroll()) return undefined;
     if (!document.getElementById('smooth-wrapper') || !document.getElementById('smooth-content')) {
       return undefined;
     }
@@ -118,10 +117,7 @@ export default function LandingHome() {
   useEffect(() => {
     // Detect mobile device - only disable smooth scroll on actual mobile devices
     // Check for mobile user agent AND touch capability (not just screen width)
-    const isMobileDevice = typeof window !== 'undefined' && (
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
-      ('ontouchstart' in window || navigator.maxTouchPoints > 0)
-    );
+    const isMobileDevice = preferNativeLandingScroll();
 
     // On mobile, use normal scroll - don't initialize smooth scroll
     if (isMobileDevice) {
@@ -301,7 +297,7 @@ export default function LandingHome() {
 
   return (
     <>
-    <div id="smooth-wrapper" className={`min-h-screen bg-black ${dmSans.variable}`}>
+    <div id="smooth-wrapper" className={`landing-page min-h-screen bg-black md:overflow-x-clip ${dmSans.variable}`}>
       <div id="smooth-content">
       {/* Navigation — transparent over assemble hero */}
       <nav className="absolute left-0 right-0 top-0 z-50 px-4 pt-4 sm:px-6 sm:pt-6" style={{ margin: 0 }}>
@@ -556,7 +552,7 @@ export default function LandingHome() {
       <SunToSoilSection dmSansFamily={dmSans.style.fontFamily} />
       
       {/* Stats & About Section - Modern Two-Column Layout */}
-      <section id="about" className="bg-black relative z-10 min-h-screen flex items-center py-12 sm:py-16 md:py-20">
+      <section id="about" className="bg-black relative z-10 flex min-h-0 items-center py-12 sm:py-16 md:min-h-screen md:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
           <div className="bg-gray-900/50 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 border border-gray-800/50">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 items-center">
@@ -623,7 +619,7 @@ export default function LandingHome() {
       </section>
 
       {/* Precision Engineering Section */}
-      <section id="pump-showcase" className="bg-black relative z-10 min-h-screen flex items-center py-8 sm:py-12 md:py-16">
+      <section id="pump-showcase" className="bg-black relative z-10 flex min-h-0 items-center py-8 sm:py-12 md:min-h-screen md:py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
           <div className="text-center mb-6 sm:mb-8 md:mb-10">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 md:mb-5"  style={{ 
@@ -649,7 +645,7 @@ export default function LandingHome() {
                 alt="TerraEco Solar Pump Prototype" 
                 width={400}
                 height={100}
-                className="max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-xl h-auto object-contain"
+                className="h-auto w-full max-w-sm object-contain sm:max-w-md md:max-w-lg lg:max-w-xl"
               />
               
               {/* Callout 1 - Top Right Annotation */}
@@ -706,7 +702,7 @@ export default function LandingHome() {
       
 
       {/* Platform Section - TerraEco IoT Integration */}
-      <section id="platform" className="bg-black min-h-screen flex items-center py-12 sm:py-16 md:py-20">
+      <section id="platform" className="flex min-h-0 items-center bg-black py-12 sm:py-16 md:min-h-screen md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full flex items-center">
           <div className="w-full">
             <div className="text-center mb-2 sm:mb-8 md:mb-2">
@@ -737,7 +733,7 @@ export default function LandingHome() {
                         alt="TerraEco Solar Pump with IoT Web Technology Integration" 
                         width={500}
                         height={100}
-                        className="h-auto rounded-xl sm:rounded-2xl shadow-2xl"
+                        className="h-auto w-full rounded-xl shadow-2xl sm:rounded-2xl"
                       />
                       {/* Overlay with connection indicators */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
@@ -776,12 +772,13 @@ export default function LandingHome() {
       {/* Platform Features Section */}
       <section 
         id="features" 
-        className="bg-black min-h-screen flex items-center py-12 sm:py-16 md:py-20"
+        className="flex min-h-0 items-center bg-black py-12 sm:py-16 md:min-h-screen md:py-20"
         style={{
           backgroundImage: 'url(/pump-glow-view.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'scroll',
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
@@ -875,7 +872,7 @@ export default function LandingHome() {
       </section>
 
       {/* CTA Section - TerraEco IoT Platform */}
-      <section id="resources" className="bg-black min-h-screen flex items-center py-12 sm:py-16 md:py-20">
+      <section id="resources" className="flex min-h-0 items-center bg-black py-12 sm:py-16 md:min-h-screen md:py-20">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center w-full">
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
             Transform Your Agriculture with Smart IoT
@@ -904,7 +901,7 @@ export default function LandingHome() {
       </section>
 
       {/* Footer */}
-      <footer id="company" className="bg-black text-white border-t border-gray-800 min-h-screen flex items-center py-12 sm:py-16 md:py-20">
+      <footer id="company" className="flex min-h-0 items-center border-t border-gray-800 bg-black py-12 text-white sm:py-16 md:min-h-screen md:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="sm:col-span-2 lg:col-span-1">

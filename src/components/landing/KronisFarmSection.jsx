@@ -22,7 +22,7 @@ const FEATURES = [
   {
     label: 'Smart Irrigation',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.45" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 3.2C12 3.2 6.5 9.2 6.5 13.2a5.5 5.5 0 0011 0C17.5 9.2 12 3.2 12 3.2z" />
       </svg>
     ),
@@ -30,7 +30,7 @@ const FEATURES = [
   {
     label: 'Solar Powered',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.45" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden>
         <circle cx="12" cy="12" r="3.25" />
         <path strokeLinecap="round" d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M5.9 5.9l1.4 1.4M16.7 16.7l1.4 1.4M18.1 5.9l-1.4 1.4M7.3 16.7l-1.4 1.4" />
       </svg>
@@ -39,7 +39,7 @@ const FEATURES = [
   {
     label: 'IoT Connected',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.45" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden>
         <path strokeLinecap="round" d="M5.2 14.2a8.2 8.2 0 0113.6 0M8.1 16.8a4.4 4.4 0 017.8 0" />
         <circle cx="12" cy="19.4" r="1.1" fill="currentColor" stroke="none" />
       </svg>
@@ -48,7 +48,7 @@ const FEATURES = [
   {
     label: 'Higher Yield',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.45" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 20.5V11M12 11c0-4.2 3.1-7.2 7-7.7-.4 4.1-3.1 7.2-7 7.7zm0 0c0-4.2-3.1-7.2-7-7.7.4 4.1 3.1 7.2 7 7.7z" />
       </svg>
     ),
@@ -62,7 +62,7 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
   return (
     <section
       id="kronis-farm"
-      className="relative isolate min-h-[100svh] w-full overflow-hidden bg-[#0c1610]"
+      className="relative isolate min-h-[100svh] w-full overflow-x-clip bg-[#0c1610] md:h-[100svh] md:overflow-hidden"
       style={{ fontFamily: dmSansFamily }}
     >
       <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
@@ -71,21 +71,20 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
           alt=""
           fill
           priority
-          quality={100}
           sizes="100vw"
-          className="object-cover object-[center_28%]"
+          className="object-cover object-[center_42%] md:object-[center_28%]"
         />
       </div>
       <div
-        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-black/30 via-black/10 to-transparent"
+        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-black/35 via-black/10 to-black/50 md:bg-gradient-to-r md:from-black/30 md:via-black/10 md:to-transparent"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[28%] bg-gradient-to-t from-black/25 to-transparent"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[38%] bg-gradient-to-t from-black/55 to-transparent md:h-[28%] md:from-black/25"
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col px-5 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col px-5 pb-16 pt-8 sm:px-8 sm:py-10 md:h-full md:min-h-0 md:justify-between md:pb-12 lg:px-12 lg:py-12">
         {/* Top bar */}
         <div className="flex items-start justify-between gap-4">
           <div className="relative">
@@ -94,7 +93,7 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
               aria-hidden
             />
             <p
-              className="flex items-center text-[clamp(1.85rem,4.2vw,2.75rem)] font-semibold tracking-tight text-white"
+              className="flex items-center text-[clamp(1.7rem,8vw,2.75rem)] font-semibold tracking-tight text-white"
               style={WHITE_TYPE}
             >
               Kr
@@ -122,29 +121,29 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
             </p>
           </div>
           <p
-            className="hidden pt-1.5 text-right text-[11px] font-normal tracking-[0.02em] text-black sm:block sm:text-xs md:text-sm"
-            style={{ textShadow: '0 1px 2px rgba(255,255,255,0.35)' }}
+            className="hidden max-w-[9rem] pt-1.5 text-right text-[11px] font-normal leading-snug tracking-[0.02em] text-white/90 sm:block sm:max-w-none sm:text-xs md:text-sm"
+            style={{ textShadow: TEXT_SHADOW }}
           >
             Smart Agriculture | Sustainable Tomorrow
           </p>
         </div>
 
         {/* Hero copy — mid-left like mockup */}
-        <div className="relative mt-[min(18vh,9rem)] flex max-w-full flex-col sm:mt-[min(20vh,10rem)] lg:max-w-4xl">
+        <div className="relative mt-10 flex max-w-full flex-col md:my-auto md:mt-0 lg:max-w-4xl">
           <div
             className="pointer-events-none absolute -inset-x-5 -inset-y-4 -z-10 rounded-[2rem] bg-black/30 blur-2xl sm:-inset-x-8"
             aria-hidden
           />
-          <h2 className="whitespace-nowrap text-[clamp(1.55rem,5.2vw,4.35rem)] font-medium leading-[1.08] tracking-tight">
+          <h2 className="text-[clamp(1.45rem,6.6vw,4.35rem)] font-medium leading-[1.15] tracking-tight md:whitespace-nowrap md:text-[clamp(1.55rem,5.2vw,4.35rem)] md:leading-[1.08]">
             <span className="text-white" style={WHITE_TYPE}>
               Water.{' '}
             </span>
             <span style={MINT_TYPE}>Energy.</span>
-            <span style={MINT_TYPE}> Intelligence.</span>
+            <span className="sm:inline" style={MINT_TYPE}> Intelligence.</span>
           </h2>
 
           <p
-            className="mt-3 text-base font-normal text-white sm:mt-4 sm:text-lg md:text-xl"
+            className="mt-2 max-w-xs text-sm font-normal text-white sm:mt-4 sm:max-w-none sm:text-lg md:text-xl"
             style={{ textShadow: TEXT_SHADOW }}
           >
             Agriculture, beautifully connected.
@@ -153,7 +152,7 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
           <button
             type="button"
             onClick={onExplore}
-            className="mt-7 inline-flex w-fit items-center gap-2 rounded-full border border-white/20 px-7 py-3 text-sm font-medium text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/70 sm:mt-8 sm:px-8 sm:py-3.5 sm:text-base"
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-7 py-3 text-sm font-medium text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-200/70 sm:mt-8 sm:w-fit sm:px-8 sm:py-3.5 sm:text-base"
             style={{
               background:
                 'linear-gradient(90deg, rgba(46,196,168,0.85) 0%, rgba(130,230,170,0.8) 55%, rgba(170,245,190,0.78) 100%)',
@@ -167,16 +166,12 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
           </button>
         </div>
 
-        <div className="relative mt-auto pb-5 pt-14 sm:pb-8 sm:pt-16">
-          <div
-            className="pointer-events-none absolute -inset-x-3 -inset-y-2 -z-10 rounded-2xl bg-black/25 blur-xl"
-            aria-hidden
-          />
-          <ul className="flex flex-wrap gap-x-9 gap-y-5 sm:gap-x-12 md:gap-x-14">
+        <div className="relative z-20 mt-10 w-full shrink-0 rounded-2xl bg-black/55 px-4 py-5 backdrop-blur-md sm:mt-12 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none md:mt-0">
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-5 sm:flex sm:flex-wrap sm:gap-x-12 sm:gap-y-5 md:gap-x-14">
             {FEATURES.map((item) => (
               <li
                 key={item.label}
-                className="flex min-w-[5.5rem] flex-col items-center text-center sm:min-w-[6.25rem]"
+                className="flex min-w-0 flex-col items-center text-center sm:min-w-[6.25rem]"
               >
                 <span
                   className="text-white"
@@ -185,7 +180,7 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
                   {item.icon}
                 </span>
                 <span
-                  className="mt-2.5 text-[11px] font-normal tracking-wide text-white sm:text-xs md:text-[13px]"
+                  className="mt-2 block w-full text-[12px] font-medium leading-snug text-white sm:mt-2.5 sm:text-xs sm:font-normal md:text-[13px]"
                   style={{ textShadow: TEXT_SHADOW }}
                 >
                   {item.label}

@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { preferNativeLandingScroll } from '@/lib/landingMotion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -150,6 +151,7 @@ export default function SunToSoilSection({ dmSansFamily }) {
     const bg = bgRef.current;
     const content = contentRef.current;
     if (!section || !bg) return undefined;
+    if (preferNativeLandingScroll()) return undefined;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -226,7 +228,7 @@ export default function SunToSoilSection({ dmSansFamily }) {
 
       <div
         ref={contentRef}
-        className="relative z-10 mx-auto flex min-h-[85vh] w-full max-w-7xl flex-col justify-center gap-10 px-5 py-16 sm:px-8 sm:py-20 lg:min-h-[100vh] lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:px-10 lg:py-24 xl:px-12"
+        className="relative z-10 mx-auto flex min-h-0 w-full max-w-7xl flex-col justify-center gap-10 px-5 py-16 sm:px-8 sm:py-20 md:min-h-[85vh] lg:min-h-[100vh] lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:px-10 lg:py-24 xl:px-12"
       >
         <div className="max-w-md shrink-0 lg:max-w-sm xl:max-w-md">
           <div className="mb-5 flex flex-col gap-2">
@@ -289,11 +291,11 @@ export default function SunToSoilSection({ dmSansFamily }) {
             />
           </svg>
 
-          <ol className="relative z-[1] flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-5 lg:grid lg:grid-cols-7 lg:gap-2 lg:overflow-visible lg:pb-0 xl:gap-3 [&::-webkit-scrollbar]:hidden">
+          <ol className="relative z-[1] grid grid-cols-3 gap-x-3 gap-y-6 overflow-visible pb-2 sm:grid-cols-3 sm:gap-5 lg:grid-cols-7 lg:gap-2 lg:pb-0 xl:gap-3">
             {STEPS.map((step) => (
               <li
                 key={step.id}
-                className="flex w-[6.75rem] shrink-0 snap-center flex-col items-center sm:w-[7.5rem] lg:w-auto"
+                className="flex w-auto flex-col items-center"
               >
                 <div
                   className="relative aspect-square w-full max-w-[7.75rem] rounded-full p-[2px] lg:max-w-none"

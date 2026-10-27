@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { preferNativeLandingScroll } from '@/lib/landingMotion';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -57,6 +58,7 @@ function captionIndexForProgress(progress) {
  */
 export default function VideoHero({ dmSansFamily }) {
   const sectionRef = useRef(null);
+  const stageRef = useRef(null);
   const canvasRef = useRef(null);
   const imagesRef = useRef([]);
   const frameIndexRef = useRef(0);
@@ -74,6 +76,7 @@ export default function VideoHero({ dmSansFamily }) {
 
     let cancelled = false;
     let trigger;
+    let raf = 0;
     const ctx = canvas.getContext('2d', { alpha: false });
 
     const drawFrame = (index) => {
@@ -93,8 +96,10 @@ export default function VideoHero({ dmSansFamily }) {
       ctx.fillStyle = ASSEMBLY_BG;
       ctx.fillRect(0, 0, w, h);
 
-      // Fit entire frame in view (exploded assemblies are tall — cover crops them)
-      const scale = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+      // Desktop: contain the full exploded plate. Mobile: zoom so the pump fills the phone.
+      const fit = Math.min(w / img.naturalWidth, h / img.naturalHeight);
+      const zoom = w < 768 ? 1.55 : 1;
+      const scale = fit * zoom;
       const dw = img.naturalWidth * scale;
       const dh = img.naturalHeight * scale;
       const dx = (w - dw) / 2;
@@ -116,8 +121,89 @@ export default function VideoHero({ dmSansFamily }) {
         })
       );
 
+    const applyProgress = (progress) => {
+      const next = Math.min(
+        FRAME_COUNT - 1,
+        Math.max(0, Math.round(progress * (FRAME_COUNT - 1)))
+      );
+      if (next !== frameIndexRef.current) {
+        frameIndexRef.current = next;
+        drawFrame(next);
+      }
+
+      const nextCaption = captionIndexForProgress(progress);
+      if (nextCaption !== captionIndexRef.current) {
+        captionIndexRef.current = nextCaption;
+        setCaptionIndex(nextCaption);
+      }
+
+      const showCaptions = progress >= CAPTIONS[0].at;
+      const showHint = progress < 0.08;
+      setCaptionsVisible((prev) => (prev === showCaptions ? prev : showCaptions));
+      setScrollHintVisible((prev) => (prev === showHint ? prev : showHint));
+    };
+
     const bindScroll = () => {
       trigger?.kill();
+      const native = preferNativeLandingScroll();
+
+      if (native) {
+        const stage = stageRef.current;
+        const pinStage = (rect, viewH) => {
+          if (!stage) return;
+          stage.style.left = '0px';
+          stage.style.right = '0px';
+          stage.style.width = '100%';
+          stage.style.height = `${viewH}px`;
+          if (rect.top <= 0 && rect.bottom > viewH) {
+            stage.style.position = 'fixed';
+            stage.style.top = '0px';
+            stage.style.bottom = 'auto';
+          } else if (rect.top > 0) {
+            stage.style.position = 'absolute';
+            stage.style.top = '0px';
+            stage.style.bottom = 'auto';
+          } else {
+            stage.style.position = 'absolute';
+            stage.style.top = 'auto';
+            stage.style.bottom = '0px';
+          }
+        };
+        const onScroll = () => {
+          if (raf) return;
+          raf = window.requestAnimationFrame(() => {
+            raf = 0;
+            const viewH = window.innerHeight;
+            const rect = section.getBoundingClientRect();
+            pinStage(rect, viewH);
+            const total = section.offsetHeight - viewH;
+            if (total <= 0) return;
+            const progress = Math.min(1, Math.max(0, -rect.top / total));
+            applyProgress(progress);
+          });
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+        bindScroll.teardown = () => {
+          window.removeEventListener('scroll', onScroll);
+          if (stage) {
+            stage.style.position = '';
+            stage.style.top = '';
+            stage.style.bottom = '';
+            stage.style.height = '';
+            stage.style.width = '';
+            stage.style.left = '';
+            stage.style.right = '';
+          }
+        };
+        drawFrame(frameIndexRef.current);
+        return;
+      }
+
+      ScrollTrigger.config({
+        ignoreMobileResize: true,
+        autoRefreshEvents: 'visibilitychange,DOMContentLoaded,load',
+      });
       trigger = ScrollTrigger.create({
         trigger: section,
         start: 'top top',
@@ -127,27 +213,7 @@ export default function VideoHero({ dmSansFamily }) {
         scrub: 0.35,
         anticipatePin: 1,
         invalidateOnRefresh: true,
-        onUpdate: (self) => {
-          const { progress } = self;
-
-          const next = Math.min(
-            FRAME_COUNT - 1,
-            Math.max(0, Math.round(progress * (FRAME_COUNT - 1)))
-          );
-          if (next !== frameIndexRef.current) {
-            frameIndexRef.current = next;
-            drawFrame(next);
-          }
-
-          const nextCaption = captionIndexForProgress(progress);
-          if (nextCaption !== captionIndexRef.current) {
-            captionIndexRef.current = nextCaption;
-            setCaptionIndex(nextCaption);
-          }
-
-          setCaptionsVisible(progress >= CAPTIONS[0].at);
-          setScrollHintVisible(progress < 0.08);
-        },
+        onUpdate: (self) => applyProgress(self.progress),
       });
       ScrollTrigger.refresh();
       drawFrame(frameIndexRef.current);
@@ -168,30 +234,24 @@ export default function VideoHero({ dmSansFamily }) {
       requestAnimationFrame(() => {
         if (cancelled) return;
         bindScroll();
-        requestAnimationFrame(() => {
-          if (cancelled) return;
-          ScrollTrigger.refresh();
-          drawFrame(frameIndexRef.current);
-        });
+        drawFrame(frameIndexRef.current);
       });
     });
 
     const onResize = () => {
       drawFrame(frameIndexRef.current);
-      ScrollTrigger.refresh();
+      if (!preferNativeLandingScroll()) ScrollTrigger.refresh();
     };
     window.addEventListener('resize', onResize);
     window.addEventListener('load', onResize);
-
-    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(onResize) : null;
-    ro?.observe(section);
 
     return () => {
       cancelled = true;
       window.removeEventListener('resize', onResize);
       window.removeEventListener('load', onResize);
-      ro?.disconnect();
       trigger?.kill();
+      bindScroll.teardown?.();
+      if (raf) window.cancelAnimationFrame(raf);
     };
   }, []);
 
@@ -201,10 +261,14 @@ export default function VideoHero({ dmSansFamily }) {
     <section
       id="home"
       ref={sectionRef}
-      className="relative h-[100svh] max-h-[100vh] w-full overflow-hidden"
+      className="relative h-[320svh] w-full overflow-visible md:h-[100svh] md:max-h-[100svh] md:overflow-hidden"
       style={{ fontFamily: dmSansFamily, backgroundColor: ASSEMBLY_BG }}
       aria-label="Pump assembly scroll sequence"
     >
+      <div
+        ref={stageRef}
+        className="absolute inset-x-0 top-0 h-[100svh] w-full overflow-hidden md:inset-0 md:h-auto"
+      >
       <canvas
         ref={canvasRef}
         className={`absolute inset-0 h-full w-full transition-opacity duration-500 ${
@@ -238,7 +302,7 @@ export default function VideoHero({ dmSansFamily }) {
         }`}
         aria-hidden={!captionsVisible}
       >
-        <div className="mx-auto w-full max-w-7xl px-5 pt-10 sm:px-8 sm:pt-12 md:px-10 lg:px-12">
+        <div className="mx-auto w-full max-w-7xl px-5 pt-20 sm:px-8 sm:pt-16 md:px-10 md:pt-12 lg:px-12">
           <div className="max-w-[18rem] sm:max-w-xs md:max-w-sm lg:max-w-md">
             {captionsVisible && (
               <div key={captionIndex} className="assembly-caption">
@@ -265,6 +329,7 @@ export default function VideoHero({ dmSansFamily }) {
         <div className="flex h-9 w-5 items-start justify-center rounded-full border border-black/20 p-1.5">
           <span className="h-1.5 w-1 animate-bounce rounded-full bg-orange-500" />
         </div>
+      </div>
       </div>
 
       <style>{`
