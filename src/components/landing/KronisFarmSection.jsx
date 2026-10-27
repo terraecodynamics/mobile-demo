@@ -92,27 +92,18 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
               className="pointer-events-none absolute -inset-x-3 -inset-y-2 -z-10 rounded-2xl bg-black/25 blur-xl"
               aria-hidden
             />
-            <p
-              className="flex items-center text-[clamp(1.7rem,8vw,2.75rem)] font-semibold tracking-tight text-white"
-              style={WHITE_TYPE}
-            >
-              Kr
-              <span className="relative mx-[0.04em] inline-flex h-[0.76em] w-[0.76em] items-center justify-center align-middle">
-                <span className="absolute inset-0 rounded-full border-[2.5px] border-white/95" />
-                <svg
-                  viewBox="0 0 24 24"
-                  className="relative z-[1] h-[58%] w-[58%] text-[#7DFFB0]"
-                  style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.55))' }}
-                  aria-hidden
-                >
-                  <path
-                    fill="currentColor"
-                    d="M12 19.5V10.2M12 10.2c0-4.1 3-7.1 6.8-7.5-.45 4-2.9 7-6.8 7.5zm0 0c0-4.1-3-7.1-6.8-7.5.45 4 2.9 7 6.8 7.5z"
-                  />
-                </svg>
-              </span>
-              nis
-            </p>
+            <Image
+              src="/kronis-logo.svg"
+              alt="Kronis"
+              width={168}
+              height={62}
+              priority
+              className="h-9 w-auto max-w-[11rem] object-contain object-left sm:h-11 sm:max-w-[14rem] md:h-12"
+              style={{
+                filter:
+                  'brightness(0) invert(1) drop-shadow(0 1px 2px rgba(0,0,0,0.45)) drop-shadow(0 2px 10px rgba(0,0,0,0.25))',
+              }}
+            />
             <p
               className="mt-1 text-[11px] font-normal tracking-wide text-white/90 sm:text-xs"
               style={{ textShadow: TEXT_SHADOW }}

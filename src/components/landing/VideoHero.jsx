@@ -319,16 +319,29 @@ export default function VideoHero({ dmSansFamily }) {
       </div>
 
       <div
-        className={`pointer-events-none absolute inset-x-0 bottom-8 z-10 flex flex-col items-center gap-3 px-4 text-center transition-opacity duration-300 sm:bottom-10 ${
+        className={`pointer-events-none absolute inset-x-0 bottom-8 z-10 flex justify-center transition-opacity duration-300 sm:bottom-10 ${
           scrollHintVisible ? 'opacity-100' : 'opacity-0'
         }`}
+        aria-hidden={!scrollHintVisible}
       >
-        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-black/45 sm:text-xs">
-          Scroll to assemble
-        </p>
         <div className="flex h-9 w-5 items-start justify-center rounded-full border border-black/20 p-1.5">
           <span className="h-1.5 w-1 animate-bounce rounded-full bg-orange-500" />
         </div>
+      </div>
+
+      <div
+        className="pointer-events-none absolute bottom-8 right-5 z-20 tabular-nums sm:bottom-10 sm:right-8 md:right-10 lg:right-12"
+        aria-hidden
+      >
+        <p className="flex items-baseline gap-2 font-medium tracking-tight text-zinc-800">
+          <span className="text-lg text-zinc-400 sm:text-xl">—</span>
+          <span className="text-2xl sm:text-3xl md:text-4xl">
+            {String(captionIndex + 1).padStart(2, '0')}
+          </span>
+          <span className="text-sm text-zinc-400 sm:text-base">
+            / {String(CAPTIONS.length).padStart(2, '0')}
+          </span>
+        </p>
       </div>
       </div>
 
