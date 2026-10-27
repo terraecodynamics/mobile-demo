@@ -1,5 +1,6 @@
 "use client";
 
+import { AppShellLock } from "@/components/auth/AppShellLock";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { RequireAuth } from "@/components/auth/RequireAuth";
 import { PhoneShell } from "@/components/phone/PhoneShell";
@@ -18,6 +19,7 @@ export default function DemoLayout({
 }) {
   return (
     <AuthProvider>
+      <AppShellLock />
       <PhoneShell>
         <DemoGate>{children}</DemoGate>
       </PhoneShell>

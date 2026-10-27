@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
     "10.*.*.*",
     "172.*.*.*",
   ],
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;
