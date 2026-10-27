@@ -33,8 +33,8 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
-      <body className="h-full overflow-hidden" suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} antialiased`}>
+      <body suppressHydrationWarning>
         {children}
       </body>
     </html>
