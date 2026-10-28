@@ -154,7 +154,7 @@ export default async function KronisProductPage({ params }: PageProps) {
                   width={980}
                   height={980}
                   priority
-                  className="page-live-hero relative z-10 mx-auto h-auto w-[min(86%,420px)] object-contain drop-shadow-[0_40px_70px_rgba(0,0,0,0.55)] lg:w-[min(92%,480px)]"
+                  className="page-live-hero relative z-10 mx-auto h-auto w-[min(96%,640px)] object-contain drop-shadow-[0_40px_70px_rgba(0,0,0,0.55)]"
                 />
               </figure>
             </div>

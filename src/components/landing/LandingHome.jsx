@@ -28,6 +28,7 @@ import TwoSolutionsSection from '@/components/landing/TwoSolutionsSection';
 import SunToSoilSection from '@/components/landing/SunToSoilSection';
 import KronisCompareSection from '@/components/landing/KronisCompareSection';
 import { preferNativeLandingScroll } from '@/lib/landingMotion';
+import { applySavedScroll, consumePopRestore } from '@/lib/scrollMemory';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -108,6 +109,10 @@ export default function LandingHome() {
     });
     smootherRef.current = smoother;
     ScrollTrigger.refresh();
+    if (consumePopRestore('/')) {
+      applySavedScroll('/');
+      window.setTimeout(() => applySavedScroll('/'), 120);
+    }
     return () => {
       smoother.kill();
       if (smootherRef.current === smoother) smootherRef.current = null;
@@ -142,6 +147,10 @@ export default function LandingHome() {
         scrollTop: () => window.pageYOffset || document.documentElement.scrollTop,
         kill: () => {}
       };
+      if (consumePopRestore('/')) {
+        applySavedScroll('/');
+        window.setTimeout(() => applySavedScroll('/'), 120);
+      }
       return;
     }
 

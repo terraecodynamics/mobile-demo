@@ -28,7 +28,7 @@ const MODELS = [
   {
     id: 'pro',
     href: '/pump/micro-4i-pro',
-    image: '/pump-prototype-black.png',
+    image: '/kronis-4i-pro.png',
     alt: 'Kronis Micro 4i Pro controller',
     label: 'Advanced',
     name: 'Kronis Micro 4i Pro',
@@ -79,9 +79,11 @@ export default function KronisCompareSection({ dmSansFamily }) {
               <Image
                 src={model.image}
                 alt={model.alt}
-                width={800}
-                height={800}
-                className="h-auto w-[min(78%,200px)] object-contain drop-shadow-[0_22px_30px_rgba(20,33,25,0.16)]"
+                width={900}
+                height={900}
+                className={`h-auto object-contain drop-shadow-[0_22px_30px_rgba(20,33,25,0.16)] ${
+                  model.id === 'pro' ? 'w-[min(94%,240px)]' : 'w-[min(78%,200px)]'
+                }`}
               />
             </figure>,
           ])}
