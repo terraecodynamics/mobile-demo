@@ -17,10 +17,10 @@ const HERO_TITLE_METAL = {
 };
 
 const HOTSPOTS = [
-  { id: 'panel', label: 'Solar array', top: '18%', left: '42%' },
-  { id: 'iot', label: 'IoT control unit', top: '32%', left: '58%' },
-  { id: 'pump', label: 'High-efficiency pump', top: '62%', left: '38%' },
-  { id: 'base', label: 'Stable mounting base', top: '78%', left: '52%' },
+  { id: 'panel', label: 'Foldable solar array', top: '28%', left: '58%' },
+  { id: 'iot', label: 'IoT control unit', top: '62%', left: '78%' },
+  { id: 'pump', label: 'High-efficiency pump', top: '38%', left: '28%' },
+  { id: 'base', label: 'Stable mounting base', top: '78%', left: '22%' },
 ];
 
 function HotspotButton({ active, onToggle, label }) {
@@ -166,12 +166,12 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
         <div className="relative z-[5] flex min-h-0 flex-1 flex-col gap-5 overflow-visible pt-1 sm:gap-8 md:gap-9 md:overflow-y-auto md:pt-[clamp(5.75rem,16vw,10rem)] lg:flex-row lg:items-center lg:justify-between lg:gap-6 lg:overflow-y-visible lg:pt-4 lg:pb-10 xl:gap-8 2xl:gap-10">
         {/* Product + hotspots — title sits above in page box; pump draws over title via z-10 */}
         <div className="relative flex min-w-0 flex-1 items-start justify-center self-start">
-          <div className="relative mx-auto w-full max-w-[18rem] sm:max-w-[22rem] md:max-w-md lg:max-w-lg xl:max-w-xl 2xl:max-w-[32rem]">
+          <div className="relative mx-auto w-full max-w-[22rem] sm:max-w-[28rem] md:max-w-xl lg:max-w-2xl xl:max-w-[42rem] 2xl:max-w-[46rem]">
             <Image
-              src="/pump-prototype-black.png"
-              alt="TerraEco solar irrigation system"
-              width={700}
-              height={700}
+              src="/4i-pro-new.png"
+              alt="Kronis Micro 4i Pro solar irrigation kit"
+              width={980}
+              height={980}
               priority
               className="relative z-10 mx-auto h-auto w-full object-contain"
             />

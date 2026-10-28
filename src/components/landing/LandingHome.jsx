@@ -28,6 +28,7 @@ import TwoSolutionsSection from '@/components/landing/TwoSolutionsSection';
 import SunToSoilSection from '@/components/landing/SunToSoilSection';
 import KronisCompareSection from '@/components/landing/KronisCompareSection';
 import { preferNativeLandingScroll } from '@/lib/landingMotion';
+import { applySavedScroll, consumePopRestore } from '@/lib/scrollMemory';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -108,6 +109,10 @@ export default function LandingHome() {
     });
     smootherRef.current = smoother;
     ScrollTrigger.refresh();
+    if (consumePopRestore('/')) {
+      applySavedScroll('/');
+      window.setTimeout(() => applySavedScroll('/'), 120);
+    }
     return () => {
       smoother.kill();
       if (smootherRef.current === smoother) smootherRef.current = null;
@@ -142,6 +147,10 @@ export default function LandingHome() {
         scrollTop: () => window.pageYOffset || document.documentElement.scrollTop,
         kill: () => {}
       };
+      if (consumePopRestore('/')) {
+        applySavedScroll('/');
+        window.setTimeout(() => applySavedScroll('/'), 120);
+      }
       return;
     }
 
@@ -871,10 +880,7 @@ export default function LandingHome() {
         </div>
       </section>
 
-      <KronisCompareSection
-        dmSansFamily={dmSans.style.fontFamily}
-        scrollToSection={scrollToSection}
-      />
+      <KronisCompareSection dmSansFamily={dmSans.style.fontFamily} />
 
       {/* CTA Section - TerraEco IoT Platform */}
       <section id="resources" className="flex min-h-0 items-center bg-black py-12 sm:py-16 md:min-h-screen md:py-20">
@@ -905,59 +911,124 @@ export default function LandingHome() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer id="company" className="flex min-h-0 items-center border-t border-gray-800 bg-black py-12 text-white sm:py-16 md:min-h-screen md:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            <div className="sm:col-span-2 lg:col-span-1">
-              <div className="mb-4 sm:mb-6">
-                <Image
-                  src="/kronis-logo.svg"
-                  alt="Kronis"
-                  width={140}
-                  height={51}
-                  className="h-8 w-auto object-contain object-left sm:h-10"
-                  style={{ filter: 'brightness(0) invert(1)' }}
-                />
-              </div>
-              <p className="text-sm sm:text-base text-gray-400 leading-relaxed mb-6 sm:mb-8">
-                Powering the future of sustainable agriculture with solar-powered irrigation systems and intelligent IoT technology. 
-                Monitor, control, and optimize your agricultural infrastructure through our comprehensive web platform.
+      <footer id="company" className="relative overflow-hidden border-t border-white/10 bg-[#090b0a] text-white">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-500/70 to-transparent"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute -left-24 top-0 h-64 w-64 rounded-full bg-orange-600/10 blur-3xl"
+          aria-hidden
+        />
+        <div className="relative mx-auto w-full max-w-7xl px-5 py-14 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_1.8fr] lg:gap-16">
+            <div className="max-w-md">
+              <Image
+                src="/kronis-logo.svg"
+                alt="Kronis"
+                width={140}
+                height={51}
+                className="h-9 w-auto object-contain object-left sm:h-10"
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
+              <p className="mt-5 text-sm leading-relaxed text-white/55 sm:text-[15px]">
+                Precision agriculture for the field — solar irrigation, sensors, and remote control in one platform.
               </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link
+                  href="/login"
+                  className="inline-flex items-center rounded-full bg-gradient-to-r from-orange-500 to-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110"
+                >
+                  Open platform
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => setIsDemoModalOpen(true)}
+                  className="inline-flex items-center rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-white/80 transition hover:border-white/50 hover:text-white"
+                >
+                  Book a demo
+                </button>
+              </div>
             </div>
-            <div>
-              <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm sm:text-base text-gray-400">
-                <li><button className="hover:text-white transition-colors text-left">IoT Dashboard</button></li>
-                <li><button className="hover:text-white transition-colors text-left">Device Management</button></li>
-                <li><button className="hover:text-white transition-colors text-left">Analytics & Reports</button></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Company</h4>
-              <ul className="space-y-2 text-sm sm:text-base text-gray-400">
-                <li><button className="hover:text-white transition-colors text-left">About us</button></li>
-                <li><button className="hover:text-white transition-colors text-left">Partners</button></li>
-                <li><button className="hover:text-white transition-colors text-left">Careers</button></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Resources</h4>
-              <ul className="space-y-2 text-sm sm:text-base text-gray-400">
-                <li><button className="hover:text-white transition-colors text-left">Blog</button></li>
-                <li><button className="hover:text-white transition-colors text-left">Documentation</button></li>
-                <li><button className="hover:text-white transition-colors text-left">Support</button></li>
-              </ul>
+
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+              <div>
+                <h4 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-400/90">
+                  Platform
+                </h4>
+                <ul className="mt-4 space-y-3 text-sm text-white/55">
+                  <li>
+                    <Link href="/login" className="transition hover:text-white">
+                      IoT Dashboard
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/pump" className="transition hover:text-white">
+                      Kronis pump
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/sensor" className="transition hover:text-white">
+                      Field sensors
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-400/90">
+                  Company
+                </h4>
+                <ul className="mt-4 space-y-3 text-sm text-white/55">
+                  <li>
+                    <button type="button" onClick={(e) => scrollToSection('about', e)} className="transition hover:text-white">
+                      About us
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" onClick={(e) => scrollToSection('features', e)} className="transition hover:text-white">
+                      Features
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" onClick={(e) => scrollToSection('kronis-compare', e)} className="transition hover:text-white">
+                      Products
+                    </button>
+                  </li>
+                </ul>
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <h4 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-orange-400/90">
+                  Connect
+                </h4>
+                <ul className="mt-4 space-y-3 text-sm text-white/55">
+                  <li>
+                    <a href="mailto:terraecodynamics@gmail.com" className="transition hover:text-white">
+                      terraecodynamics@gmail.com
+                    </a>
+                  </li>
+                  <li>
+                    <a href="tel:+918763996457" className="transition hover:text-white">
+                      +91 87639 96457
+                    </a>
+                  </li>
+                  <li>
+                    <Link href="/login" className="transition hover:text-white">
+                      Sign in
+                    </Link>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 sm:mt-8">
-            <p className="text-gray-400 text-xs sm:text-sm text-center sm:text-left">
-              © {new Date().getFullYear()} TerraEco. All rights reserved.
+
+          <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 sm:mt-14 sm:flex-row sm:items-center">
+            <p className="text-xs text-white/40 sm:text-sm">
+              © {new Date().getFullYear()} TerraEco Dynamics Pvt. Ltd.
             </p>
-            <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6">
-              <button className="text-gray-400 hover:text-white transition-colors text-xs sm:text-sm">Privacy Policy</button>
-              <button className="text-gray-400 hover:text-white transition-colors text-xs sm:text-sm">Terms of Service</button>
-              <button className="text-gray-400 hover:text-white transition-colors text-xs sm:text-sm">Cookie Policy</button>
+            <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-white/40 sm:text-sm">
+              <button type="button" className="transition hover:text-white/80">Privacy</button>
+              <button type="button" className="transition hover:text-white/80">Terms</button>
+              <button type="button" className="transition hover:text-white/80">Cookies</button>
             </div>
           </div>
         </div>

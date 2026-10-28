@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 
@@ -136,9 +137,9 @@ export default function TwoSolutionsSection({ dmSansFamily, scrollToSection }) {
             <p className="mt-1 text-sm text-white/80 sm:text-[15px]">Move water intelligently.</p>
           </div>
 
-          <button
-            type="button"
-            onClick={(e) => scrollToSection?.('platform', e)}
+          <Link
+            href="/pump"
+            scroll
             className="absolute bottom-6 left-5 z-10 inline-flex items-center gap-3 text-sm font-medium text-white transition hover:opacity-90 sm:bottom-8 sm:left-7"
           >
             <span
@@ -148,7 +149,7 @@ export default function TwoSolutionsSection({ dmSansFamily, scrollToSection }) {
               <ArrowRight className="h-4 w-4" />
             </span>
             Explore Pump
-          </button>
+          </Link>
         </article>
 
         {/* Sensor card */}
@@ -204,9 +205,9 @@ export default function TwoSolutionsSection({ dmSansFamily, scrollToSection }) {
             </ul>
           </div>
 
-          <button
-            type="button"
-            onClick={(e) => scrollToSection?.('features', e)}
+          <Link
+            href="/sensor"
+            scroll
             className="absolute bottom-6 left-5 z-10 inline-flex items-center gap-3 text-sm font-medium text-white transition hover:opacity-90 sm:bottom-8 sm:left-7"
           >
             <span
@@ -216,7 +217,7 @@ export default function TwoSolutionsSection({ dmSansFamily, scrollToSection }) {
               <ArrowRight className="h-4 w-4" />
             </span>
             Explore Sensor
-          </button>
+          </Link>
 
           <nav
             className="absolute bottom-6 right-5 z-10 hidden space-y-2.5 text-right sm:bottom-8 sm:right-7 md:block"

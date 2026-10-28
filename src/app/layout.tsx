@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} antialiased`} data-scroll-behavior="smooth">
       <body suppressHydrationWarning>
+        <ScrollToTop />
         {children}
       </body>
     </html>

@@ -84,7 +84,7 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
         aria-hidden
       />
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col px-5 pb-16 pt-8 sm:px-8 sm:py-10 md:h-full md:min-h-0 md:justify-between md:pb-12 lg:px-12 lg:py-12">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-7xl flex-col justify-center gap-7 px-5 py-10 sm:gap-8 sm:px-8 sm:py-10 md:h-full md:min-h-0 md:justify-between md:gap-0 md:py-12 lg:px-12">
         {/* Top bar */}
         <div className="flex items-start justify-between gap-4">
           <div className="relative">
@@ -120,7 +120,7 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
         </div>
 
         {/* Hero copy — mid-left like mockup */}
-        <div className="relative mt-10 flex max-w-full flex-col md:my-auto md:mt-0 lg:max-w-4xl">
+        <div className="relative flex max-w-full flex-col lg:max-w-4xl">
           <div
             className="pointer-events-none absolute -inset-x-5 -inset-y-4 -z-10 rounded-[2rem] bg-black/30 blur-2xl sm:-inset-x-8"
             aria-hidden
@@ -157,7 +157,7 @@ export default function KronisFarmSection({ dmSansFamily, onExplore }) {
           </button>
         </div>
 
-        <div className="relative z-20 mt-10 w-full shrink-0 rounded-2xl bg-black/55 px-4 py-5 backdrop-blur-md sm:mt-12 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none md:mt-0">
+        <div className="relative z-20 w-full shrink-0 rounded-2xl bg-black/55 px-4 py-5 backdrop-blur-md sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
           <ul className="grid grid-cols-2 gap-x-4 gap-y-5 sm:flex sm:flex-wrap sm:gap-x-12 sm:gap-y-5 md:gap-x-14">
             {FEATURES.map((item) => (
               <li

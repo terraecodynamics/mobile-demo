@@ -318,3 +318,75 @@ body {
     opacity: 0;
   }
 }
+
+/* Pump / sensor page enter */
+@keyframes page-live-hero {
+  from {
+    transform: scale(1.1);
+    filter: brightness(0.62) saturate(0.85);
+  }
+  to {
+    transform: scale(1);
+    filter: brightness(1) saturate(1);
+  }
+}
+@keyframes page-live-copy {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-live-curtain {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  overflow: hidden;
+}
+.page-live-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: #070707;
+}
+.page-live-panel--a {
+  top: 0;
+}
+.page-live-panel--b {
+  bottom: 0;
+}
+.page-live-mark {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+}
+.page-live-main {
+  opacity: 0;
+}
+.page-live-hero {
+  animation: page-live-hero 1.45s 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.page-live-copy {
+  animation: page-live-copy 0.8s 0.82s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-live-curtain {
+    display: none;
+  }
+  .page-live-main {
+    opacity: 1;
+  }
+  .page-live-hero,
+  .page-live-copy {
+    animation: none;
+  }
+}
