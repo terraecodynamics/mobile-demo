@@ -81,7 +81,7 @@ export const KRONIS_PRODUCTS: KronisProduct[] = [
   {
     slug: "micro-4i-pro",
     id: "pro",
-    image: "/4i-pro-new.png",
+    image: "/kronis-4i-pro.png",
     label: "Advanced",
     name: "Kronis Micro 4i Pro",
     lede: "Lightweight bifacial array, IoT, portal and sensor-ready control.",

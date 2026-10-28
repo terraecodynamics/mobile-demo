@@ -6,7 +6,6 @@ import MarketingChrome from "@/components/landing/MarketingChrome";
 import {
   KRONIS_PRODUCTS,
   KRONIS_SHARED,
-  formatInr,
   getKronisProduct,
 } from "@/lib/kronisProducts";
 
@@ -103,24 +102,7 @@ export default async function KronisProductPage({ params }: PageProps) {
                   ))}
                 </div>
 
-                <div className="mt-10 flex items-end justify-between gap-6 border-t border-white/10 pt-8">
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-white/40">From</p>
-                    <p className="mt-1 text-4xl font-semibold tracking-tight sm:text-5xl">
-                      {formatInr(product.priceInr)}
-                    </p>
-                    <p className="mt-2 text-xs text-white/40">{product.priceNote}</p>
-                  </div>
-                  <a
-                    href="tel:+917205150067"
-                    className="hidden h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-red-600 text-white shadow-[0_12px_40px_rgba(234,88,12,0.35)] sm:inline-flex"
-                    aria-label="Book this pump"
-                  >
-                    <ArrowUpRight className="h-5 w-5" />
-                  </a>
-                </div>
-
-                <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-8 sm:flex-row sm:items-center">
                   <a
                     href="tel:+917205150067"
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-[#142119] transition hover:bg-[#f0e8dc]"
@@ -276,8 +258,7 @@ export default async function KronisProductPage({ params }: PageProps) {
                       <ArrowUpRight className="h-4 w-4" />
                     </span>
                   </div>
-                  <div className="mt-6 flex items-end justify-between">
-                    <p className="text-lg font-semibold">{formatInr(item.priceInr)}</p>
+                  <div className="mt-6 flex justify-end">
                     <Image
                       src={item.image}
                       alt=""
