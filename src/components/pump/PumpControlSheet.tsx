@@ -1,5 +1,6 @@
 "use client";
 
+import { useAppView } from "@/components/phone/AppViewProvider";
 import { NeoModeButton } from "@/components/ui/NeoModeButton";
 import { SoftButton } from "@/components/ui/SoftUi";
 import { PumpDial } from "@/components/pump/PumpDial";
@@ -128,6 +129,7 @@ export function PumpControlSheet({
   scheduleActive = false,
   scheduleCountdown = null,
 }: Props) {
+  const isWeb = useAppView() === "web";
   const bodyRef = useRef<HTMLDivElement>(null);
   const [dialSize, setDialSize] = useState(220);
   const [autoKind, setAutoKind] = useState<"schedule" | "moisture">("schedule");
@@ -202,7 +204,7 @@ export function PumpControlSheet({
         {mode !== "rental" ? (
           <div
             className="relative z-[4] shrink-0 px-2 text-center"
-            style={{ paddingTop: 4, paddingBottom: 2, background: kronis.background }}
+            style={{ paddingTop: isWeb ? 36 : 4, paddingBottom: 2, background: kronis.background }}
           >
             <div
               className="font-bold tracking-[-0.3px] transition-colors duration-300"

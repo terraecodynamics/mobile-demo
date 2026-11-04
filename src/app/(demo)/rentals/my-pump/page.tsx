@@ -19,12 +19,14 @@ import {
 import { ArrowLeft, KeyRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useAppView } from "@/components/phone/AppViewProvider";
 
 /**
  * Rentee screen after key attach — onboarded pump, start / stop only.
  */
 export default function MyPumpPage() {
   const router = useRouter();
+  const isWeb = useAppView() === "web";
   const { session } = useAuth();
   const [rental, setRental] = useState<AttachedRental | null>(null);
   const [timerMinutes, setTimerMinutes] = useState(0);
@@ -73,11 +75,13 @@ export default function MyPumpPage() {
         style={{ background: kronis.background }}
       >
         <div className="flex items-center gap-3 pb-3">
+          {!isWeb ? (
           <SoftChip
             icon={ArrowLeft}
             onClick={() => router.push("/rentals")}
             label="Back"
           />
+          ) : null}
           <div className="min-w-0 flex-1">
             <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
               My pump
@@ -113,11 +117,13 @@ export default function MyPumpPage() {
       style={{ background: kronis.background }}
     >
       <div className="relative z-20 flex items-center gap-3 px-3.5 pb-2 pt-2">
+        {!isWeb ? (
         <SoftChip
           icon={ArrowLeft}
           onClick={() => router.push("/rentals")}
           label="Back"
         />
+        ) : null}
         <div className="min-w-0 flex-1">
           <div className="truncate text-[17px] font-extrabold" style={{ color: kronis.ink }}>
             {rental.model}
@@ -137,8 +143,9 @@ export default function MyPumpPage() {
         </span>
       </div>
 
+      <div className={isWeb ? "mx-auto grid min-h-0 w-full max-w-4xl flex-1 grid-cols-2 items-center gap-8 px-8" : "contents"}>
       <div
-        className="mx-3.5 mb-3 rounded-[16px] border px-3.5 py-2.5"
+        className={isWeb ? "rounded-[16px] border px-3.5 py-2.5" : "mx-3.5 mb-3 rounded-[16px] border px-3.5 py-2.5"}
         style={{
           background: kronis.surface,
           borderColor: kronis.border,
@@ -196,6 +203,7 @@ export default function MyPumpPage() {
         >
           Tap the dial to start or stop. This pump is onboarded to your rental.
         </p>
+      </div>
       </div>
 
       <div className="shrink-0 px-3.5 pb-5 pt-1">

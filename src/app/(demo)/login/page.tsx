@@ -5,10 +5,11 @@ import {
   homePathForRole,
   matchDemoAccount,
 } from "@/lib/auth";
+import { useAppView } from "@/components/phone/AppViewProvider";
 import { kronis } from "@/lib/kronis";
 import { AlertCircle, Eye, EyeOff, KeyRound, Lock, Mail, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 type LoginMethod = "password" | "otp";
 
@@ -25,7 +26,8 @@ function formatPhoneNumber(text: string) {
 
 export default function LoginPage() {
   const router = useRouter();
-  const { session, ready, login } = useAuth();
+  const { ready, login } = useAuth();
+  const isWeb = useAppView() === "web";
 
   const [loginMethod, setLoginMethod] = useState<LoginMethod>("password");
   const [emailOrMobile, setEmailOrMobile] = useState("");
@@ -36,11 +38,6 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [inputType, setInputType] = useState<"email" | "phone">("email");
-
-  useEffect(() => {
-    if (!ready || !session) return;
-    router.replace(homePathForRole(session.role));
-  }, [ready, session, router]);
 
   const accent = kronis.lime;
 
@@ -143,7 +140,7 @@ export default function LoginPage() {
     [emailOrMobile, accent]
   );
 
-  if (!ready || session) {
+  if (!ready) {
     return (
       <div className="flex min-h-0 flex-1" style={{ background: kronis.background }} />
     );
@@ -175,7 +172,11 @@ export default function LoginPage() {
         }}
       />
 
-      <div className="no-scrollbar relative z-10 flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-5 py-6">
+      <div
+        className={`no-scrollbar relative z-10 flex min-h-0 flex-1 flex-col justify-center overflow-y-auto px-5 py-6 ${
+          isWeb ? "mx-auto w-full max-w-[440px]" : ""
+        }`}
+      >
         <div className="mb-10 flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/kronis-logo.svg" alt="TerraEco" width={160} height={58} className="h-[58px] w-[160px]" />

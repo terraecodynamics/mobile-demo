@@ -44,6 +44,7 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAppView } from "@/components/phone/AppViewProvider";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import "ol/ol.css";
@@ -132,6 +133,7 @@ function analysisCircleGeom(lat: number, lng: number, radiusMeters: number) {
 
 export default function FarmPage() {
   const router = useRouter();
+  const isWeb = useAppView() === "web";
   /** Start on Odisha demo; replace with GPS when available */
   const [pin, setPin] = useState<LatLng>({
     lat: DEMO_AQUA_FARM.lat,
@@ -1302,10 +1304,22 @@ export default function FarmPage() {
   const assignField = farms.find((f) => f.id === assignFieldId);
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col" style={{ background: kronis.background }}>
-      <header className="flex items-center gap-3 px-3.5 pb-3 pt-2">
-        <SoftChip icon={ArrowLeft} onClick={() => router.push("/home")} label="Back" />
-        <div className="min-w-0 flex-1">
+    <div
+      className={isWeb ? "relative flex h-full min-h-0 flex-1" : "relative flex min-h-0 flex-1 flex-col"}
+      style={{ background: kronis.background }}
+    >
+      <div className={isWeb ? "relative min-h-0 min-w-0 flex-1" : "contents"}>
+      <header
+        className={
+          isWeb
+            ? "absolute left-4 top-4 z-20 flex items-center gap-3 rounded-2xl bg-white/95 px-3 py-2 shadow-lg"
+            : "flex items-center gap-3 px-3.5 pb-3 pt-2"
+        }
+      >
+        {!isWeb ? (
+          <SoftChip icon={ArrowLeft} onClick={() => router.push("/home")} label="Back" />
+        ) : null}
+        <div className={isWeb ? "hidden" : "min-w-0 flex-1"}>
           <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
             Farm boundary
           </div>
@@ -1319,8 +1333,12 @@ export default function FarmPage() {
       </header>
 
       <div
-        className="relative mx-3.5 mb-3 min-h-0 flex-1 overflow-hidden rounded-2xl"
-        style={{ boxShadow: "inset 0 0 0 1px rgba(23,26,18,0.08)" }}
+        className={
+          isWeb
+            ? "absolute inset-0 overflow-hidden"
+            : "relative mx-3.5 mb-3 min-h-0 flex-1 overflow-hidden rounded-2xl"
+        }
+        style={isWeb ? undefined : { boxShadow: "inset 0 0 0 1px rgba(23,26,18,0.08)" }}
       >
         <div ref={mapHostRef} className="absolute inset-0" />
         <div ref={pinHostRef} className="pointer-events-none absolute left-0 top-0 h-0 w-0 overflow-visible">
@@ -1500,10 +1518,37 @@ export default function FarmPage() {
           </div>
         ) : null}
       </div>
+      </div>
 
-      {/* Slider: collection always (when not drawing); playback only before Confirm */}
+      <div
+        className={
+          isWeb
+            ? `flex h-full w-[400px] shrink-0 flex-col overflow-y-auto border-l p-5 ${
+                !collectMode && !confirmed && !drawingFarms && !editingFarms && !aiDetecting
+                  ? "justify-center"
+                  : ""
+              }`
+            : "contents"
+        }
+        style={isWeb ? { background: "#fff", borderColor: "rgba(23,26,18,0.08)" } : undefined}
+      >
+      {isWeb ? (
+        <div className="mb-5">
+          <div className="text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: kronis.inkMuted }}>
+            Farm
+          </div>
+          <div className="mt-1 text-[22px] font-extrabold leading-tight" style={{ color: kronis.ink }}>
+            {confirmed ? "Fields in this area" : "Set the boundary"}
+          </div>
+          <p className="mt-2 text-[13px] leading-snug" style={{ color: kronis.inkMuted }}>
+            {confirmed
+              ? "Pick the parcels to include, assign a pump, then save."
+              : "Drag the circle on the map, then set how many acres Kronis should analyse."}
+          </p>
+        </div>
+      ) : null}
       {!drawingFarms && !editingFarms && !aiDetecting && (collectMode || !confirmed) ? (
-        <SoftRaised className="mx-3.5 mb-3 px-3.5 py-3" radius={18}>
+        <SoftRaised className={isWeb ? "px-4 py-4" : "mx-3.5 mb-3 px-3.5 py-3"} radius={18}>
           <div className="mb-2 flex items-baseline justify-between">
             <span className="text-[13px] font-bold" style={{ color: kronis.ink }}>
               Analysis area
@@ -1620,7 +1665,7 @@ export default function FarmPage() {
       ) : null}
 
       {confirmed ? (
-        <div className="no-scrollbar mx-3.5 mb-3 max-h-[160px] space-y-2 overflow-y-auto">
+        <div className={isWeb ? "mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto" : "no-scrollbar mx-3.5 mb-3 max-h-[160px] space-y-2 overflow-y-auto"}>
           {farms.map((farm) => {
             const active = collectMode
               ? farm.id === selectedFarmId
@@ -1719,7 +1764,15 @@ export default function FarmPage() {
         </div>
       ) : null}
 
-      <div className="flex gap-2.5 px-3.5 pb-3">
+      <div
+        className={
+          isWeb
+            ? !collectMode && !confirmed && !drawingFarms && !editingFarms && !aiDetecting
+              ? "mt-5 flex gap-2.5"
+              : "mt-auto flex gap-2.5 pt-5"
+            : "flex gap-2.5 px-3.5 pb-3"
+        }
+      >
         {!collectMode ? (
           aiDetecting ? (
             <SoftButton
@@ -1909,6 +1962,7 @@ export default function FarmPage() {
       ) : (
         <div className="pb-4" />
       )}
+      </div>
 
       {/* Native-style: Pump in {field} multi-assign sheet */}
       {assignFieldId && !collectMode ? (

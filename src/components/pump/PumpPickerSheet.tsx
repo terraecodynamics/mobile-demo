@@ -5,7 +5,8 @@ import { SoftButton } from "@/components/ui/SoftUi";
 import { SheetModal } from "@/components/ui/SheetModal";
 import { ALL_PUMPS_ID } from "@/components/pump/MapStage";
 import { kronis } from "@/lib/kronis";
-import { Check, ChevronRight, LayoutGrid, Plus } from "lucide-react";
+import { useAppView } from "@/components/phone/AppViewProvider";
+import { Check, ChevronRight, LayoutGrid, Plus, X } from "lucide-react";
 
 export type PickerPump = {
   id: string;
@@ -54,26 +55,11 @@ export function PumpPickerSheet({
   onViewAll,
   sheetHeight,
 }: Props) {
-  return (
-    <SheetModal
-      open={open}
-      onClose={onClose}
-      height={sheetHeight ? `${sheetHeight}px` : "62%"}
-      maxHeight={sheetHeight ? `${sheetHeight}px` : "62%"}
-      header={
-        <div
-          className="px-1 text-[22px] font-extrabold tracking-[-0.3px]"
-          style={{ color: kronis.ink }}
-        >
-          Select pump
-        </div>
-      }
-    >
-      <div className="flex min-h-0 flex-col">
-        <div
-          className="no-scrollbar min-h-0 flex-1 overflow-y-auto"
-          style={{ maxHeight: sheetHeight ? Math.max(160, sheetHeight - 200) : 280 }}
-        >
+  const isWeb = useAppView() === "web";
+
+  const body = (
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto">
           <button
             type="button"
             onClick={() => {
@@ -207,7 +193,7 @@ export function PumpPickerSheet({
           })}
         </div>
 
-        <div className="mt-2 flex flex-col gap-2.5 pt-2">
+        <div className="mt-2 flex flex-col gap-2.5 border-t pt-3" style={{ borderColor: "rgba(23,26,18,0.08)" }}>
           {onViewAll ? (
             <button
               type="button"
@@ -244,6 +230,68 @@ export function PumpPickerSheet({
           />
         </div>
       </div>
+  );
+
+  if (isWeb) {
+    if (!open) return null;
+    return (
+      <div className="fixed inset-0 z-[80]">
+        <button
+          type="button"
+          aria-label="Close pump picker"
+          className="absolute inset-0 bg-black/30"
+          onClick={onClose}
+        />
+        <aside
+          className="absolute inset-y-0 right-0 flex w-[400px] max-w-[92vw] flex-col border-l p-5 shadow-[-24px_0_60px_rgba(23,26,18,0.22)]"
+          style={{
+            background: kronis.background,
+            borderColor: "rgba(23,26,18,0.08)",
+            animation: "kronis-drawer-in 280ms cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          <style>{`@keyframes kronis-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#c87828]">
+                Fleet
+              </p>
+              <h2 className="text-[22px] font-extrabold tracking-[-0.3px]" style={{ color: kronis.ink }}>
+                Select pump
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="grid h-9 w-9 place-items-center rounded-full"
+              style={{ background: kronis.surface }}
+              aria-label="Close"
+            >
+              <X size={16} color={kronis.ink} />
+            </button>
+          </div>
+          {body}
+        </aside>
+      </div>
+    );
+  }
+
+  return (
+    <SheetModal
+      open={open}
+      onClose={onClose}
+      height={sheetHeight ? `${sheetHeight}px` : "62%"}
+      maxHeight={sheetHeight ? `${sheetHeight}px` : "62%"}
+      header={
+        <div
+          className="px-1 text-[22px] font-extrabold tracking-[-0.3px]"
+          style={{ color: kronis.ink }}
+        >
+          Select pump
+        </div>
+      }
+      >
+      {body}
     </SheetModal>
   );
 }

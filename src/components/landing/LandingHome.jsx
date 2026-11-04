@@ -3,6 +3,7 @@
 import { DM_Sans } from 'next/font/google';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useLayoutEffect, useState, useRef, useCallback } from 'react';
 import {
   ArrowRight,
@@ -16,6 +17,8 @@ import {
   X,
   Search,
   ShoppingBag,
+  Monitor,
+  Smartphone,
 } from 'lucide-react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -28,6 +31,7 @@ import TwoSolutionsSection from '@/components/landing/TwoSolutionsSection';
 import SunToSoilSection from '@/components/landing/SunToSoilSection';
 import KronisCompareSection from '@/components/landing/KronisCompareSection';
 import { preferNativeLandingScroll } from '@/lib/landingMotion';
+import { setAppView } from '@/lib/appView';
 import { applySavedScroll, consumePopRestore } from '@/lib/scrollMemory';
 
 if (typeof window !== 'undefined') {
@@ -47,9 +51,16 @@ const dmSans = DM_Sans({
 });
 
 export default function LandingHome() {
+  const router = useRouter();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isDemoModalOpen, setIsDemoModalOpen] = useState(false);
   const smootherRef = useRef(null);
+
+  const openApp = (view) => {
+    setAppView(view);
+    setIsMobileMenuOpen(false);
+    router.push('/login');
+  };
 
   useEffect(() => {
     if (preferNativeLandingScroll()) return undefined;
@@ -408,13 +419,24 @@ export default function LandingHome() {
               >
                 <Search className="h-5 w-5" />
               </button>
-              <Link
-                href="/login"
-                className="text-sm font-medium text-zinc-900 transition-colors hover:text-orange-600"
+              <button
+                type="button"
+                onClick={() => openApp('web')}
+                className="inline-flex items-center gap-1.5 rounded-full border border-zinc-900/15 bg-white px-3 py-2 text-xs font-semibold text-zinc-900 transition hover:border-orange-500 hover:text-orange-600 sm:text-sm"
                 style={{ fontFamily: dmSans.style.fontFamily }}
               >
-                Login
-              </Link>
+                <Monitor className="h-3.5 w-3.5" />
+                Web
+              </button>
+              <button
+                type="button"
+                onClick={() => openApp('phone')}
+                className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-600 px-3 py-2 text-xs font-semibold text-white transition hover:brightness-110 sm:text-sm"
+                style={{ fontFamily: dmSans.style.fontFamily }}
+              >
+                <Smartphone className="h-3.5 w-3.5" />
+                Mobile
+              </button>
               <button
                 type="button"
                 onClick={() => setIsDemoModalOpen(true)}
@@ -514,21 +536,33 @@ export default function LandingHome() {
                 Company
               </button>
               <div className="mt-2 space-y-2 border-t border-black/10 pt-3">
-                <Link
-                  href="/login"
-                  className="block py-2 text-zinc-900 transition hover:text-orange-600"
-                  style={{ fontFamily: dmSans.style.fontFamily }}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Login
-                </Link>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openApp('web')}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-full border border-zinc-900/15 bg-white py-3 text-sm font-semibold text-zinc-900"
+                    style={{ fontFamily: dmSans.style.fontFamily }}
+                  >
+                    <Monitor className="h-4 w-4" />
+                    Web
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => openApp('phone')}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-red-600 py-3 text-sm font-bold text-white"
+                    style={{ fontFamily: dmSans.style.fontFamily }}
+                  >
+                    <Smartphone className="h-4 w-4" />
+                    Mobile
+                  </button>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
                     setIsDemoModalOpen(true);
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full rounded-full bg-gradient-to-r from-orange-500 to-red-600 py-3 text-center text-sm font-bold text-white transition hover:brightness-110"
+                  className="w-full rounded-full border border-zinc-900/15 py-3 text-center text-sm font-bold text-zinc-900 transition hover:border-orange-500 hover:text-orange-600"
                   style={{ fontFamily: dmSans.style.fontFamily }}
                 >
                   Book a demo
@@ -935,12 +969,22 @@ export default function LandingHome() {
                 Precision agriculture for the field — solar irrigation, sensors, and remote control in one platform.
               </p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  href="/login"
-                  className="inline-flex items-center rounded-full bg-gradient-to-r from-orange-500 to-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110"
+                <button
+                  type="button"
+                  onClick={() => openApp('web')}
+                  className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-[#142119] transition hover:bg-[#f0e8dc]"
                 >
-                  Open platform
-                </Link>
+                  <Monitor className="h-4 w-4" />
+                  Web
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openApp('phone')}
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-110"
+                >
+                  <Smartphone className="h-4 w-4" />
+                  Mobile
+                </button>
                 <button
                   type="button"
                   onClick={() => setIsDemoModalOpen(true)}
