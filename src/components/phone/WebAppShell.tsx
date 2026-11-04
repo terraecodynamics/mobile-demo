@@ -42,12 +42,8 @@ export function WebAppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="fixed inset-0 flex overflow-hidden" style={{ background: "#e7ebf2" }}>
       <aside className="flex w-[88px] shrink-0 flex-col items-center border-r border-black/5 bg-white py-5">
-        <Link
-          href={items[0].href}
-          className="mb-6 grid h-10 w-10 place-items-center rounded-2xl bg-[#171A12] text-[13px] font-bold text-white"
-          aria-label="Kronis home"
-        >
-          K
+        <Link href={items[0].href} className="mb-6 flex items-center justify-center" aria-label="Kronis home">
+          <img src="/kronis-logo.svg" alt="Kronis" className="h-7 w-auto max-w-[72px]" />
         </Link>
 
         <nav className="flex flex-1 flex-col items-center gap-1">

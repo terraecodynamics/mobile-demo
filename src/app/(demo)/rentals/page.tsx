@@ -2,13 +2,18 @@
 
 import { useAuth } from "@/components/auth/AuthProvider";
 import { EnterHandoffKeySheet } from "@/components/rental/EnterHandoffKeySheet";
+import { MapStage } from "@/components/pump/MapStage";
+import { PumpMapMarker } from "@/components/pump/PumpMapMarker";
+import { ActiveRenteesSheet } from "@/components/rental/ActiveRenteesSheet";
+import { HandoffKeySheet } from "@/components/rental/HandoffKeySheet";
+import { PutOnRentSheet } from "@/components/rental/PutOnRentSheet";
 import { RentalDiscoverMap } from "@/components/rental/RentalDiscoverMap";
 import { SoftChip, SoftRaised, SoftButton } from "@/components/ui/SoftUi";
-import { dummyRentals, type RentalListing } from "@/data/dummy";
-import { getPrimaryAttached } from "@/lib/handoffKeys";
-import { getRentListings } from "@/lib/rentListings";
+import { dummyPumps, dummyRentals, dummyUser, type RentalListing } from "@/data/dummy";
+import { getOpenOfferForPump, getPrimaryAttached, issueHandoffKey, type HandoffOffer } from "@/lib/handoffKeys";
+import { getPublishedForPump, getRentListings, publishPumpForRent } from "@/lib/rentListings";
 import { kronis } from "@/lib/kronis";
-import { ArrowLeft, Gauge, KeyRound, Phone, Plus, Search, UserRound } from "lucide-react";
+import { ArrowLeft, CalendarDays, Gauge, KeyRound, Phone, Plus, Search, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppView } from "@/components/phone/AppViewProvider";
@@ -117,8 +122,13 @@ export default function RentalsPage() {
   const [listings, setListings] = useState<RentalListing[]>([]);
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [addOpen, setAddOpen] = useState(false);
-  const [phone, setPhone] = useState("");
+  const [listOpen, setListOpen] = useState(false);
+  const [renteesOpen, setRenteesOpen] = useState(false);
+  const [listToast, setListToast] = useState<string | null>(null);
+  const [pumpId, setPumpId] = useState(dummyPumps[0]?.id ?? "");
+  const [muted, setMuted] = useState(false);
+  const [handoffOpen, setHandoffOpen] = useState(false);
+  const [handoffOffer, setHandoffOffer] = useState<HandoffOffer | null>(null);
   const [enterKeyOpen, setEnterKeyOpen] = useState(false);
   const [hasAttached, setHasAttached] = useState(false);
   const cardRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -186,16 +196,44 @@ export default function RentalsPage() {
     });
   }, [selectedId]);
 
-  const total = useMemo(
-    () => dummyRentals.reduce((s, r) => s + r.amountInr, 0),
-    []
-  );
+  const total = useMemo(() => dummyRentals.reduce((s, r) => s + r.amountInr, 0), []);
+  const mapPump = dummyPumps.find((p) => p.id === pumpId) ?? dummyPumps[0];
+
+  const openGiveKey = () => {
+    if (!mapPump) return;
+    const published = getPublishedForPump(mapPump.id);
+    const existing = getOpenOfferForPump(mapPump.id);
+    if (existing) {
+      setHandoffOffer(existing);
+      setHandoffOpen(true);
+      return;
+    }
+    const offer = issueHandoffKey({
+      pumpId: mapPump.id,
+      model: published?.model ?? mapPump.model,
+      serial: mapPump.serial,
+      ratePerDayInr: published?.ratePerDayInr ?? 700,
+      ownerName: dummyUser.name,
+      ownerPhone: dummyUser.mobile,
+    });
+    setHandoffOffer(offer);
+    setHandoffOpen(true);
+  };
+
+  const cyclePump = () => {
+    const i = dummyPumps.findIndex((p) => p.id === mapPump?.id);
+    const next = dummyPumps[(i + 1) % dummyPumps.length];
+    if (next) setPumpId(next.id);
+  };
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col" style={{ background: kronis.background }}>
+    <div
+      className={isWeb ? "relative flex h-full min-h-0 flex-1" : "relative flex min-h-0 flex-1 flex-col"}
+      style={{ background: isWeb ? "#e7ebf2" : kronis.background }}
+    >
+      {!isWeb ? (
       <div className="relative z-20 flex items-center gap-2.5 px-3.5 pb-2 pt-2">
-        {!isWeb ? (
-          isRentee ? (
+        {isRentee ? (
           <SoftChip
             icon={UserRound}
             onClick={() => router.push("/profile")}
@@ -204,8 +242,7 @@ export default function RentalsPage() {
           />
         ) : (
           <SoftChip icon={ArrowLeft} onClick={() => router.push("/home")} label="Back" />
-        )
-        ) : null}
+        )}
         <div className="min-w-0 flex-1">
           <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
             {isRentee ? "Find" : "My rentals"}
@@ -244,16 +281,120 @@ export default function RentalsPage() {
           </>
         ) : null}
       </div>
+      ) : null}
 
-      {isRentee ? (
+      {isRentee && isWeb ? (
         <>
-        <div className={isWeb ? "grid min-h-0 flex-1 grid-cols-[1.15fr_0.9fr] gap-4 p-4" : "contents"}>
+          <div className="relative min-h-0 min-w-0 flex-1">
+            <div className="absolute inset-0">
+              <RentalDiscoverMap
+                listings={filtered}
+                selectedId={selected?.id ?? null}
+                myLocation={MY_LOCATION}
+                onSelect={(id) => {
+                  skipScrollRef.current = false;
+                  setSelectedId(id);
+                }}
+              />
+            </div>
+            <div
+              className="pointer-events-none absolute bottom-4 left-4 z-10 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold"
+              style={{ background: "rgba(23,26,18,0.72)", color: "#fff" }}
+            >
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ background: "#60a5fa", boxShadow: "0 0 0 3px rgba(96,165,250,0.35)" }}
+              />
+              Near you · {filtered.filter((l) => l.available).length} available
+            </div>
+          </div>
+          <aside
+            className="flex h-full w-[400px] shrink-0 flex-col border-l bg-white p-5"
+            style={{ borderColor: "rgba(23,26,18,0.08)" }}
+          >
+            <div className="text-[11px] font-bold uppercase tracking-[0.14em]" style={{ color: kronis.inkMuted }}>
+              Find
+            </div>
+            <div className="mt-1 text-[22px] font-extrabold leading-tight" style={{ color: kronis.ink }}>
+              Nearby pumps
+            </div>
+            <p className="mt-2 text-[13px] leading-snug" style={{ color: kronis.inkMuted }}>
+              {session?.name ?? "Rentee"} · pick a pin or a listing, then call the owner.
+            </p>
+            <div className="mt-4 flex gap-2">
+              <button
+                type="button"
+                onClick={() => setEnterKeyOpen(true)}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-2xl py-2.5 text-[13px] font-extrabold"
+                style={{ background: "#f4f6f8", color: kronis.ink }}
+              >
+                <KeyRound size={15} />
+                Attach key
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/rentals/my-pump")}
+                className="relative flex flex-1 items-center justify-center gap-1.5 rounded-2xl py-2.5 text-[13px] font-extrabold"
+                style={{ background: kronis.limeSoft, color: kronis.lime }}
+              >
+                <Gauge size={15} />
+                Start pump
+                {hasAttached ? (
+                  <span className="absolute right-2 top-2 h-2 w-2 rounded-full" style={{ background: kronis.lime }} />
+                ) : null}
+              </button>
+            </div>
+            <div
+              className="mt-4 flex items-center gap-2 rounded-2xl px-3 py-2.5"
+              style={{ background: "#f4f6f8" }}
+            >
+              <Search size={16} color={kronis.inkMuted} strokeWidth={2.2} />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search village…"
+                className="min-w-0 flex-1 bg-transparent text-[14px] outline-none"
+                style={{ color: kronis.ink }}
+              />
+            </div>
+            <div className="no-scrollbar mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto">
+              {filtered.length === 0 ? (
+                <div className="rounded-[18px] px-4 py-8 text-center text-sm font-semibold" style={{ color: kronis.inkMuted, background: "#f4f6f8" }}>
+                  No matches for “{query}”
+                </div>
+              ) : (
+                filtered.map((listing) => (
+                  <ListingCard
+                    key={listing.id}
+                    listing={listing}
+                    selected={listing.id === selected?.id}
+                    cardRef={(el) => {
+                      cardRefs.current[listing.id] = el;
+                    }}
+                    onSelect={() => setSelectedId(listing.id)}
+                    onCall={() => callPhone(listing.ownerPhone)}
+                  />
+                ))
+              )}
+            </div>
+          </aside>
+          <EnterHandoffKeySheet
+            open={enterKeyOpen}
+            renteeName={session?.name}
+            renteePhone={session?.phone}
+            onClose={closeEnterKey}
+            onAttached={() => {
+              setHasAttached(true);
+              setListings(getRentListings());
+              router.push("/rentals/my-pump");
+            }}
+          />
+        </>
+      ) : isRentee ? (
+        <>
+        <div className="contents">
           <div
-            className={
-              isWeb
-                ? "relative min-h-0 overflow-hidden rounded-[22px]"
-                : "relative mx-3.5 min-h-[220px] flex-[1.15] overflow-hidden rounded-[22px]"
-            }
+            className="relative mx-3.5 min-h-[220px] flex-[1.15] overflow-hidden rounded-[22px]"
             style={{
               boxShadow:
                 "4px 6px 14px rgba(102,109,122,0.28), -2px -2px 8px rgba(255,255,255,0.75)",
@@ -343,15 +484,98 @@ export default function RentalsPage() {
               }}
             />
         </>
+      ) : isWeb && mapPump ? (
+        <>
+          <div className="relative min-h-0 min-w-0 flex-1">
+            <MapStage
+              pumps={dummyPumps}
+              selectedId={mapPump.id}
+              running={mapPump.running}
+              muted={muted}
+              onMute={() => setMuted((m) => !m)}
+              onRentals={() => setRenteesOpen(true)}
+              onSelectPump={setPumpId}
+              sheetHeight={0}
+            />
+          </div>
+          <aside
+            className="flex h-full w-[400px] shrink-0 flex-col border-l"
+            style={{ background: kronis.background, borderColor: "rgba(23,26,18,0.08)" }}
+          >
+            <button
+              type="button"
+              onClick={cyclePump}
+              className="mx-4 mt-4 flex items-center gap-2 rounded-full bg-white py-2 pl-2 pr-4 text-left"
+              style={{ boxShadow: "0 8px 24px rgba(23,26,18,0.08)" }}
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden">
+                <PumpMapMarker number={mapPump.number} compact />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[15px] font-extrabold" style={{ color: kronis.ink }}>
+                  {mapPump.model}
+                </span>
+                <span className="block text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+                  {mapPump.serial}
+                </span>
+              </span>
+              <span className="text-[12px] font-extrabold" style={{ color: kronis.lime }}>
+                Switch
+              </span>
+            </button>
+
+            <div className="flex min-h-0 flex-1 flex-col items-center justify-center px-8 text-center">
+              <span
+                className="flex h-12 w-12 items-center justify-center rounded-2xl"
+                style={{ background: kronis.limeSoft }}
+              >
+                <CalendarDays size={22} color={kronis.lime} strokeWidth={2.1} />
+              </span>
+              <div className="mt-3 text-[20px] font-extrabold" style={{ color: kronis.ink }}>
+                Rent a pump
+              </div>
+              <p className="mt-1 text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
+                List it, then give the key to the rentee
+              </p>
+              <div className="mt-5 flex w-full max-w-[300px] flex-col gap-2.5">
+                <SoftButton
+                  label="List for rent"
+                  variant="orange"
+                  className="w-full"
+                  onClick={() => setListOpen(true)}
+                />
+                <SoftButton label="Give key" variant="ink" className="w-full" onClick={openGiveKey} />
+              </div>
+            </div>
+
+            <div
+              className="mx-4 mb-5 flex items-center justify-center gap-8 rounded-full bg-white px-6 py-3"
+              style={{ boxShadow: "0 8px 24px rgba(23,26,18,0.08)" }}
+            >
+              <div className="text-center">
+                <div className="text-[18px] font-extrabold" style={{ color: kronis.ink }}>
+                  {mapPump.flowLpm ?? "—"}
+                  <span className="text-[12px] font-bold"> L/min</span>
+                </div>
+                <div className="text-[10px] font-bold tracking-[0.12em]" style={{ color: kronis.inkMuted }}>
+                  FLOW
+                </div>
+              </div>
+              <div className="h-8 w-px" style={{ background: "rgba(23,26,18,0.12)" }} />
+              <div className="text-center">
+                <div className="text-[18px] font-extrabold" style={{ color: kronis.ink }}>
+                  {mapPump.soilPct}%
+                </div>
+                <div className="text-[10px] font-bold tracking-[0.12em]" style={{ color: kronis.inkMuted }}>
+                  SOIL
+                </div>
+              </div>
+            </div>
+          </aside>
+        </>
       ) : (
         <>
-          <div
-            className={
-              isWeb
-                ? "grid min-h-0 flex-1 grid-cols-2 content-start gap-4 overflow-y-auto p-6 xl:grid-cols-3"
-                : "no-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-3.5 pb-28"
-            }
-          >
+          <div className="no-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-3.5 pb-28">
             {dummyRentals.map((r) => (
               <SoftRaised key={r.id} className="w-full p-4">
                 <div className="flex items-start justify-between gap-2">
@@ -392,16 +616,8 @@ export default function RentalsPage() {
           </div>
 
           <div
-            className={
-              isWeb
-                ? "flex shrink-0 items-center gap-3 border-t px-6 py-4"
-                : "absolute bottom-0 left-0 right-0 z-20 flex items-center gap-3 px-4 pb-5 pt-3"
-            }
-            style={
-              isWeb
-                ? { borderColor: "rgba(23,26,18,0.08)", background: kronis.background }
-                : { background: `linear-gradient(180deg, transparent, ${kronis.background} 30%)` }
-            }
+            className="absolute bottom-0 left-0 right-0 z-20 flex items-center gap-3 px-4 pb-5 pt-3"
+            style={{ background: `linear-gradient(180deg, transparent, ${kronis.background} 30%)` }}
           >
             <div className="min-w-0 flex-1 text-sm font-semibold" style={{ color: kronis.inkMuted }}>
               {dummyRentals.length} rentals
@@ -410,54 +626,57 @@ export default function RentalsPage() {
               icon={Plus}
               size={52}
               color={kronis.lime}
-              onClick={() => setAddOpen(true)}
-              label="Add rental"
+              onClick={() => setListOpen(true)}
+              label="List for rent"
             />
             <div className="min-w-0 flex-1 text-right text-sm font-extrabold" style={{ color: kronis.ink }}>
               ₹{total.toLocaleString("en-IN")}
             </div>
           </div>
-
-          {addOpen ? (
-            <div className="absolute inset-0 z-50 flex flex-col justify-end bg-black/35">
-              <button type="button" className="absolute inset-0" onClick={() => setAddOpen(false)} />
-              <div
-                className="relative rounded-t-[28px] px-4 pb-10 pt-3"
-                style={{ background: kronis.background }}
-              >
-                <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-[#c5ccd6]" />
-                <div className="mb-3 text-[17px] font-extrabold" style={{ color: kronis.ink }}>
-                  Add rental
-                </div>
-                <label className="mb-1 block text-xs font-bold" style={{ color: kronis.inkMuted }}>
-                  Rentee mobile
-                </label>
-                <input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91…"
-                  className="mb-4 w-full rounded-2xl border-0 px-4 py-3 text-[15px] outline-none"
-                  style={{
-                    background: "#fff",
-                    color: kronis.ink,
-                    boxShadow:
-                      "inset 3px 3px 8px rgba(163,177,198,0.35), inset -2px -2px 6px rgba(255,255,255,0.9)",
-                  }}
-                />
-                <SoftButton
-                  label="Save (demo)"
-                  variant="orange"
-                  className="w-full"
-                  onClick={() => {
-                    setPhone("");
-                    setAddOpen(false);
-                  }}
-                />
-              </div>
+        </>
+      )}
+      {!isRentee ? (
+        <>
+          <PutOnRentSheet
+            open={listOpen}
+            pumps={dummyPumps.map((p) => ({
+              id: p.id,
+              model: p.model,
+              serial: p.serial,
+              number: p.number,
+            }))}
+            selectedPumpId={mapPump?.id}
+            onClose={() => setListOpen(false)}
+            onSaved={(payload) => {
+              const listed = dummyPumps.find((p) => p.id === payload.pumpId);
+              if (!listed) return;
+              const unitLabel = `${payload.model} · ${payload.serial}`;
+              publishPumpForRent({
+                pumpId: payload.pumpId,
+                pumpName: unitLabel,
+                lat: listed.lat,
+                lng: listed.lng,
+                model: payload.model,
+                serial: payload.serial,
+                ratePerDayInr: payload.ratePerDayInr,
+                available: payload.available,
+              });
+              setListToast(payload.available ? `Listed · ${unitLabel}` : `Unlisted · ${unitLabel}`);
+              window.setTimeout(() => setListToast(null), 2400);
+            }}
+          />
+          <HandoffKeySheet open={handoffOpen} offer={handoffOffer} onClose={() => setHandoffOpen(false)} />
+          <ActiveRenteesSheet open={renteesOpen} onClose={() => setRenteesOpen(false)} />
+          {listToast ? (
+            <div
+              className="pointer-events-none absolute bottom-6 left-1/2 z-[80] -translate-x-1/2 rounded-2xl px-4 py-3 text-[13px] font-bold text-white shadow-lg"
+              style={{ background: "rgba(23,26,18,0.92)" }}
+            >
+              {listToast}
             </div>
           ) : null}
         </>
-      )}
+      ) : null}
     </div>
   );
 }

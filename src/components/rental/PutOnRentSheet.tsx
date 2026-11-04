@@ -2,8 +2,9 @@
 
 import { SoftButton } from "@/components/ui/SoftUi";
 import { SheetModal } from "@/components/ui/SheetModal";
+import { useAppView } from "@/components/phone/AppViewProvider";
 import { kronis } from "@/lib/kronis";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export type RentPumpOption = {
@@ -54,6 +55,7 @@ export function PutOnRentSheet({
     setSaving(false);
   }, [open, initialRate, initialAvailable, selectedPumpId, pumps]);
 
+  const isWeb = useAppView() === "web";
   const selected = pumps.find((p) => p.id === pumpId) ?? pumps[0];
   const rateNum = parseFloat(rate);
   const canSave = !!selected && Number.isFinite(rateNum) && rateNum > 0;
@@ -74,26 +76,13 @@ export function PutOnRentSheet({
     }, 180);
   };
 
-  return (
-    <SheetModal
-      open={open}
-      onClose={onClose}
-      maxHeight="72%"
-      dim
-      header={
-        <div
-          className="text-[22px] font-extrabold tracking-[-0.3px]"
-          style={{ color: kronis.ink }}
-        >
-          List for rent
-        </div>
-      }
-    >
+  const body = (
+    <div className={isWeb ? "flex min-h-0 flex-1 flex-col" : undefined}>
       <button
         type="button"
         onClick={() => setAvailable((v) => !v)}
         className="mb-3.5 flex w-full items-center justify-between rounded-[16px] border px-3.5 py-3.5"
-        style={{ background: kronis.surface, borderColor: kronis.border }}
+        style={{ background: isWeb ? "#f4f6f8" : kronis.surface, borderColor: kronis.border }}
       >
         <span className="text-[15px] font-extrabold" style={{ color: kronis.ink }}>
           Available
@@ -113,9 +102,9 @@ export function PutOnRentSheet({
         className="mb-2 text-[12px] font-bold uppercase tracking-[0.6px]"
         style={{ color: kronis.inkMuted }}
       >
-        Pump · {pumps.length}
+        Device · {pumps.length}
       </div>
-      <div className="no-scrollbar mb-4 flex max-h-[200px] flex-col gap-1.5 overflow-y-auto">
+      <div className={isWeb ? "no-scrollbar mb-4 flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto" : "no-scrollbar mb-4 flex max-h-[240px] flex-col gap-1.5 overflow-y-auto"}>
         {pumps.map((p) => {
           const active = p.id === selected?.id;
           return (
@@ -125,10 +114,8 @@ export function PutOnRentSheet({
               onClick={() => setPumpId(p.id)}
               className="flex w-full items-center gap-3 rounded-[14px] px-3 py-3 text-left active:scale-[0.99]"
               style={{
-                background: active ? kronis.limeSoft : "#e8eaed",
-                border: active
-                  ? `1.5px solid ${kronis.lime}`
-                  : "1.5px solid transparent",
+                background: active ? kronis.limeSoft : isWeb ? "#f4f6f8" : "#e8eaed",
+                border: active ? `1.5px solid ${kronis.lime}` : "1.5px solid transparent",
               }}
             >
               <span className="min-w-0 flex-1">
@@ -138,10 +125,7 @@ export function PutOnRentSheet({
                 >
                   {p.model}
                 </span>
-                <span
-                  className="mt-0.5 block text-[12px] font-semibold"
-                  style={{ color: kronis.inkMuted }}
-                >
+                <span className="mt-0.5 block text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
                   {p.serial}
                 </span>
               </span>
@@ -168,19 +152,74 @@ export function PutOnRentSheet({
         placeholder="700"
         className="mb-5 w-full rounded-xl border-0 px-3 py-3 text-[18px] font-extrabold outline-none"
         style={{
-          background: kronis.background,
+          background: isWeb ? "#f4f6f8" : kronis.background,
           color: kronis.ink,
-          boxShadow:
-            "inset 2px 2px 6px rgba(163,177,198,0.3), inset -1px -1px 4px rgba(255,255,255,0.9)",
+          boxShadow: isWeb
+            ? undefined
+            : "inset 2px 2px 6px rgba(163,177,198,0.3), inset -1px -1px 4px rgba(255,255,255,0.9)",
         }}
       />
 
       <SoftButton
-        label={saving ? "…" : "List"}
+        label={saving ? "…" : available ? "List" : "Save"}
         variant="orange"
-        className="w-full"
+        className={isWeb ? "mt-auto w-full" : "w-full"}
         onClick={save}
       />
+    </div>
+  );
+
+  if (isWeb) {
+    if (!open) return null;
+    return (
+      <div className="fixed inset-0 z-[80]">
+        <button
+          type="button"
+          aria-label="Close list for rent"
+          className="absolute inset-0 bg-black/30"
+          onClick={onClose}
+        />
+        <aside
+          className="absolute inset-y-0 right-0 flex w-[400px] max-w-[92vw] flex-col border-l p-5 shadow-[-24px_0_60px_rgba(23,26,18,0.22)]"
+          style={{
+            background: kronis.background,
+            borderColor: "rgba(23,26,18,0.08)",
+            animation: "kronis-drawer-in 280ms cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          <style>{`@keyframes kronis-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div className="text-[22px] font-extrabold tracking-[-0.3px]" style={{ color: kronis.ink }}>
+              List for rent
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full"
+              style={{ background: kronis.surface }}
+              aria-label="Close"
+            >
+              <X size={16} color={kronis.ink} />
+            </button>
+          </div>
+          {body}
+        </aside>
+      </div>
+    );
+  }
+  return (
+    <SheetModal
+      open={open}
+      onClose={onClose}
+      maxHeight="72%"
+      dim
+      header={
+        <div className="text-[22px] font-extrabold tracking-[-0.3px]" style={{ color: kronis.ink }}>
+          List for rent
+        </div>
+      }
+    >
+      {body}
     </SheetModal>
   );
 }

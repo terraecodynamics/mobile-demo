@@ -2,10 +2,11 @@
 
 import { SoftButton } from "@/components/ui/SoftUi";
 import { SheetModal } from "@/components/ui/SheetModal";
+import { useAppView } from "@/components/phone/AppViewProvider";
 import { dummyRentals, type DummyRental } from "@/data/dummy";
 import { getAllAttached } from "@/lib/handoffKeys";
 import { kronis } from "@/lib/kronis";
-import { Check, Phone, UserRound } from "lucide-react";
+import { Check, Phone, UserRound, X } from "lucide-react";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 type Props = {
@@ -90,28 +91,22 @@ export function ActiveRenteesSheet({ open, onClose, onManageAll }: Props) {
 
   const activeCount = rows.filter((r) => r.status === "ACTIVE").length;
   const completedCount = rows.filter((r) => r.status === "COMPLETED").length;
+  const isWeb = useAppView() === "web";
 
-  return (
-    <SheetModal
-      open={open}
-      onClose={onClose}
-      height="72%"
-      maxHeight="72%"
-      header={
-        <div>
-          <div
-            className="text-[22px] font-extrabold tracking-[-0.3px]"
-            style={{ color: kronis.ink }}
-          >
-            Active rentees
-          </div>
-          <div className="mt-0.5 text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
-            {activeCount} on pump
-            {completedCount > 0 ? ` · ${completedCount} completed` : ""}
-          </div>
-        </div>
-      }
-    >
+  const header = (
+    <div>
+      <div className="text-[22px] font-extrabold tracking-[-0.3px]" style={{ color: kronis.ink }}>
+        Active rentees
+      </div>
+      <div className="mt-0.5 text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
+        {activeCount} on pump
+        {completedCount > 0 ? ` · ${completedCount} completed` : ""}
+      </div>
+    </div>
+  );
+
+  const list = (
+    <>
       <div className="no-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-2">
         {rows.length === 0 ? (
           <div
@@ -272,6 +267,49 @@ export function ActiveRenteesSheet({ open, onClose, onManageAll }: Props) {
           }}
         />
       ) : null}
+    </>
+  );
+
+  if (isWeb) {
+    if (!open) return null;
+    return (
+      <div className="fixed inset-0 z-[80]">
+        <button
+          type="button"
+          aria-label="Close active rentees"
+          className="absolute inset-0 bg-black/30"
+          onClick={onClose}
+        />
+        <aside
+          className="absolute inset-y-0 right-0 flex w-[400px] max-w-[92vw] flex-col border-l p-5 shadow-[-24px_0_60px_rgba(23,26,18,0.22)]"
+          style={{
+            background: kronis.background,
+            borderColor: "rgba(23,26,18,0.08)",
+            animation: "kronis-drawer-in 280ms cubic-bezier(0.22, 1, 0.36, 1)",
+          }}
+        >
+          <style>{`@keyframes kronis-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
+          <div className="mb-4 flex items-start justify-between gap-3">
+            {header}
+            <button
+              type="button"
+              onClick={onClose}
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-full"
+              style={{ background: kronis.surface }}
+              aria-label="Close"
+            >
+              <X size={16} color={kronis.ink} />
+            </button>
+          </div>
+          {list}
+        </aside>
+      </div>
+    );
+  }
+
+  return (
+    <SheetModal open={open} onClose={onClose} height="72%" maxHeight="72%" header={header}>
+      {list}
     </SheetModal>
   );
 }
