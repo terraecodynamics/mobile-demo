@@ -49,6 +49,7 @@ import {
 import { Expand } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useAppView } from "@/components/phone/AppViewProvider";
 
 /**
  * Native pumpHomeSheetHeight, but never taller than the stage.
@@ -88,6 +89,7 @@ function formatRemaining(mins: number) {
  */
 export default function HomePage() {
   const router = useRouter();
+  const isWeb = useAppView() === "web";
   const stageRef = useRef<HTMLDivElement>(null);
   const [stageH, setStageH] = useState(640);
   const [selectedId, setSelectedId] = useState(dummyPumps[0].id);
@@ -308,9 +310,10 @@ export default function HomePage() {
 
   return (
     <div
-      className="relative flex min-h-0 flex-1 flex-col"
+      className={isWeb ? "flex h-full min-h-0 flex-1" : "relative flex min-h-0 flex-1 flex-col"}
       style={{ background: kronis.mapBackground }}
     >
+      {!isWeb ? (
       <PumpHomeAppBar
         initials={dummyUser.initials}
         deviceName={showAllPumps ? "All pumps" : pump.model}
@@ -322,8 +325,9 @@ export default function HomePage() {
         onPicker={() => setPickerOpen(true)}
         onNotifications={() => router.push("/notifications")}
       />
+      ) : null}
 
-      <div ref={stageRef} className="relative min-h-0 flex-1">
+      <div ref={stageRef} className="relative min-h-0 min-w-0 flex-1">
         <MapStage
           pumps={pumps}
           selectedId={selectedId}
@@ -340,7 +344,7 @@ export default function HomePage() {
             setPowerLoading(false);
             toggleLock.current = false;
           }}
-          sheetHeight={controlSheetH}
+          sheetHeight={isWeb ? 0 : controlSheetH}
           fenceFields={fenceFields}
         />
 
@@ -349,8 +353,12 @@ export default function HomePage() {
           SoftChip is position:relative — wrap in an absolute host.
         */}
         <div
-          className="pointer-events-auto absolute right-3.5 z-30"
-          style={{ bottom: Math.max(52, controlSheetH + 18) }}
+          className="pointer-events-auto absolute z-30"
+          style={
+            isWeb
+              ? { right: 16, bottom: 16 }
+              : { right: 14, bottom: Math.max(52, controlSheetH + 18) }
+          }
         >
           <SoftChip
             icon={Expand}
@@ -361,6 +369,7 @@ export default function HomePage() {
           />
         </div>
 
+        {!isWeb ? (
         <div
           className="absolute bottom-0 left-0 right-0 z-20"
           style={{
@@ -434,7 +443,87 @@ export default function HomePage() {
             />
           </div>
         </div>
+        ) : null}
       </div>
+
+      {isWeb ? (
+        <aside
+          className="flex h-full w-[400px] shrink-0 flex-col border-l"
+          style={{ background: kronis.background, borderColor: "rgba(23,26,18,0.08)" }}
+        >
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className="flex items-center gap-3 border-b px-5 py-4 text-left"
+            style={{ borderColor: "rgba(23,26,18,0.08)" }}
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-[11px] font-semibold uppercase tracking-[0.16em] text-[#c87828]">
+                {showAllPumps ? "Fleet" : running ? "Running" : offline ? "Offline" : "Ready"}
+              </span>
+              <span className="mt-1 block truncate text-lg font-extrabold" style={{ color: kronis.ink }}>
+                {showAllPumps ? "All pumps" : pump.model}
+              </span>
+              <span className="block truncate text-xs font-semibold" style={{ color: kronis.inkMuted }}>
+                {showAllPumps ? `${pumps.length} on map` : pump.serial}
+              </span>
+            </span>
+            <span className="text-xs font-semibold" style={{ color: kronis.inkMuted }}>
+              Switch
+            </span>
+          </button>
+          <div className="min-h-0 flex-1">
+            <PumpControlSheet
+              mode={mode}
+              onModeChange={setMode}
+              statusTitle={statusTitle}
+              statusSubtitle={statusSubtitle}
+              timerMinutes={
+                running && remainingMinutes != null
+                  ? Math.max(0, Math.round(remainingMinutes))
+                  : timerMinutes
+              }
+              onTimerChange={handleTimerChange}
+              running={running}
+              offline={offline}
+              powerLoading={powerLoading}
+              onToggle={handleTogglePower}
+              flow={offline ? "—" : displayFlow == null ? "—" : String(displayFlow)}
+              soil={String(pump.soilPct)}
+              onMetrics={() => setMetricsOpen(true)}
+              onOpenSoilMoisture={() => setSoilTargetOpen(true)}
+              onOpenSchedule={() => setScheduleOpen(true)}
+              onOpenRentals={() => setRentOpen(true)}
+              onOpenHandoffKey={() => {
+                const published = getPublishedForPump(pump.id);
+                const existing = getOpenOfferForPump(pump.id);
+                if (existing) {
+                  setHandoffOffer(existing);
+                  setHandoffOpen(true);
+                  return;
+                }
+                const offer = issueHandoffKey({
+                  pumpId: pump.id,
+                  model: published?.model ?? pump.model,
+                  serial: pump.serial,
+                  ratePerDayInr: published?.ratePerDayInr ?? 700,
+                  ownerName: dummyUser.name,
+                  ownerPhone: dummyUser.mobile,
+                });
+                setHandoffOffer(offer);
+                setHandoffOpen(true);
+              }}
+              moistureEnabled={moistureRule.isEnabled}
+              moistureSubtitle={
+                moistureRule.isEnabled
+                  ? `Armed · ${moistureRule.startBelow}–${moistureRule.stopAbove}%`
+                  : null
+              }
+              scheduleEnabled={scheduleRule?.isEnabled === true}
+            />
+          </div>
+        </aside>
+      ) : null}
 
       <PumpPickerSheet
         open={pickerOpen}

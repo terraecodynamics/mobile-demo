@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAppView } from "@/components/phone/AppViewProvider";
 
 type Mode = "scan" | "code";
 
@@ -49,6 +50,7 @@ const DEMO_CODES = new Set([
 
 export default function AddPumpPage() {
   const router = useRouter();
+  const isWeb = useAppView() === "web";
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const scanLoopRef = useRef<number | null>(null);
@@ -222,11 +224,15 @@ export default function AddPumpPage() {
       style={{ background: kronis.background }}
     >
       <header className="flex items-center gap-2 px-3 pb-2.5 pt-1">
+        {!isWeb ? (
         <SoftChip
           icon={ArrowLeft}
           onClick={() => router.back()}
           label="Back"
         />
+        ) : (
+          <div className="h-[42px] w-[42px]" />
+        )}
         <div
           className="flex-1 text-center text-[18px] font-extrabold tracking-[-0.2px]"
           style={{ color: kronis.ink }}
@@ -236,7 +242,7 @@ export default function AddPumpPage() {
         <div className="h-[42px] w-[42px]" />
       </header>
 
-      <div className="no-scrollbar flex-1 overflow-y-auto px-[18px] pb-8 pt-1">
+      <div className={`no-scrollbar flex-1 overflow-y-auto pb-8 pt-1 ${isWeb ? "mx-auto w-full max-w-xl px-6" : "px-[18px]"}`}>
         <p
           className="mb-4 text-[15px] font-semibold leading-[22px]"
           style={{ color: kronis.inkMuted }}

@@ -5,10 +5,11 @@ import {
   homePathForRole,
   matchDemoAccount,
 } from "@/lib/auth";
+import { setAppView, type AppView } from "@/lib/appView";
 import { kronis } from "@/lib/kronis";
 import { AlertCircle, Eye, EyeOff, KeyRound, Lock, Mail, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type LoginMethod = "password" | "otp";
 
@@ -36,6 +37,7 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [inputType, setInputType] = useState<"email" | "phone">("email");
+  const openAs = useRef<AppView>("phone");
 
   useEffect(() => {
     if (!ready || !session) return;
@@ -56,6 +58,7 @@ export default function LoginPage() {
     busy || (loginMethod === "otp" && otpSent && otp.length !== 6);
 
   const finishLogin = (role: "owner" | "rentee", name: string, phone: string) => {
+    setAppView(openAs.current);
     login(role, name, phone.startsWith("+") ? phone : `+91 ${phone}`);
     router.replace(homePathForRole(role));
   };
@@ -385,7 +388,10 @@ export default function LoginPage() {
             <button
               type="button"
               disabled={primaryDisabled}
-              onClick={onPrimaryPress}
+              onClick={() => {
+                openAs.current = "phone";
+                onPrimaryPress();
+              }}
               className="mt-1.5 w-full overflow-hidden rounded-full active:scale-[0.99] disabled:opacity-65"
               style={{
                 minHeight: 50,
@@ -394,6 +400,25 @@ export default function LoginPage() {
             >
               <span className="text-[15px] font-bold text-white">{primaryLabel}</span>
             </button>
+
+            {!(loginMethod === "otp" && !otpSent) ? (
+              <button
+                type="button"
+                disabled={primaryDisabled}
+                onClick={() => {
+                  openAs.current = "web";
+                  onPrimaryPress();
+                }}
+                className="mt-2.5 w-full rounded-full border bg-white text-[14px] font-bold active:scale-[0.99] disabled:opacity-65"
+                style={{
+                  minHeight: 46,
+                  borderColor: kronis.border,
+                  color: kronis.ink,
+                }}
+              >
+                Open web app
+              </button>
+            ) : null}
 
             {loginMethod === "otp" && otpSent ? (
               <button

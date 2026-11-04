@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { useAppView } from "@/components/phone/AppViewProvider";
 
 function getInitials(name: string | undefined) {
   if (!name) return "U";
@@ -44,6 +45,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { session, logout } = useAuth();
   const isRentee = session?.role === "rentee";
+  const isWeb = useAppView() === "web";
   const [fieldCount, setFieldCount] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -116,12 +118,14 @@ export default function ProfilePage() {
       className="relative flex min-h-0 flex-1 flex-col"
       style={{ background: kronis.background }}
     >
-      <header className="flex items-center gap-3 px-4 pb-2 pt-1">
+      <header className={`flex items-center gap-3 pb-2 pt-1 ${isWeb ? "px-8 pt-6" : "px-4"}`}>
+        {!isWeb ? (
         <SoftChip
           icon={ArrowLeft}
           onClick={() => router.push(backPath)}
           label="Back"
         />
+        ) : null}
         <div
           className="text-[22px] font-extrabold tracking-[-0.3px]"
           style={{ color: kronis.ink }}
@@ -130,7 +134,7 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <div className="no-scrollbar flex-1 overflow-y-auto px-4 pb-10">
+      <div className={`no-scrollbar min-h-0 flex-1 overflow-y-auto pb-10 ${isWeb ? "px-8 py-4" : "px-4"}`}>
         {/* Identity */}
         <div className="mb-[22px] mt-2 flex items-center gap-3.5">
           <div
@@ -312,6 +316,8 @@ export default function ProfilePage() {
               />
             </div>
 
+            {dummyPumps.length ? (
+            <div className={isWeb ? "grid grid-cols-2 gap-3" : ""}>
             {dummyPumps.map((p) => {
               const line = `${p.serial} · Solar`;
               return (
@@ -374,6 +380,8 @@ export default function ProfilePage() {
                 </button>
               );
             })}
+            </div>
+            ) : null}
 
             {/* Users */}
             <div

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAppView } from "@/components/phone/AppViewProvider";
 
 const kindMeta: Record<
   DummyNotification["kind"],
@@ -45,6 +46,7 @@ function iconFor(n: DummyNotification) {
 
 export default function NotificationsPage() {
   const router = useRouter();
+  const isWeb = useAppView() === "web";
   const [items, setItems] = useState(dummyNotifications);
 
   const unreadCount = items.filter((n) => n.unread).length;
@@ -77,13 +79,15 @@ export default function NotificationsPage() {
       className="flex min-h-0 flex-1 flex-col"
       style={{ background: kronis.background }}
     >
-      <header className="flex items-start gap-2.5 px-3.5 pb-2 pt-2">
+      <header className={`flex items-start gap-2.5 pb-2 pt-2 ${isWeb ? "px-8 pt-6" : "px-3.5"}`}>
+        {!isWeb ? (
         <SoftChip
           icon={ArrowLeft}
           onClick={() => router.push("/home")}
           label="Back"
           flat
         />
+        ) : null}
         <div className="min-w-0 flex-1 pt-0.5">
           <div
             className="text-[22px] font-extrabold leading-tight tracking-[-0.3px]"
@@ -113,7 +117,7 @@ export default function NotificationsPage() {
         </button>
       </header>
 
-      <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto px-3.5 pb-6 pt-1">
+      <div className={`no-scrollbar min-h-0 flex-1 overflow-y-auto pb-6 pt-1 ${isWeb ? "grid grid-cols-2 content-start gap-6 px-8" : "px-3.5"}`}>
         {sections.map((section) => (
           <section key={section.title} className="mb-3.5">
             <div

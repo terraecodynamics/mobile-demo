@@ -1,7 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState, type CSSProperties } from "react";
+import { Monitor } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { kronis } from "@/lib/kronis";
+import { setAppView } from "@/lib/appView";
 import { KronisSplash } from "@/components/ui/KronisSplash";
 
 /** Design phone size (iPhone-ish). Scaled to fit desktop viewport. */
@@ -13,6 +16,7 @@ const FRAME_H = 844;
  * Real phone / narrow viewport: full-bleed app — no bezel, no scale.
  */
 export function PhoneShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
   const [booted, setBooted] = useState(false);
   const [scale, setScale] = useState(0.82);
   const [isMobile, setIsMobile] = useState(false);
@@ -99,12 +103,22 @@ export function PhoneShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="flex h-dvh max-h-dvh items-center justify-center overflow-hidden p-2 sm:p-4"
+      className="relative flex h-dvh max-h-dvh items-center justify-center overflow-hidden p-2 sm:p-4"
       style={{
         background:
           "radial-gradient(ellipse at 30% 20%, #eef2f7 0%, #c5ccd8 55%, #b4bdc9 100%)",
       }}
     >
+      {pathname !== "/login" ? (
+        <button
+          type="button"
+          onClick={() => setAppView("web")}
+          className="absolute right-5 top-5 z-20 inline-flex items-center gap-2 rounded-full bg-[#171A12] px-4 py-2.5 text-sm font-semibold text-white shadow-lg"
+        >
+          <Monitor size={16} />
+          Open web app
+        </button>
+      ) : null}
       <div className="relative shrink-0" style={{ width: slotW, height: slotH }}>
         <div
           className="absolute left-0 top-0 flex flex-col overflow-hidden"

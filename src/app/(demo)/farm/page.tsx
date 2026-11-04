@@ -44,6 +44,7 @@ import {
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useAppView } from "@/components/phone/AppViewProvider";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import "ol/ol.css";
@@ -132,6 +133,7 @@ function analysisCircleGeom(lat: number, lng: number, radiusMeters: number) {
 
 export default function FarmPage() {
   const router = useRouter();
+  const isWeb = useAppView() === "web";
   /** Start on Odisha demo; replace with GPS when available */
   const [pin, setPin] = useState<LatLng>({
     lat: DEMO_AQUA_FARM.lat,
@@ -1302,9 +1304,15 @@ export default function FarmPage() {
   const assignField = farms.find((f) => f.id === assignFieldId);
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col" style={{ background: kronis.background }}>
+    <div
+      className={isWeb ? "flex min-h-0 flex-1" : "relative flex min-h-0 flex-1 flex-col"}
+      style={{ background: kronis.background }}
+    >
+      <div className={isWeb ? "flex min-h-0 min-w-0 flex-1 flex-col" : "contents"}>
       <header className="flex items-center gap-3 px-3.5 pb-3 pt-2">
-        <SoftChip icon={ArrowLeft} onClick={() => router.push("/home")} label="Back" />
+        {!isWeb ? (
+          <SoftChip icon={ArrowLeft} onClick={() => router.push("/home")} label="Back" />
+        ) : null}
         <div className="min-w-0 flex-1">
           <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
             Farm boundary
@@ -1319,7 +1327,7 @@ export default function FarmPage() {
       </header>
 
       <div
-        className="relative mx-3.5 mb-3 min-h-0 flex-1 overflow-hidden rounded-2xl"
+        className={`relative min-h-0 flex-1 overflow-hidden ${isWeb ? "" : "mx-3.5 mb-3 rounded-2xl"}`}
         style={{ boxShadow: "inset 0 0 0 1px rgba(23,26,18,0.08)" }}
       >
         <div ref={mapHostRef} className="absolute inset-0" />
@@ -1500,8 +1508,16 @@ export default function FarmPage() {
           </div>
         ) : null}
       </div>
+      </div>
 
-      {/* Slider: collection always (when not drawing); playback only before Confirm */}
+      <div
+        className={
+          isWeb
+            ? "flex w-[380px] shrink-0 flex-col overflow-y-auto border-l py-3"
+            : "contents"
+        }
+        style={isWeb ? { background: kronis.background, borderColor: "rgba(23,26,18,0.08)" } : undefined}
+      >
       {!drawingFarms && !editingFarms && !aiDetecting && (collectMode || !confirmed) ? (
         <SoftRaised className="mx-3.5 mb-3 px-3.5 py-3" radius={18}>
           <div className="mb-2 flex items-baseline justify-between">
@@ -1909,6 +1925,7 @@ export default function FarmPage() {
       ) : (
         <div className="pb-4" />
       )}
+      </div>
 
       {/* Native-style: Pump in {field} multi-assign sheet */}
       {assignFieldId && !collectMode ? (

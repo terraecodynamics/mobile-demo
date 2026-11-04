@@ -11,6 +11,7 @@ import { kronis } from "@/lib/kronis";
 import { ArrowLeft, Gauge, KeyRound, Phone, Plus, Search, UserRound } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useAppView } from "@/components/phone/AppViewProvider";
 
 const statusColor = {
   ACTIVE: kronis.lime,
@@ -111,6 +112,7 @@ export default function RentalsPage() {
   const router = useRouter();
   const { session } = useAuth();
   const isRentee = session?.role === "rentee";
+  const isWeb = useAppView() === "web";
 
   const [listings, setListings] = useState<RentalListing[]>([]);
   const [query, setQuery] = useState("");
@@ -192,7 +194,8 @@ export default function RentalsPage() {
   return (
     <div className="relative flex min-h-0 flex-1 flex-col" style={{ background: kronis.background }}>
       <div className="relative z-20 flex items-center gap-2.5 px-3.5 pb-2 pt-2">
-        {isRentee ? (
+        {!isWeb ? (
+          isRentee ? (
           <SoftChip
             icon={UserRound}
             onClick={() => router.push("/profile")}
@@ -201,7 +204,8 @@ export default function RentalsPage() {
           />
         ) : (
           <SoftChip icon={ArrowLeft} onClick={() => router.push("/home")} label="Back" />
-        )}
+        )
+        ) : null}
         <div className="min-w-0 flex-1">
           <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
             {isRentee ? "Find" : "My rentals"}
@@ -243,8 +247,13 @@ export default function RentalsPage() {
 
       {isRentee ? (
         <>
+        <div className={isWeb ? "grid min-h-0 flex-1 grid-cols-[1.15fr_0.9fr] gap-4 p-4" : "contents"}>
           <div
-            className="relative mx-3.5 min-h-[220px] flex-[1.15] overflow-hidden rounded-[22px]"
+            className={
+              isWeb
+                ? "relative min-h-0 overflow-hidden rounded-[22px]"
+                : "relative mx-3.5 min-h-[220px] flex-[1.15] overflow-hidden rounded-[22px]"
+            }
             style={{
               boxShadow:
                 "4px 6px 14px rgba(102,109,122,0.28), -2px -2px 8px rgba(255,255,255,0.75)",
@@ -320,6 +329,8 @@ export default function RentalsPage() {
               )}
             </div>
 
+          </div>
+          </div>
             <EnterHandoffKeySheet
               open={enterKeyOpen}
               renteeName={session?.name}
@@ -331,11 +342,16 @@ export default function RentalsPage() {
                 router.push("/rentals/my-pump");
               }}
             />
-          </div>
         </>
       ) : (
         <>
-          <div className="no-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-3.5 pb-28">
+          <div
+            className={
+              isWeb
+                ? "grid min-h-0 flex-1 grid-cols-2 content-start gap-4 overflow-y-auto p-6 xl:grid-cols-3"
+                : "no-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto px-3.5 pb-28"
+            }
+          >
             {dummyRentals.map((r) => (
               <SoftRaised key={r.id} className="w-full p-4">
                 <div className="flex items-start justify-between gap-2">
@@ -376,10 +392,16 @@ export default function RentalsPage() {
           </div>
 
           <div
-            className="absolute bottom-0 left-0 right-0 z-20 flex items-center gap-3 px-4 pb-5 pt-3"
-            style={{
-              background: `linear-gradient(180deg, transparent, ${kronis.background} 30%)`,
-            }}
+            className={
+              isWeb
+                ? "flex shrink-0 items-center gap-3 border-t px-6 py-4"
+                : "absolute bottom-0 left-0 right-0 z-20 flex items-center gap-3 px-4 pb-5 pt-3"
+            }
+            style={
+              isWeb
+                ? { borderColor: "rgba(23,26,18,0.08)", background: kronis.background }
+                : { background: `linear-gradient(180deg, transparent, ${kronis.background} 30%)` }
+            }
           >
             <div className="min-w-0 flex-1 text-sm font-semibold" style={{ color: kronis.inkMuted }}>
               {dummyRentals.length} rentals
