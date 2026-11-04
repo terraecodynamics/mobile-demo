@@ -8,7 +8,7 @@ import { WebAppShell } from "@/components/phone/WebAppShell";
 import { AppViewProvider } from "@/components/phone/AppViewProvider";
 import { readAppView, type AppView } from "@/lib/appView";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 function DemoGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -18,9 +18,9 @@ function DemoGate({ children }: { children: React.ReactNode }) {
 
 function DemoFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [view, setView] = useState<AppView>("phone");
+  const [view, setView] = useState<AppView | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const sync = () => setView(readAppView());
     sync();
     window.addEventListener("terraeco-view", sync);
@@ -31,12 +31,23 @@ function DemoFrame({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  if (!view) {
+    return <div className="fixed inset-0" style={{ background: "#e7ebf2" }} />;
+  }
+
   const body = (
     <AppViewProvider value={view}>
       <DemoGate>{children}</DemoGate>
     </AppViewProvider>
   );
-  if (pathname !== "/login" && view === "web") {
+  if (view === "web" && pathname === "/login") {
+    return (
+      <div className="fixed inset-0 flex flex-col overflow-hidden" style={{ background: "#e7ebf2" }}>
+        {body}
+      </div>
+    );
+  }
+  if (view === "web") {
     return <WebAppShell>{body}</WebAppShell>;
   }
   return <PhoneShell>{body}</PhoneShell>;
