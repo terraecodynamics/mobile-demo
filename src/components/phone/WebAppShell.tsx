@@ -4,11 +4,14 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { setAppView } from "@/lib/appView";
 import {
   Bell,
+  Building2,
   House,
   KeyRound,
+  Radio,
   Smartphone,
   Sprout,
   UserRound,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -26,11 +29,23 @@ const RENTEE_NAV = [
   { href: "/profile", label: "Profile", icon: UserRound },
 ];
 
+const ORG_NAV = [
+  { href: "/org", label: "Org", icon: Building2 },
+  { href: "/org/farmers", label: "Farmers", icon: Users },
+  { href: "/org/sensors", label: "Sensors", icon: Radio },
+  { href: "/profile", label: "Profile", icon: UserRound },
+];
+
 export function WebAppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { session } = useAuth();
-  const items = session?.role === "rentee" ? RENTEE_NAV : OWNER_NAV;
+  const items =
+    session?.role === "rentee"
+      ? RENTEE_NAV
+      : session?.role === "org"
+        ? ORG_NAV
+        : OWNER_NAV;
 
   const initials = (session?.name || "K")
     .split(" ")
@@ -43,12 +58,16 @@ export function WebAppShell({ children }: { children: React.ReactNode }) {
     <div className="fixed inset-0 flex overflow-hidden" style={{ background: "#e7ebf2" }}>
       <aside className="flex w-[88px] shrink-0 flex-col items-center border-r border-black/5 bg-white py-5">
         <Link href={items[0].href} className="mb-6 flex items-center justify-center" aria-label="Kronis home">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/kronis-logo.svg" alt="Kronis" className="h-7 w-auto max-w-[72px]" />
         </Link>
 
         <nav className="flex flex-1 flex-col items-center gap-1">
           {items.map((item) => {
-            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const active =
+              item.href === "/org"
+                ? pathname === "/org"
+                : pathname === item.href || pathname.startsWith(`${item.href}/`);
             const Icon = item.icon;
             return (
               <Link

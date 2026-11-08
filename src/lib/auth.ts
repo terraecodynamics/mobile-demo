@@ -1,6 +1,6 @@
-/** Demo auth — localStorage session for owner vs rentee */
+/** Demo auth — localStorage session for owner, rentee, and organization */
 
-export type AuthRole = "owner" | "rentee";
+export type AuthRole = "owner" | "rentee" | "org";
 
 export type AuthSession = {
   role: AuthRole;
@@ -25,6 +25,14 @@ export const DEMO_RENTEE = {
   email: "rentee@terraeco.app",
   password: "5678",
   otp: "567890",
+} as const;
+
+export const DEMO_ORG = {
+  name: "Green Valley Co-op",
+  phone: "9876510000",
+  email: "org@terraeco.app",
+  password: "org123",
+  otp: "111111",
 } as const;
 
 function digitsOnly(value: string) {
@@ -54,6 +62,13 @@ export function matchDemoAccount(emailOrMobile: string) {
   ) {
     return { role: "rentee" as const, account: DEMO_RENTEE };
   }
+  if (
+    id === DEMO_ORG.email ||
+    phone === DEMO_ORG.phone ||
+    id === `+91${DEMO_ORG.phone}`
+  ) {
+    return { role: "org" as const, account: DEMO_ORG };
+  }
   return null;
 }
 
@@ -63,7 +78,9 @@ export function readSession(): AuthSession | null {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as AuthSession;
-    if (parsed?.role !== "owner" && parsed?.role !== "rentee") return null;
+    if (parsed?.role !== "owner" && parsed?.role !== "rentee" && parsed?.role !== "org") {
+      return null;
+    }
     if (!parsed.name || !parsed.phone) return null;
     return parsed;
   } catch {
@@ -80,7 +97,9 @@ export function clearSession(): void {
 }
 
 export function homePathForRole(role: AuthRole): string {
-  return role === "rentee" ? "/rentals" : "/home";
+  if (role === "rentee") return "/rentals";
+  if (role === "org") return "/org";
+  return "/home";
 }
 
 /** Paths a rentee may open (everything else redirects to /rentals) */
@@ -89,5 +108,15 @@ export function isRenteeAllowedPath(pathname: string): boolean {
   if (pathname === "/login") return true;
   if (pathname === "/profile") return true;
   if (pathname.startsWith("/rentals/")) return true;
+  return false;
+}
+
+/** Paths an organization may open */
+export function isOrgAllowedPath(pathname: string): boolean {
+  if (pathname === "/login") return true;
+  if (pathname === "/org") return true;
+  if (pathname.startsWith("/org/")) return true;
+  if (pathname === "/profile") return true;
+  if (pathname.startsWith("/share/")) return true;
   return false;
 }

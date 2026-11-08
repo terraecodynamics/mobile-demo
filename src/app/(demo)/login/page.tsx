@@ -4,6 +4,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import {
   homePathForRole,
   matchDemoAccount,
+  type AuthRole,
 } from "@/lib/auth";
 import { useAppView } from "@/components/phone/AppViewProvider";
 import { kronis } from "@/lib/kronis";
@@ -52,7 +53,7 @@ export default function LoginPage() {
   const primaryDisabled =
     busy || (loginMethod === "otp" && otpSent && otp.length !== 6);
 
-  const finishLogin = (role: "owner" | "rentee", name: string, phone: string) => {
+  const finishLogin = (role: AuthRole, name: string, phone: string) => {
     login(role, name, phone.startsWith("+") ? phone : `+91 ${phone}`);
     router.replace(homePathForRole(role));
   };
