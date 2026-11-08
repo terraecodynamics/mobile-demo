@@ -423,9 +423,6 @@ export default function LoginPage() {
                 Register
               </button>
             </div>
-            <p className="mt-3 text-center text-[11px] font-semibold leading-snug" style={{ color: kronis.inkMuted }}>
-              Org demo · org@terraeco.app / org123
-            </p>
           </div>
         </div>
       </div>
