@@ -4,6 +4,7 @@ import type {
   OrgSensor,
 } from "@/lib/orgTypes";
 import { placeNameFromLocation } from "@/lib/orgLocations";
+import { defaultPumpPrices, defaultSensorPrices } from "@/lib/orgPricing";
 
 export type OrgInventoryLive = OrgInventoryItem & {
   deployed: number;
@@ -11,6 +12,9 @@ export type OrgInventoryLive = OrgInventoryItem & {
   owned: number;
   stockValue: number;
   retailValue: number;
+  /** Average onboarded unit cost for devices in this SKU */
+  avgUnitCost: number;
+  avgUnitPrice: number;
 };
 
 export type OrgSummary = {
@@ -48,43 +52,87 @@ function matchPumpSku(model: string, item: OrgInventoryItem) {
   return m === name || m.includes(item.modelNo.toLowerCase());
 }
 
+function sensorCost(s: OrgSensor) {
+  if (typeof s.unitCost === "number" && Number.isFinite(s.unitCost)) return s.unitCost;
+  return defaultSensorPrices({ type: s.type, modelNo: s.modelNo }).unitCost;
+}
+
+function sensorPrice(s: OrgSensor) {
+  if (typeof s.unitPrice === "number" && Number.isFinite(s.unitPrice)) return s.unitPrice;
+  return defaultSensorPrices({ type: s.type, modelNo: s.modelNo }).unitPrice;
+}
+
 export function buildInventoryLive(file: OrgDemoFile): OrgInventoryLive[] {
   const inventory = file.inventory ?? [];
   return inventory.map((item) => {
     if (item.category === "sensor") {
       const matched = file.sensors.filter((s) => matchSensorSku(s, item));
+      const stockUnits = matched.filter((s) => !s.farmerId);
       const deployed = matched.filter((s) => s.farmerId).length;
-      const inStock = matched.filter((s) => !s.farmerId).length;
+      const inStock = stockUnits.length;
       const owned = matched.length;
+      const stockValue = stockUnits.reduce((n, s) => n + sensorCost(s), 0);
+      const retailValue = stockUnits.reduce((n, s) => n + sensorPrice(s), 0);
+      const avgUnitCost =
+        owned > 0
+          ? Math.round(matched.reduce((n, s) => n + sensorCost(s), 0) / owned)
+          : item.unitCost;
+      const avgUnitPrice =
+        owned > 0
+          ? Math.round(matched.reduce((n, s) => n + sensorPrice(s), 0) / owned)
+          : item.unitPrice;
       return {
         ...item,
-        /** Keep catalog field aligned with live warehouse count */
+        unitCost: avgUnitCost,
+        unitPrice: avgUnitPrice,
         stockQty: inStock,
         deployed,
         inStock,
         owned,
-        stockValue: inStock * item.unitCost,
-        retailValue: inStock * item.unitPrice,
+        stockValue,
+        retailValue,
+        avgUnitCost,
+        avgUnitPrice,
       };
     }
 
     if (item.category === "pump") {
       const matched = file.pumps.filter((p) => matchPumpSku(p.model, item));
+      const stockUnits = matched.filter((p) => !p.farmerId);
       const deployed = matched.filter((p) => p.farmerId).length;
-      const inStock = matched.filter((p) => !p.farmerId).length;
+      const inStock = stockUnits.length;
       const owned = matched.length;
+      const priced = matched.map((p) => {
+        const d = defaultPumpPrices(p.model);
+        return {
+          unitCost: typeof p.unitCost === "number" ? p.unitCost : d.unitCost,
+          unitPrice: typeof p.unitPrice === "number" ? p.unitPrice : d.unitPrice,
+        };
+      });
+      const stockPriced = matched
+        .map((p, i) => ({ p, price: priced[i] }))
+        .filter(({ p }) => !p.farmerId);
+      const stockValue = stockPriced.reduce((n, x) => n + x.price.unitCost, 0);
+      const retailValue = stockPriced.reduce((n, x) => n + x.price.unitPrice, 0);
+      const avgUnitCost =
+        owned > 0 ? Math.round(priced.reduce((n, x) => n + x.unitCost, 0) / owned) : item.unitCost;
+      const avgUnitPrice =
+        owned > 0 ? Math.round(priced.reduce((n, x) => n + x.unitPrice, 0) / owned) : item.unitPrice;
       return {
         ...item,
+        unitCost: avgUnitCost,
+        unitPrice: avgUnitPrice,
         stockQty: inStock,
         deployed,
         inStock,
         owned,
-        stockValue: inStock * item.unitCost,
-        retailValue: inStock * item.unitPrice,
+        stockValue,
+        retailValue,
+        avgUnitCost,
+        avgUnitPrice,
       };
     }
 
-    // Accessories stay catalog-driven
     return {
       ...item,
       deployed: 0,
@@ -92,6 +140,8 @@ export function buildInventoryLive(file: OrgDemoFile): OrgInventoryLive[] {
       owned: item.stockQty,
       stockValue: item.stockQty * item.unitCost,
       retailValue: item.stockQty * item.unitPrice,
+      avgUnitCost: item.unitCost,
+      avgUnitPrice: item.unitPrice,
     };
   });
 }
@@ -101,6 +151,18 @@ export function buildOrgSummary(file: OrgDemoFile): OrgSummary {
   const deviceInventory = inventory.filter((i) => i.category !== "accessory");
   const unassignedSensors = file.sensors.filter((s) => !s.farmerId).length;
   const assignedSensors = file.sensors.length - unassignedSensors;
+
+  // Prefer summing live device prices for sensors + inventory rows for pumps/accessories mix
+  const sensorStockValue = file.sensors
+    .filter((s) => !s.farmerId)
+    .reduce((n, s) => n + sensorCost(s), 0);
+  const sensorRetailValue = file.sensors
+    .filter((s) => !s.farmerId)
+    .reduce((n, s) => n + sensorPrice(s), 0);
+  const pumpRows = deviceInventory.filter((i) => i.category === "pump");
+  const pumpStockValue = pumpRows.reduce((n, i) => n + i.stockValue, 0);
+  const pumpRetailValue = pumpRows.reduce((n, i) => n + i.retailValue, 0);
+
   return {
     farmers: file.farmers.length,
     pumps: file.pumps.length,
@@ -110,14 +172,11 @@ export function buildOrgSummary(file: OrgDemoFile): OrgSummary {
     unassignedPumps: file.pumps.filter((p) => !p.farmerId).length,
     shares: file.shares.length,
     inventorySkus: inventory.length,
-    // Device warehouse only (sensors + pumps) so finance matches modules
     inventoryStockUnits: deviceInventory.reduce((n, i) => n + i.inStock, 0),
-    inventoryStockValue: deviceInventory.reduce((n, i) => n + i.stockValue, 0),
-    inventoryRetailValue: deviceInventory.reduce((n, i) => n + i.retailValue, 0),
-    inventoryMarginPotential: deviceInventory.reduce(
-      (n, i) => n + (i.unitPrice - i.unitCost) * i.inStock,
-      0
-    ),
+    inventoryStockValue: sensorStockValue + pumpStockValue,
+    inventoryRetailValue: sensorRetailValue + pumpRetailValue,
+    inventoryMarginPotential:
+      sensorRetailValue + pumpRetailValue - (sensorStockValue + pumpStockValue),
   };
 }
 

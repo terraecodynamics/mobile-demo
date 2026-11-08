@@ -9,6 +9,7 @@ import type {
 } from "@/lib/orgTypes";
 import { resolveSensorCoords } from "@/lib/orgLocations";
 import { buildInventoryLive, buildOrgSummary } from "@/lib/orgMetrics";
+import { defaultSensorPrices } from "@/lib/orgPricing";
 
 const FILE = path.join(process.cwd(), "src/data/org-demo.json");
 
@@ -101,6 +102,10 @@ function normalizeSensor(sensor: OrgSensor): OrgSensor {
     lng: sensor.lng,
     installLocation,
   });
+  const defaults = defaultSensorPrices({
+    type: sensor.type,
+    modelNo: sensor.modelNo,
+  });
   return {
     ...sensor,
     model: sensor.model || SENSOR_MODELS[sensor.type] || "Kronis Sense",
@@ -110,6 +115,15 @@ function normalizeSensor(sensor: OrgSensor): OrgSensor {
     installLocation,
     powerSource: sensor.powerSource || "battery",
     notes: sensor.notes || "",
+    unitCost:
+      typeof sensor.unitCost === "number" && Number.isFinite(sensor.unitCost)
+        ? sensor.unitCost
+        : defaults.unitCost,
+    unitPrice:
+      typeof sensor.unitPrice === "number" && Number.isFinite(sensor.unitPrice)
+        ? sensor.unitPrice
+        : defaults.unitPrice,
+    currency: "INR",
     lat: resolved?.lat ?? sensor.lat ?? null,
     lng: resolved?.lng ?? sensor.lng ?? null,
   };
@@ -126,6 +140,8 @@ export async function addSensor(input: {
   installLocation?: string;
   powerSource?: OrgSensor["powerSource"];
   notes?: string;
+  unitCost?: number;
+  unitPrice?: number;
   farmerId?: string | null;
 }) {
   const file = await readOrgFile();
@@ -135,19 +151,38 @@ export async function addSensor(input: {
   const serial = (input.serial || input.unitId).trim().toUpperCase();
   const unitId = (input.unitId || serial).trim().toUpperCase();
   const installLocation = (input.installLocation || "").trim();
+  const modelNo = (input.modelNo || "").trim().toUpperCase();
   const resolved = resolveSensorCoords({ installLocation });
+  const catalog = (file.inventory ?? []).find(
+    (i) => i.category === "sensor" && (i.modelNo || i.sku).toUpperCase() === modelNo
+  );
+  const defaults = defaultSensorPrices({ type: input.type, modelNo });
+  const unitCost =
+    typeof input.unitCost === "number" && Number.isFinite(input.unitCost)
+      ? input.unitCost
+      : catalog?.unitCost ?? defaults.unitCost;
+  const unitPrice =
+    typeof input.unitPrice === "number" && Number.isFinite(input.unitPrice)
+      ? input.unitPrice
+      : catalog?.unitPrice ?? defaults.unitPrice;
+  if (unitCost < 0 || unitPrice < 0) {
+    throw new Error("Prices must be zero or positive");
+  }
   const sensor: OrgSensor = normalizeSensor({
     id: uid("os"),
     type: input.type,
     label: input.label.trim(),
     unitId,
     model: (input.model || SENSOR_MODELS[input.type]).trim(),
-    modelNo: (input.modelNo || "").trim().toUpperCase(),
+    modelNo,
     serial,
     firmware: (input.firmware || "1.0.0").trim(),
     installLocation,
     powerSource: input.powerSource || "battery",
     notes: (input.notes || "").trim(),
+    unitCost,
+    unitPrice,
+    currency: "INR",
     farmerId: input.farmerId ?? null,
     lat: resolved?.lat ?? null,
     lng: resolved?.lng ?? null,
@@ -316,6 +351,9 @@ function publicSensor(sensor: OrgSensor) {
     installLocation: s.installLocation,
     powerSource: s.powerSource,
     notes: s.notes,
+    unitCost: s.unitCost,
+    unitPrice: s.unitPrice,
+    currency: s.currency ?? "INR",
     farmerId: s.farmerId,
     lat: s.lat,
     lng: s.lng,

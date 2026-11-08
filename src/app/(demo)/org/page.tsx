@@ -13,6 +13,8 @@ import type {
   OrgShare,
 } from "@/lib/orgTypes";
 import {
+  ChevronLeft,
+  ChevronRight,
   MapPinned,
   Plus,
   Radio,
@@ -85,6 +87,73 @@ function BarChart({
           </div>
         </div>
       ))}
+    </div>
+  );
+}
+
+const PAGE_SIZE = 5;
+
+function PaginatedBarChart({
+  items,
+  color = kronis.lime,
+  emptyText,
+}: {
+  items: { label: string; value: number; color?: string }[];
+  color?: string;
+  emptyText: string;
+}) {
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+
+  useEffect(() => {
+    setPage((p) => Math.min(p, totalPages - 1));
+  }, [totalPages]);
+
+  if (items.length === 0) {
+    return (
+      <div className="text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
+        {emptyText}
+      </div>
+    );
+  }
+
+  const safePage = Math.min(page, totalPages - 1);
+  const slice = items.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
+  const max = Math.max(1, ...items.map((x) => x.value));
+
+  return (
+    <div>
+      <BarChart items={slice} max={max} color={color} />
+      {totalPages > 1 ? (
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            disabled={safePage <= 0}
+            aria-label="Previous page"
+            className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-35"
+            style={{ background: "#fff", color: kronis.ink, boxShadow: "0 2px 8px rgba(23,26,18,0.06)" }}
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+          >
+            <ChevronLeft size={16} strokeWidth={2.4} />
+          </button>
+          <div className="text-[11px] font-extrabold" style={{ color: kronis.inkMuted }}>
+            {safePage + 1} / {totalPages}
+            <span className="ml-1.5 font-semibold">
+              · {items.length} total
+            </span>
+          </div>
+          <button
+            type="button"
+            disabled={safePage >= totalPages - 1}
+            aria-label="Next page"
+            className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-35"
+            style={{ background: "#fff", color: kronis.ink, boxShadow: "0 2px 8px rgba(23,26,18,0.06)" }}
+            onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+          >
+            <ChevronRight size={16} strokeWidth={2.4} />
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -212,8 +281,7 @@ export default function OrgDashboardPage() {
     }
     const byLocation = [...locationCounts.entries()]
       .map(([label, value]) => ({ label, value }))
-      .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label))
-      .slice(0, 8);
+      .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
 
     const villageCounts = new Map<string, number>();
     for (const s of data.sensors) {
@@ -285,7 +353,6 @@ export default function OrgDashboardPage() {
   }
 
   const typeMax = Math.max(1, ...charts.byType.map((x) => x.value));
-  const locMax = Math.max(1, ...charts.byLocation.map((x) => x.value), 1);
   const modelMax = Math.max(1, ...charts.byModel.map((x) => x.value), 1);
 
   return (
@@ -460,7 +527,7 @@ export default function OrgDashboardPage() {
                 <table className="w-full min-w-[560px] border-collapse text-left">
                   <thead>
                     <tr style={{ background: kronis.background }}>
-                      {["Product", "Owned", "In stock", "Deployed", "Cost", "Stock value"].map((h) => (
+                      {["Product", "Owned", "In stock", "Deployed", "Avg cost", "Stock value"].map((h) => (
                         <th
                           key={h}
                           className="px-3 py-2 text-[10px] font-extrabold uppercase tracking-[0.08em]"
@@ -510,26 +577,21 @@ export default function OrgDashboardPage() {
               <div className="mb-3 text-[14px] font-extrabold" style={{ color: kronis.ink }}>
                 Locations used most
               </div>
-              {charts.byLocation.length === 0 ? (
-                <div className="text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
-                  Assign sensors to see install locations.
-                </div>
-              ) : (
-                <BarChart items={charts.byLocation} max={locMax} color="#2F80ED" />
-              )}
+              <PaginatedBarChart
+                items={charts.byLocation}
+                color="#2F80ED"
+                emptyText="Assign sensors to see install locations."
+              />
             </SoftRaised>
 
             <SoftRaised className="w-full p-4" radius={18}>
               <div className="mb-3 text-[14px] font-extrabold" style={{ color: kronis.ink }}>
                 By village
               </div>
-              {charts.byVillage.length === 0 ? (
-                <div className="text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
-                  No village coverage yet.
-                </div>
-              ) : (
-                <BarChart items={charts.byVillage} max={Math.max(1, ...charts.byVillage.map((x) => x.value))} />
-              )}
+              <PaginatedBarChart
+                items={charts.byVillage}
+                emptyText="No village coverage yet."
+              />
             </SoftRaised>
 
             <SoftRaised className="w-full p-4" radius={18}>

@@ -422,6 +422,9 @@
       "installLocation": "Sakhigopal · paddy block",
       "powerSource": "battery",
       "notes": "",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.9464,
       "lng": 85.8138
     },
@@ -525,6 +528,9 @@
       "installLocation": "Satyabadi · canal bund",
       "powerSource": "solar",
       "notes": "",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 19.952,
       "lng": 85.825
     },
@@ -616,6 +622,9 @@
       "installLocation": "Pipili · vegetable patch",
       "powerSource": "battery",
       "notes": "",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 20.12,
       "lng": 85.83
     },
@@ -707,6 +716,9 @@
       "installLocation": "Nimapada · orchard edge",
       "powerSource": "wired",
       "notes": "",
+      "unitCost": 5600,
+      "unitPrice": 8900,
+      "currency": "INR",
       "lat": 20.07,
       "lng": 86.02
     },
@@ -810,6 +822,9 @@
       "installLocation": "Konark · coastal field",
       "powerSource": "solar",
       "notes": "",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 19.8878,
       "lng": 86.0945
     },
@@ -901,6 +916,9 @@
       "installLocation": "Delanga · rice field",
       "powerSource": "battery",
       "notes": "",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 20.083,
       "lng": 85.783
     },
@@ -992,6 +1010,9 @@
       "installLocation": "Kakatpur · east plot",
       "powerSource": "battery",
       "notes": "",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.983,
       "lng": 86.2
     },
@@ -1095,6 +1116,9 @@
       "installLocation": "Chandanpur · farm hub",
       "powerSource": "solar",
       "notes": "",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 19.875,
       "lng": 85.862
     },
@@ -1186,6 +1210,9 @@
       "installLocation": "Brahmagiri · wetland",
       "powerSource": "battery",
       "notes": "",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.796,
       "lng": 85.645
     },
@@ -1277,6 +1304,9 @@
       "installLocation": "Gop · canopy rail",
       "powerSource": "wired",
       "notes": "",
+      "unitCost": 5600,
+      "unitPrice": 8900,
+      "currency": "INR",
       "lat": 19.982,
       "lng": 86.005
     },
@@ -1368,6 +1398,9 @@
       "installLocation": "Astaranga · creek side",
       "powerSource": "battery",
       "notes": "",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.98,
       "lng": 86.27
     },
@@ -1471,6 +1504,9 @@
       "installLocation": "Puri · backyard mast",
       "powerSource": "solar",
       "notes": "",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -1562,6 +1598,9 @@
       "installLocation": "Sakhigopal · west block",
       "powerSource": "battery",
       "notes": "",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.9464,
       "lng": 85.8138
     },
@@ -1653,6 +1692,9 @@
       "installLocation": "Pipili · shade house",
       "powerSource": "wired",
       "notes": "",
+      "unitCost": 5600,
+      "unitPrice": 8900,
+      "currency": "INR",
       "lat": 20.12,
       "lng": 85.83
     },
@@ -1744,6 +1786,9 @@
       "installLocation": "Nimapada · north acre",
       "powerSource": "battery",
       "notes": "",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 20.07,
       "lng": 86.02
     },
@@ -1847,6 +1892,9 @@
       "installLocation": "Delanga · block hub",
       "powerSource": "solar",
       "notes": "",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 20.083,
       "lng": 85.783
     },
@@ -1938,6 +1986,9 @@
       "installLocation": "Puri · warehouse A",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2029,6 +2080,9 @@
       "installLocation": "Puri · warehouse A",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2120,6 +2174,9 @@
       "installLocation": "Puri · warehouse A",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2211,6 +2268,9 @@
       "installLocation": "Puri · warehouse A",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2302,6 +2362,9 @@
       "installLocation": "Puri · warehouse A",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2393,6 +2456,9 @@
       "installLocation": "Puri · warehouse B",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2484,6 +2550,9 @@
       "installLocation": "Puri · warehouse B",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2575,6 +2644,9 @@
       "installLocation": "Puri · warehouse B",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2678,6 +2750,9 @@
       "installLocation": "Puri · warehouse A",
       "powerSource": "solar",
       "notes": "Ready for assignment",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2781,6 +2856,9 @@
       "installLocation": "Puri · warehouse A",
       "powerSource": "solar",
       "notes": "Ready for assignment",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2884,6 +2962,9 @@
       "installLocation": "Puri · warehouse B",
       "powerSource": "solar",
       "notes": "Ready for assignment",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -2987,6 +3068,9 @@
       "installLocation": "Puri · warehouse B",
       "powerSource": "solar",
       "notes": "Ready for assignment",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -3078,6 +3162,9 @@
       "installLocation": "Puri · warehouse A",
       "powerSource": "wired",
       "notes": "Ready for assignment",
+      "unitCost": 5600,
+      "unitPrice": 8900,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -3169,6 +3256,9 @@
       "installLocation": "Puri · warehouse A",
       "powerSource": "wired",
       "notes": "Ready for assignment",
+      "unitCost": 5600,
+      "unitPrice": 8900,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -3260,6 +3350,9 @@
       "installLocation": "Puri · warehouse B",
       "powerSource": "wired",
       "notes": "Ready for assignment",
+      "unitCost": 5600,
+      "unitPrice": 8900,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -3351,6 +3444,9 @@
       "installLocation": "Puri · warehouse B",
       "powerSource": "wired",
       "notes": "Ready for assignment",
+      "unitCost": 5600,
+      "unitPrice": 8900,
+      "currency": "INR",
       "lat": 19.8135,
       "lng": 85.8312
     },
@@ -3442,6 +3538,9 @@
       "installLocation": "Chandanpur · staging",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 19.875,
       "lng": 85.862
     },
@@ -3533,6 +3632,9 @@
       "installLocation": "Nimapada · staging",
       "powerSource": "battery",
       "notes": "Ready for assignment",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "currency": "INR",
       "lat": 20.07,
       "lng": 86.02
     },
@@ -3636,6 +3738,9 @@
       "installLocation": "Konark · staging",
       "powerSource": "solar",
       "notes": "Ready for assignment",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "currency": "INR",
       "lat": 19.8878,
       "lng": 86.0945
     }

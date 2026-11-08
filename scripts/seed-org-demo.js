@@ -132,12 +132,19 @@ const modelName = {
   "KS-E-310": "Kronis Sense Env",
 };
 
+const modelPrices = {
+  "KS-S-100": { unitCost: 4200, unitPrice: 6500 },
+  "KS-W-200": { unitCost: 7800, unitPrice: 11900 },
+  "KS-E-310": { unitCost: 5600, unitPrice: 8900 },
+};
+
 const sensors = sensorDefs.map((d, i) => {
   const [id, type, label, farmerId, unitId, modelNo, serial, installLocation, powerSource, fw] = d;
   const place = installLocation.split("·")[0].trim();
   const site = SITES[place] || SITES.Puri;
   const readings =
     type === "soil" ? soilReading(36 + (i % 10)) : type === "weather" ? weatherReading(28 + (i % 4)) : envReading(29 + (i % 3));
+  const prices = modelPrices[modelNo] || { unitCost: 5000, unitPrice: 8000 };
   return {
     id,
     type,
@@ -153,6 +160,9 @@ const sensors = sensorDefs.map((d, i) => {
     installLocation,
     powerSource,
     notes: farmerId ? "" : "Ready for assignment",
+    unitCost: prices.unitCost,
+    unitPrice: prices.unitPrice,
+    currency: "INR",
     lat: site.lat,
     lng: site.lng,
   };

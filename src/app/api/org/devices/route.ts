@@ -16,6 +16,8 @@ export async function POST(req: Request) {
       installLocation?: string;
       powerSource?: OrgSensor["powerSource"];
       notes?: string;
+      unitCost?: number;
+      unitPrice?: number;
       farmerId?: string | null;
       kind?: "pump" | "sensor";
       deviceId?: string;
@@ -54,6 +56,12 @@ export async function POST(req: Request) {
       if (!["battery", "solar", "wired"].includes(power)) {
         return NextResponse.json({ error: "Invalid power source" }, { status: 400 });
       }
+      if (body.unitCost == null || !Number.isFinite(Number(body.unitCost))) {
+        return NextResponse.json({ error: "Purchase cost is required" }, { status: 400 });
+      }
+      if (body.unitPrice == null || !Number.isFinite(Number(body.unitPrice))) {
+        return NextResponse.json({ error: "Sell price is required" }, { status: 400 });
+      }
       const sensor = await addSensor({
         type,
         label: body.label,
@@ -65,6 +73,8 @@ export async function POST(req: Request) {
         installLocation: body.installLocation,
         powerSource: power,
         notes: body.notes,
+        unitCost: Number(body.unitCost),
+        unitPrice: Number(body.unitPrice),
         farmerId: body.farmerId ?? null,
       });
       return NextResponse.json({ sensor }, { status: 201 });

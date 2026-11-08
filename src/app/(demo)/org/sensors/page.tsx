@@ -5,7 +5,8 @@ import { ViewModeToggle, type OrgListView } from "@/components/org/ViewModeToggl
 import { SoftButton, SoftChip, SoftRaised } from "@/components/ui/SoftUi";
 import { useAppView } from "@/components/phone/AppViewProvider";
 import { kronis } from "@/lib/kronis";
-import type { OrgFarmer, OrgSensor, OrgShare } from "@/lib/orgTypes";
+import { defaultSensorPrices } from "@/lib/orgPricing";
+import type { OrgFarmer, OrgInventoryItem, OrgSensor, OrgShare } from "@/lib/orgTypes";
 import {
   ArrowLeft,
   Check,
@@ -23,14 +24,24 @@ type OrgPayload = {
   farmers: OrgFarmer[];
   sensors: OrgSensor[];
   shares: OrgShare[];
+  inventory?: OrgInventoryItem[];
   summary: {
     farmers: number;
     sensors: number;
     assignedSensors: number;
     unassignedSensors: number;
     shares: number;
+    inventoryStockValue?: number;
   };
 };
+
+function inr(n: number) {
+  return new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
 
 type Tab = "inventory" | "assign" | "shares";
 
@@ -57,12 +68,14 @@ function OrgSensorsPageInner() {
   const [sensorLabel, setSensorLabel] = useState("");
   const [sensorUnit, setSensorUnit] = useState("");
   const [sensorModel, setSensorModel] = useState("Kronis Sense Soil");
-  const [sensorModelNo, setSensorModelNo] = useState("");
+  const [sensorModelNo, setSensorModelNo] = useState("KS-S-100");
   const [sensorSerial, setSensorSerial] = useState("");
   const [sensorFirmware, setSensorFirmware] = useState("1.0.0");
   const [sensorLocation, setSensorLocation] = useState("");
   const [sensorPower, setSensorPower] = useState<"battery" | "solar" | "wired">("battery");
   const [sensorNotes, setSensorNotes] = useState("");
+  const [sensorCost, setSensorCost] = useState(String(defaultSensorPrices({ type: "soil" }).unitCost));
+  const [sensorPrice, setSensorPrice] = useState(String(defaultSensorPrices({ type: "soil" }).unitPrice));
   const [sensorType, setSensorType] = useState<"soil" | "weather" | "environment">("soil");
   const [assignFarmerId, setAssignFarmerId] = useState(presetFarmer ?? "");
   const [onboardFarmerId, setOnboardFarmerId] = useState("");
@@ -187,6 +200,18 @@ function OrgSensorsPageInner() {
         ? "Kronis Sense Weather"
         : "Kronis Sense Env";
 
+  const defaultModelNoFor = (type: "soil" | "weather" | "environment") =>
+    type === "soil" ? "KS-S-100" : type === "weather" ? "KS-W-200" : "KS-E-310";
+
+  const applyCatalogPrices = (type: "soil" | "weather" | "environment", modelNo: string) => {
+    const catalog = data?.inventory?.find(
+      (i) => i.category === "sensor" && (i.modelNo || i.sku).toUpperCase() === modelNo.trim().toUpperCase()
+    );
+    const fallback = defaultSensorPrices({ type, modelNo });
+    setSensorCost(String(catalog?.unitCost ?? fallback.unitCost));
+    setSensorPrice(String(catalog?.unitPrice ?? fallback.unitPrice));
+  };
+
   const addSensor = async () => {
     if (!sensorLabel.trim()) {
       setError("Enter sensor name");
@@ -198,6 +223,16 @@ function OrgSensorsPageInner() {
     }
     if (!sensorSerial.trim() && !sensorUnit.trim()) {
       setError("Enter serial number");
+      return;
+    }
+    const unitCost = Number(sensorCost);
+    const unitPrice = Number(sensorPrice);
+    if (!Number.isFinite(unitCost) || unitCost < 0) {
+      setError("Enter a valid purchase cost");
+      return;
+    }
+    if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+      setError("Enter a valid sell price");
       return;
     }
     setBusy(true);
@@ -218,6 +253,8 @@ function OrgSensorsPageInner() {
           installLocation: sensorLocation,
           powerSource: sensorPower,
           notes: sensorNotes,
+          unitCost,
+          unitPrice,
           farmerId: onboardFarmerId || null,
         }),
       });
@@ -225,13 +262,14 @@ function OrgSensorsPageInner() {
       if (!res.ok) throw new Error(json.error || "Could not add sensor");
       setSensorLabel("");
       setSensorUnit("");
-      setSensorModelNo("");
+      setSensorModelNo(defaultModelNoFor(sensorType));
       setSensorSerial("");
       setSensorFirmware("1.0.0");
       setSensorLocation("");
       setSensorPower("battery");
       setSensorNotes("");
       setSensorModel(defaultModelFor(sensorType));
+      applyCatalogPrices(sensorType, defaultModelNoFor(sensorType));
       const givenTo = onboardFarmerId;
       setOnboardFarmerId("");
       await load();
@@ -417,10 +455,20 @@ function OrgSensorsPageInner() {
               { label: "Sensors", value: data.summary.sensors },
               { label: "Assigned", value: data.summary.assignedSensors ?? data.sensors.filter((x) => x.farmerId).length },
               { label: "In stock", value: data.summary.unassignedSensors },
-              { label: "Shares", value: data.summary.shares },
+              {
+                label: "Stock value",
+                value:
+                  data.summary.inventoryStockValue != null
+                    ? inr(data.summary.inventoryStockValue)
+                    : inr(
+                        data.sensors
+                          .filter((s) => !s.farmerId)
+                          .reduce((n, s) => n + (s.unitCost || 0), 0)
+                      ),
+              },
             ].map((s) => (
               <SoftRaised key={s.label} className="w-full p-3" radius={16}>
-                <div className="text-[18px] font-extrabold" style={{ color: kronis.ink }}>
+                <div className="truncate text-[16px] font-extrabold" style={{ color: kronis.ink }}>
                   {s.value}
                 </div>
                 <div className="text-[10px] font-bold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
@@ -453,7 +501,11 @@ function OrgSensorsPageInner() {
                         type="button"
                         onClick={() => {
                           setSensorType(t);
-                          setSensorModel(defaultModelFor(t));
+                          const model = defaultModelFor(t);
+                          const modelNo = defaultModelNoFor(t);
+                          setSensorModel(model);
+                          setSensorModelNo(modelNo);
+                          applyCatalogPrices(t, modelNo);
                         }}
                         className="rounded-full px-3 py-1.5 text-[11px] font-extrabold capitalize"
                         style={{
@@ -486,7 +538,18 @@ function OrgSensorsPageInner() {
                   </label>
                   <select
                     value={sensorModel}
-                    onChange={(e) => setSensorModel(e.target.value)}
+                    onChange={(e) => {
+                      const model = e.target.value;
+                      setSensorModel(model);
+                      const mapped =
+                        model.includes("Weather")
+                          ? "KS-W-200"
+                          : model.includes("Env")
+                            ? "KS-E-310"
+                            : "KS-S-100";
+                      setSensorModelNo(mapped);
+                      applyCatalogPrices(sensorType, mapped);
+                    }}
                     className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
                     style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
                   >
@@ -504,7 +567,10 @@ function OrgSensorsPageInner() {
                     </label>
                     <input
                       value={sensorModelNo}
-                      onChange={(e) => setSensorModelNo(e.target.value)}
+                      onChange={(e) => {
+                        setSensorModelNo(e.target.value);
+                        applyCatalogPrices(sensorType, e.target.value);
+                      }}
                       placeholder="KS-S-100"
                       className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
                       style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
@@ -558,10 +624,44 @@ function OrgSensorsPageInner() {
                   <input
                     value={sensorLocation}
                     onChange={(e) => setSensorLocation(e.target.value)}
-                    placeholder="East plot · bed 2"
+                    placeholder="Sakhigopal · paddy block"
                     className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
                     style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
                   />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="mb-1 block text-[12px] font-bold" style={{ color: kronis.inkMuted }}>
+                      Purchase cost (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={sensorCost}
+                      onChange={(e) => setSensorCost(e.target.value)}
+                      placeholder="4200"
+                      className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
+                      style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-[12px] font-bold" style={{ color: kronis.inkMuted }}>
+                      Sell price (₹)
+                    </label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={sensorPrice}
+                      onChange={(e) => setSensorPrice(e.target.value)}
+                      placeholder="6500"
+                      className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
+                      style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
+                    />
+                  </div>
+                </div>
+                <div className="text-[11px] font-semibold" style={{ color: kronis.inkMuted }}>
+                  Used for stock value · defaults from catalog when model changes
                 </div>
 
                 <div>
@@ -660,6 +760,7 @@ function OrgSensorsPageInner() {
                               <div className="mt-1 text-[12px] font-semibold" style={{ color: farmer ? kronis.ink : kronis.lime }}>
                                 {farmer ? `With ${farmer.name}` : "In stock"}
                                 {s.installLocation ? ` · ${s.installLocation}` : ""}
+                                {s.unitCost != null ? ` · Cost ${inr(s.unitCost)}` : ""}
                               </div>
                               {latest ? (
                                 <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-bold">
@@ -755,7 +856,7 @@ function OrgSensorsPageInner() {
                       <table className="w-full min-w-[820px] border-collapse text-left">
                         <thead className="sticky top-0 z-[1]">
                           <tr style={{ background: kronis.background }}>
-                            {["Sensor", "Model no.", "Serial", "Type", "Location", "Farmer", "Reading", "Action"].map(
+                            {["Sensor", "Model no.", "Serial", "Cost", "Price", "Farmer", "Reading", "Action"].map(
                               (h) => (
                                 <th
                                   key={h}
@@ -795,11 +896,11 @@ function OrgSensorsPageInner() {
                                 <td className="px-3 py-2.5 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
                                   {s.serial || s.unitId || "—"}
                                 </td>
-                                <td className="px-3 py-2.5 text-[12px] font-semibold capitalize" style={{ color: kronis.inkMuted }}>
-                                  {s.type}
+                                <td className="px-3 py-2.5 text-[12px] font-extrabold" style={{ color: kronis.ink }}>
+                                  {s.unitCost != null ? inr(s.unitCost) : "—"}
                                 </td>
                                 <td className="px-3 py-2.5 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-                                  {s.installLocation || "—"}
+                                  {s.unitPrice != null ? inr(s.unitPrice) : "—"}
                                 </td>
                                 <td className="px-3 py-2.5">
                                   <select

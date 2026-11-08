@@ -25,6 +25,10 @@ export type OrgPump = {
   serial: string;
   farmerId: string | null;
   online: boolean;
+  /** Purchase / warehouse cost (INR) */
+  unitCost?: number;
+  /** List / sell price (INR) */
+  unitPrice?: number;
   createdAt: string;
 };
 
@@ -44,6 +48,11 @@ export type OrgSensor = {
   installLocation: string;
   powerSource: OrgSensorPower;
   notes: string;
+  /** Purchase / warehouse cost (INR) */
+  unitCost: number;
+  /** List / sell price (INR) */
+  unitPrice: number;
+  currency?: "INR";
   /** Map pin — active field placement */
   lat?: number | null;
   lng?: number | null;
