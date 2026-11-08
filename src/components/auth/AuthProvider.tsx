@@ -36,9 +36,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback((role: AuthRole, name: string, phone: string) => {
+    const fallback =
+      role === "owner" ? "Pump owner" : role === "org" ? "Organization" : "Rentee";
     const next: AuthSession = {
       role,
-      name: name.trim() || (role === "owner" ? "Pump owner" : "Rentee"),
+      name: name.trim() || fallback,
       phone: phone.trim(),
       loggedInAt: new Date().toISOString(),
     };

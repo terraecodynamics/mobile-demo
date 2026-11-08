@@ -1,12 +1,16 @@
 "use client";
 
 import { useAuth } from "@/components/auth/AuthProvider";
-import { homePathForRole, isRenteeAllowedPath } from "@/lib/auth";
+import {
+  homePathForRole,
+  isOrgAllowedPath,
+  isRenteeAllowedPath,
+} from "@/lib/auth";
 import { kronis } from "@/lib/kronis";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-/** Gate demo routes: must be logged in; rentees stay on rentals. */
+/** Gate demo routes: must be logged in; role scopes stay on their areas. */
 export function RequireAuth({ children }: { children: React.ReactNode }) {
   const { session, ready } = useAuth();
   const pathname = usePathname();
@@ -20,6 +24,17 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
     }
     if (session.role === "rentee" && !isRenteeAllowedPath(pathname)) {
       router.replace(homePathForRole("rentee"));
+      return;
+    }
+    if (session.role === "org" && !isOrgAllowedPath(pathname)) {
+      router.replace(homePathForRole("org"));
+      return;
+    }
+    if (
+      (session.role === "owner" || session.role === "rentee") &&
+      pathname.startsWith("/org")
+    ) {
+      router.replace(homePathForRole(session.role));
     }
   }, [ready, session, pathname, router]);
 
@@ -38,6 +53,13 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
   if (!session) return null;
   if (session.role === "rentee" && !isRenteeAllowedPath(pathname)) return null;
+  if (session.role === "org" && !isOrgAllowedPath(pathname)) return null;
+  if (
+    (session.role === "owner" || session.role === "rentee") &&
+    pathname.startsWith("/org")
+  ) {
+    return null;
+  }
 
   return <>{children}</>;
 }

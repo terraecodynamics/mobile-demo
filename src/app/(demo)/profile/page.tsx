@@ -50,6 +50,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { session, logout } = useAuth();
   const isRentee = session?.role === "rentee";
+  const isOrg = session?.role === "org";
   const isWeb = useAppView() === "web";
   const [fieldCount, setFieldCount] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
@@ -74,17 +75,20 @@ export default function ProfilePage() {
     };
   }, [isRentee]);
 
-  const displayName = session?.name ?? (isRentee ? "Rentee" : dummyUser.name);
+  const displayName =
+    session?.name ?? (isOrg ? "Organization" : isRentee ? "Rentee" : dummyUser.name);
+  const roleLabel = isOrg ? "Organization" : isRentee ? "Rentee" : "Pump owner";
   const displayPhone = session?.phone ?? dummyUser.mobile;
 
   const contactLine = useMemo(() => {
     const bits: string[] = [];
     const masked = maskMobile(displayPhone);
     if (masked) bits.push(masked);
-    if (!isRentee && dummyUser.city) bits.push(dummyUser.city);
+    if (!isRentee && !isOrg && dummyUser.city) bits.push(dummyUser.city);
     if (isRentee) bits.push("Rentee");
+    if (isOrg) bits.push("Organization");
     return bits.join(" · ");
-  }, [displayPhone, isRentee]);
+  }, [displayPhone, isRentee, isOrg]);
 
   const users = useMemo(
     () => [
@@ -118,20 +122,25 @@ export default function ProfilePage() {
 
   const backPath = session ? homePathForRole(session.role) : "/login";
 
-  const sections = isRentee
+  const sections = isOrg
     ? [
         { id: "account", label: "Account", hint: contactLine, Icon: UserRound },
-        { id: "rentals", label: "Rentals", hint: `${nearbyAvailable} available nearby`, Icon: MapPinned },
-        { id: "support", label: "Support", hint: "Help with rentals", Icon: Phone },
         { id: "preferences", label: "Preferences", hint: "English · Litres · ₹", Icon: SlidersHorizontal },
       ]
-    : [
-        { id: "account", label: "Account", hint: contactLine, Icon: UserRound },
-        { id: "pumps", label: "My pumps", hint: `${dummyPumps.length} pumps`, Icon: Cpu },
-        { id: "users", label: "Users", hint: `${users.length} people`, Icon: Users },
-        { id: "farm", label: "Farm", hint: farmMeta, Icon: MapPinned },
-        { id: "preferences", label: "Preferences", hint: "English · Litres · ₹", Icon: SlidersHorizontal },
-      ];
+    : isRentee
+      ? [
+          { id: "account", label: "Account", hint: contactLine, Icon: UserRound },
+          { id: "rentals", label: "Rentals", hint: `${nearbyAvailable} available nearby`, Icon: MapPinned },
+          { id: "support", label: "Support", hint: "Help with rentals", Icon: Phone },
+          { id: "preferences", label: "Preferences", hint: "English · Litres · ₹", Icon: SlidersHorizontal },
+        ]
+      : [
+          { id: "account", label: "Account", hint: contactLine, Icon: UserRound },
+          { id: "pumps", label: "My pumps", hint: `${dummyPumps.length} pumps`, Icon: Cpu },
+          { id: "users", label: "Users", hint: `${users.length} people`, Icon: Users },
+          { id: "farm", label: "Farm", hint: farmMeta, Icon: MapPinned },
+          { id: "preferences", label: "Preferences", hint: "English · Litres · ₹", Icon: SlidersHorizontal },
+        ];
 
   const [section, setSection] = useState(sections[0].id);
 
@@ -150,7 +159,7 @@ export default function ProfilePage() {
                 {displayName}
               </div>
               <div className="mt-0.5 truncate text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-                {isRentee ? "Rentee" : "Pump owner"}
+                {roleLabel}
               </div>
             </div>
           </div>
@@ -220,7 +229,7 @@ export default function ProfilePage() {
                   <dt style={{ color: kronis.inkMuted }}>Mobile</dt>
                   <dd className="font-extrabold" style={{ color: kronis.ink }}>{displayPhone}</dd>
                 </div>
-                {!isRentee ? (
+                {!isRentee && !isOrg ? (
                   <div className="flex justify-between gap-4 border-b py-3" style={{ borderColor: kronis.divider }}>
                     <dt style={{ color: kronis.inkMuted }}>Farm</dt>
                     <dd className="font-extrabold" style={{ color: kronis.ink }}>{dummyUser.farmName}</dd>
@@ -228,7 +237,7 @@ export default function ProfilePage() {
                 ) : null}
                 <div className="flex justify-between gap-4 border-b py-3" style={{ borderColor: kronis.divider }}>
                   <dt style={{ color: kronis.inkMuted }}>Role</dt>
-                  <dd className="font-extrabold" style={{ color: kronis.ink }}>{isRentee ? "Rentee" : "Pump owner"}</dd>
+                  <dd className="font-extrabold" style={{ color: kronis.ink }}>{roleLabel}</dd>
                 </div>
               </dl>
               <button
@@ -447,7 +456,43 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {isRentee ? (
+        {isOrg ? (
+          <>
+            <div
+              className="mb-2.5 text-[12px] font-extrabold uppercase tracking-[0.8px]"
+              style={{ color: kronis.inkMuted }}
+            >
+              Organization
+            </div>
+            <div
+              className="mb-4 rounded-[18px] border px-3.5"
+              style={{ background: kronis.surface, borderColor: kronis.border }}
+            >
+              <div className="flex items-center justify-between py-3.5">
+                <span className="text-[15px] font-bold" style={{ color: kronis.ink }}>
+                  Role
+                </span>
+                <span
+                  className="rounded-full px-2.5 py-1 text-[12px] font-bold"
+                  style={{ background: kronis.limeSoft, color: kronis.lime }}
+                >
+                  Organization
+                </span>
+              </div>
+              <div className="h-px" style={{ background: kronis.divider }} />
+              <button
+                type="button"
+                onClick={() => router.push("/org")}
+                className="flex w-full items-center justify-between py-3.5"
+              >
+                <span className="text-[15px] font-bold" style={{ color: kronis.ink }}>
+                  Open org home
+                </span>
+                <ChevronRight size={18} color={kronis.inkMuted} />
+              </button>
+            </div>
+          </>
+        ) : isRentee ? (
           <>
             {/* Rentee account */}
             <div
@@ -833,7 +878,12 @@ export default function ProfilePage() {
             className="mt-3 text-center text-[12px] font-semibold"
             style={{ color: kronis.inkMuted }}
           >
-            Signed in as {session.role === "owner" ? "pump owner" : "rentee"}
+            Signed in as{" "}
+            {session.role === "owner"
+              ? "pump owner"
+              : session.role === "org"
+                ? "organization"
+                : "rentee"}
           </p>
         ) : null}
 

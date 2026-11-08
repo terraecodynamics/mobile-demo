@@ -1,0 +1,10 @@
+const fs = require("fs");
+const s = fs.readFileSync("f:/terraecodynamics/mobile-demo/src/app/(demo)/org/sensors/page.tsx", "utf8");
+const i = s.indexOf("{toast");
+console.log("toast", i);
+console.log(JSON.stringify(s.slice(i - 100, i + 30)));
+const j = s.indexOf('tab === "shares"');
+console.log("shares", j);
+const k = s.lastIndexOf(") : null}", i);
+console.log("last null before toast", k);
+console.log(JSON.stringify(s.slice(k - 40, k + 40)));

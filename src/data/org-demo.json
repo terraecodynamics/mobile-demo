@@ -1,0 +1,3715 @@
+{
+  "organization": {
+    "id": "org-1",
+    "name": "Green Valley Co-op",
+    "email": "org@terraeco.app",
+    "phone": "+91 98765 10000",
+    "city": "Puri",
+    "onboardedAt": "2026-09-01T10:00:00.000Z"
+  },
+  "farmers": [
+    {
+      "id": "farmer-1",
+      "name": "Ravi Kumar",
+      "phone": "+91 98765 11111",
+      "village": "Satyabadi",
+      "farmName": "Ravi Fields",
+      "createdAt": "2026-09-05T08:00:00.000Z",
+      "lat": 19.952,
+      "lng": 85.825
+    },
+    {
+      "id": "farmer-2",
+      "name": "Anita Patel",
+      "phone": "+91 98765 22222",
+      "village": "Pipili",
+      "farmName": "Patel Farm",
+      "createdAt": "2026-09-12T09:30:00.000Z",
+      "lat": 20.12,
+      "lng": 85.83
+    },
+    {
+      "id": "farmer-3",
+      "name": "Bikash Mohanty",
+      "phone": "+91 98765 33333",
+      "village": "Nimapada",
+      "farmName": "Mohanty Orchard",
+      "createdAt": "2026-09-20T10:00:00.000Z",
+      "lat": 20.07,
+      "lng": 86.02
+    },
+    {
+      "id": "farmer-4",
+      "name": "Sita Jena",
+      "phone": "+91 98765 44444",
+      "village": "Konark",
+      "farmName": "Jena Coastal Farm",
+      "createdAt": "2026-09-28T11:00:00.000Z",
+      "lat": 19.8878,
+      "lng": 86.0945
+    },
+    {
+      "id": "farmer-5",
+      "name": "Pradeep Das",
+      "phone": "+91 98765 55555",
+      "village": "Delanga",
+      "farmName": "Das Paddy Co-op",
+      "createdAt": "2026-10-02T08:00:00.000Z",
+      "lat": 20.083,
+      "lng": 85.783
+    },
+    {
+      "id": "farmer-6",
+      "name": "Mamata Sahu",
+      "phone": "+91 98765 66666",
+      "village": "Kakatpur",
+      "farmName": "Sahu Coastal Plots",
+      "createdAt": "2026-10-05T09:00:00.000Z",
+      "lat": 19.983,
+      "lng": 86.2
+    },
+    {
+      "id": "farmer-7",
+      "name": "Hari Behera",
+      "phone": "+91 98765 77777",
+      "village": "Chandanpur",
+      "farmName": "Behera Fields",
+      "createdAt": "2026-10-08T10:00:00.000Z",
+      "lat": 19.875,
+      "lng": 85.862
+    },
+    {
+      "id": "farmer-8",
+      "name": "Laxmi Nayak",
+      "phone": "+91 98765 88888",
+      "village": "Brahmagiri",
+      "farmName": "Nayak Wetlands",
+      "createdAt": "2026-10-12T11:00:00.000Z",
+      "lat": 19.796,
+      "lng": 85.645
+    },
+    {
+      "id": "farmer-9",
+      "name": "Suresh Pradhan",
+      "phone": "+91 98765 99999",
+      "village": "Gop",
+      "farmName": "Pradhan Farm",
+      "createdAt": "2026-10-15T08:30:00.000Z",
+      "lat": 19.982,
+      "lng": 86.005
+    },
+    {
+      "id": "farmer-10",
+      "name": "Kabita Rout",
+      "phone": "+91 98765 10101",
+      "village": "Astaranga",
+      "farmName": "Rout Fishery Farm",
+      "createdAt": "2026-10-18T09:15:00.000Z",
+      "lat": 19.98,
+      "lng": 86.27
+    },
+    {
+      "id": "farmer-11",
+      "name": "Niranjan Mishra",
+      "phone": "+91 98765 12121",
+      "village": "Puri",
+      "farmName": "Mishra Backyard Farm",
+      "createdAt": "2026-10-22T10:00:00.000Z",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "farmer-12",
+      "name": "Geeta Swain",
+      "phone": "+91 98765 13131",
+      "village": "Sakhigopal",
+      "farmName": "Swain Temple Fields",
+      "createdAt": "2026-10-25T11:20:00.000Z",
+      "lat": 19.9464,
+      "lng": 85.8138
+    }
+  ],
+  "inventory": [
+    {
+      "id": "inv-1",
+      "sku": "KS-S-100",
+      "name": "Kronis Sense Soil",
+      "category": "sensor",
+      "modelNo": "KS-S-100",
+      "unitCost": 4200,
+      "unitPrice": 6500,
+      "stockQty": 0,
+      "currency": "INR"
+    },
+    {
+      "id": "inv-2",
+      "sku": "KS-W-200",
+      "name": "Kronis Sense Weather",
+      "category": "sensor",
+      "modelNo": "KS-W-200",
+      "unitCost": 7800,
+      "unitPrice": 11900,
+      "stockQty": 0,
+      "currency": "INR"
+    },
+    {
+      "id": "inv-3",
+      "sku": "KS-E-310",
+      "name": "Kronis Sense Env",
+      "category": "sensor",
+      "modelNo": "KS-E-310",
+      "unitCost": 5600,
+      "unitPrice": 8900,
+      "stockQty": 0,
+      "currency": "INR"
+    },
+    {
+      "id": "inv-4",
+      "sku": "KR-4",
+      "name": "Kronis 4 Pump",
+      "category": "pump",
+      "modelNo": "KR-4",
+      "unitCost": 18500,
+      "unitPrice": 24900,
+      "stockQty": 0,
+      "currency": "INR"
+    },
+    {
+      "id": "inv-5",
+      "sku": "KR-4P",
+      "name": "Kronis 4 – Pro",
+      "category": "pump",
+      "modelNo": "KR-4P",
+      "unitCost": 24200,
+      "unitPrice": 31900,
+      "stockQty": 0,
+      "currency": "INR"
+    },
+    {
+      "id": "inv-6",
+      "sku": "KR-4I",
+      "name": "Kronis 4i",
+      "category": "pump",
+      "modelNo": "KR-4I",
+      "unitCost": 21000,
+      "unitPrice": 27900,
+      "stockQty": 0,
+      "currency": "INR"
+    },
+    {
+      "id": "inv-7",
+      "sku": "ACC-MOUNT",
+      "name": "Pole mount kit",
+      "category": "accessory",
+      "modelNo": "ACC-MOUNT",
+      "unitCost": 450,
+      "unitPrice": 890,
+      "stockQty": 120,
+      "currency": "INR"
+    },
+    {
+      "id": "inv-8",
+      "sku": "ACC-SOLAR",
+      "name": "Solar kit 20W",
+      "category": "accessory",
+      "modelNo": "ACC-SOLAR",
+      "unitCost": 1800,
+      "unitPrice": 2900,
+      "stockQty": 45,
+      "currency": "INR"
+    }
+  ],
+  "pumps": [
+    {
+      "id": "op-1",
+      "model": "Kronis 4",
+      "serial": "ORG-P-101",
+      "farmerId": "farmer-1",
+      "online": true,
+      "createdAt": "2026-09-06T10:00:00.000Z"
+    },
+    {
+      "id": "op-2",
+      "model": "Kronis 4 – Pro",
+      "serial": "ORG-P-102",
+      "farmerId": "farmer-1",
+      "online": true,
+      "createdAt": "2026-09-07T10:00:00.000Z"
+    },
+    {
+      "id": "op-3",
+      "model": "Kronis 4",
+      "serial": "ORG-P-201",
+      "farmerId": "farmer-2",
+      "online": false,
+      "createdAt": "2026-09-08T10:00:00.000Z"
+    },
+    {
+      "id": "op-4",
+      "model": "Kronis 4",
+      "serial": "ORG-P-301",
+      "farmerId": "farmer-3",
+      "online": true,
+      "createdAt": "2026-09-09T10:00:00.000Z"
+    },
+    {
+      "id": "op-5",
+      "model": "Kronis 4 – Pro",
+      "serial": "ORG-P-302",
+      "farmerId": "farmer-4",
+      "online": true,
+      "createdAt": "2026-09-10T10:00:00.000Z"
+    },
+    {
+      "id": "op-6",
+      "model": "Kronis 4",
+      "serial": "ORG-P-401",
+      "farmerId": "farmer-5",
+      "online": true,
+      "createdAt": "2026-09-11T10:00:00.000Z"
+    },
+    {
+      "id": "op-7",
+      "model": "Kronis 4i",
+      "serial": "ORG-P-402",
+      "farmerId": "farmer-6",
+      "online": false,
+      "createdAt": "2026-09-12T10:00:00.000Z"
+    },
+    {
+      "id": "op-8",
+      "model": "Kronis 4",
+      "serial": "ORG-P-501",
+      "farmerId": "farmer-7",
+      "online": true,
+      "createdAt": "2026-09-13T10:00:00.000Z"
+    },
+    {
+      "id": "op-9",
+      "model": "Kronis 4",
+      "serial": "ORG-P-601",
+      "farmerId": null,
+      "online": true,
+      "createdAt": "2026-09-14T10:00:00.000Z"
+    },
+    {
+      "id": "op-10",
+      "model": "Kronis 4",
+      "serial": "ORG-P-602",
+      "farmerId": null,
+      "online": true,
+      "createdAt": "2026-09-15T10:00:00.000Z"
+    },
+    {
+      "id": "op-11",
+      "model": "Kronis 4 – Pro",
+      "serial": "ORG-P-603",
+      "farmerId": null,
+      "online": true,
+      "createdAt": "2026-09-16T10:00:00.000Z"
+    },
+    {
+      "id": "op-12",
+      "model": "Kronis 4i",
+      "serial": "ORG-P-604",
+      "farmerId": null,
+      "online": true,
+      "createdAt": "2026-09-17T10:00:00.000Z"
+    },
+    {
+      "id": "op-13",
+      "model": "Kronis 4",
+      "serial": "ORG-P-605",
+      "farmerId": null,
+      "online": true,
+      "createdAt": "2026-09-18T10:00:00.000Z"
+    },
+    {
+      "id": "op-14",
+      "model": "Kronis 4 – Pro",
+      "serial": "ORG-P-606",
+      "farmerId": null,
+      "online": true,
+      "createdAt": "2026-09-19T10:00:00.000Z"
+    }
+  ],
+  "sensors": [
+    {
+      "id": "os-1",
+      "type": "soil",
+      "label": "Soil · Sakhigopal",
+      "farmerId": "farmer-1",
+      "unitId": "SM-4410",
+      "createdAt": "2026-09-07T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 37.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 38.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 38.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 38.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 38.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 37,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 36.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 35.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 34,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 34,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 34.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4410-A1",
+      "firmware": "1.2.0",
+      "installLocation": "Sakhigopal · paddy block",
+      "powerSource": "battery",
+      "notes": "",
+      "lat": 19.9464,
+      "lng": 85.8138
+    },
+    {
+      "id": "os-2",
+      "type": "weather",
+      "label": "Weather · Satyabadi",
+      "farmerId": "farmer-1",
+      "unitId": "WX-2201",
+      "createdAt": "2026-09-08T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 26.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 26.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2201-B2",
+      "firmware": "1.1.4",
+      "installLocation": "Satyabadi · canal bund",
+      "powerSource": "solar",
+      "notes": "",
+      "lat": 19.952,
+      "lng": 85.825
+    },
+    {
+      "id": "os-3",
+      "type": "soil",
+      "label": "Soil · Pipili",
+      "farmerId": "farmer-2",
+      "unitId": "SM-4418",
+      "createdAt": "2026-09-09T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 38,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 39.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 40.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 40.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 40.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 40.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 39,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 38.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 37.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 36.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4418-C3",
+      "firmware": "1.2.0",
+      "installLocation": "Pipili · vegetable patch",
+      "powerSource": "battery",
+      "notes": "",
+      "lat": 20.12,
+      "lng": 85.83
+    },
+    {
+      "id": "os-4",
+      "type": "environment",
+      "label": "Env · Nimapada",
+      "farmerId": "farmer-3",
+      "unitId": "EN-1102",
+      "createdAt": "2026-09-10T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.6,
+          "humidityPct": 50
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 51
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.8,
+          "humidityPct": 53
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.7,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.4,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.2,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.2,
+          "humidityPct": 58
+        }
+      ],
+      "model": "Kronis Sense Env",
+      "modelNo": "KS-E-310",
+      "serial": "EN-1102-D4",
+      "firmware": "1.0.8",
+      "installLocation": "Nimapada · orchard edge",
+      "powerSource": "wired",
+      "notes": "",
+      "lat": 20.07,
+      "lng": 86.02
+    },
+    {
+      "id": "os-5",
+      "type": "weather",
+      "label": "Weather · Konark",
+      "farmerId": "farmer-4",
+      "unitId": "WX-2210",
+      "createdAt": "2026-09-11T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 26.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 26.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 25.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 25.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2210-E5",
+      "firmware": "1.1.4",
+      "installLocation": "Konark · coastal field",
+      "powerSource": "solar",
+      "notes": "",
+      "lat": 19.8878,
+      "lng": 86.0945
+    },
+    {
+      "id": "os-6",
+      "type": "soil",
+      "label": "Soil · Delanga",
+      "farmerId": "farmer-5",
+      "unitId": "SM-4422",
+      "createdAt": "2026-09-12T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 41,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 42.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 43.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 43.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 43.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 43.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 42,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 41.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 40.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 39,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 39,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 39.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4422-F6",
+      "firmware": "1.2.0",
+      "installLocation": "Delanga · rice field",
+      "powerSource": "battery",
+      "notes": "",
+      "lat": 20.083,
+      "lng": 85.783
+    },
+    {
+      "id": "os-7",
+      "type": "soil",
+      "label": "Soil · Kakatpur East",
+      "farmerId": "farmer-6",
+      "unitId": "SM-4430",
+      "createdAt": "2026-09-13T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 42,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 43.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 44.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 44.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 44.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 44.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 43,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 42.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 41.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 40,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 40,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 40.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4430-G7",
+      "firmware": "1.2.0",
+      "installLocation": "Kakatpur · east plot",
+      "powerSource": "battery",
+      "notes": "",
+      "lat": 19.983,
+      "lng": 86.2
+    },
+    {
+      "id": "os-8",
+      "type": "weather",
+      "label": "Weather · Chandanpur",
+      "farmerId": "farmer-7",
+      "unitId": "WX-2215",
+      "createdAt": "2026-09-14T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2215-H8",
+      "firmware": "1.1.4",
+      "installLocation": "Chandanpur · farm hub",
+      "powerSource": "solar",
+      "notes": "",
+      "lat": 19.875,
+      "lng": 85.862
+    },
+    {
+      "id": "os-9",
+      "type": "soil",
+      "label": "Soil · Brahmagiri",
+      "farmerId": "farmer-8",
+      "unitId": "SM-4435",
+      "createdAt": "2026-09-15T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 44,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 45.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 46.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 46.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 46.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 46.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 45,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 44.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 43.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 42,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 42,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 42.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4435-I9",
+      "firmware": "1.2.0",
+      "installLocation": "Brahmagiri · wetland",
+      "powerSource": "battery",
+      "notes": "",
+      "lat": 19.796,
+      "lng": 85.645
+    },
+    {
+      "id": "os-10",
+      "type": "environment",
+      "label": "Env · Gop",
+      "farmerId": "farmer-9",
+      "unitId": "EN-1110",
+      "createdAt": "2026-09-16T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.6,
+          "humidityPct": 50
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 51
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.8,
+          "humidityPct": 53
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.7,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.4,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.2,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.2,
+          "humidityPct": 58
+        }
+      ],
+      "model": "Kronis Sense Env",
+      "modelNo": "KS-E-310",
+      "serial": "EN-1110-J1",
+      "firmware": "1.0.8",
+      "installLocation": "Gop · canopy rail",
+      "powerSource": "wired",
+      "notes": "",
+      "lat": 19.982,
+      "lng": 86.005
+    },
+    {
+      "id": "os-11",
+      "type": "soil",
+      "label": "Soil · Astaranga",
+      "farmerId": "farmer-10",
+      "unitId": "SM-4440",
+      "createdAt": "2026-09-17T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 37.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 38.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 38.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 38.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 38.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 37,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 36.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 35.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 34,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 34,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 34.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4440-K2",
+      "firmware": "1.2.0",
+      "installLocation": "Astaranga · creek side",
+      "powerSource": "battery",
+      "notes": "",
+      "lat": 19.98,
+      "lng": 86.27
+    },
+    {
+      "id": "os-12",
+      "type": "weather",
+      "label": "Weather · Puri",
+      "farmerId": "farmer-11",
+      "unitId": "WX-2220",
+      "createdAt": "2026-09-18T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2220-L3",
+      "firmware": "1.1.4",
+      "installLocation": "Puri · backyard mast",
+      "powerSource": "solar",
+      "notes": "",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-13",
+      "type": "soil",
+      "label": "Soil · Sakhigopal West",
+      "farmerId": "farmer-12",
+      "unitId": "SM-4445",
+      "createdAt": "2026-09-19T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 38,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 39.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 40.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 40.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 40.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 40.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 39,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 38.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 37.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 36.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4445-M4",
+      "firmware": "1.2.0",
+      "installLocation": "Sakhigopal · west block",
+      "powerSource": "battery",
+      "notes": "",
+      "lat": 19.9464,
+      "lng": 85.8138
+    },
+    {
+      "id": "os-14",
+      "type": "environment",
+      "label": "Env · Pipili",
+      "farmerId": "farmer-2",
+      "unitId": "EN-1115",
+      "createdAt": "2026-09-20T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.6,
+          "humidityPct": 50
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.1,
+          "humidityPct": 51
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.8,
+          "humidityPct": 53
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.7,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.4,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 58
+        }
+      ],
+      "model": "Kronis Sense Env",
+      "modelNo": "KS-E-310",
+      "serial": "EN-1115-N5",
+      "firmware": "1.0.8",
+      "installLocation": "Pipili · shade house",
+      "powerSource": "wired",
+      "notes": "",
+      "lat": 20.12,
+      "lng": 85.83
+    },
+    {
+      "id": "os-15",
+      "type": "soil",
+      "label": "Soil · Nimapada North",
+      "farmerId": "farmer-3",
+      "unitId": "SM-4450",
+      "createdAt": "2026-09-21T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 40,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 41.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 42.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 42.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 42.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 42.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 41,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 40.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 39.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 38,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 38,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 38.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4450-O6",
+      "firmware": "1.2.0",
+      "installLocation": "Nimapada · north acre",
+      "powerSource": "battery",
+      "notes": "",
+      "lat": 20.07,
+      "lng": 86.02
+    },
+    {
+      "id": "os-16",
+      "type": "weather",
+      "label": "Weather · Delanga",
+      "farmerId": "farmer-5",
+      "unitId": "WX-2225",
+      "createdAt": "2026-09-22T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2225-P7",
+      "firmware": "1.1.4",
+      "installLocation": "Delanga · block hub",
+      "powerSource": "solar",
+      "notes": "",
+      "lat": 20.083,
+      "lng": 85.783
+    },
+    {
+      "id": "os-17",
+      "type": "soil",
+      "label": "Soil · Stock A1",
+      "farmerId": null,
+      "unitId": "SM-4501",
+      "createdAt": "2026-09-23T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 42,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 43.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 44.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 44.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 44.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 44.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 43,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 42.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 41.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 40,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 40,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 40.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4501-Q1",
+      "firmware": "1.2.0",
+      "installLocation": "Puri · warehouse A",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-18",
+      "type": "soil",
+      "label": "Soil · Stock A2",
+      "farmerId": null,
+      "unitId": "SM-4502",
+      "createdAt": "2026-09-24T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 43,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 44.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 45.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 45.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 45.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 45.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 44,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 43.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 42.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 41,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 41,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 41.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4502-Q2",
+      "firmware": "1.2.0",
+      "installLocation": "Puri · warehouse A",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-19",
+      "type": "soil",
+      "label": "Soil · Stock A3",
+      "farmerId": null,
+      "unitId": "SM-4503",
+      "createdAt": "2026-09-25T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 44,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 45.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 46.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 46.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 46.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 46.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 45,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 44.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 43.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 42,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 42,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 42.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4503-Q3",
+      "firmware": "1.2.0",
+      "installLocation": "Puri · warehouse A",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-20",
+      "type": "soil",
+      "label": "Soil · Stock A4",
+      "farmerId": null,
+      "unitId": "SM-4504",
+      "createdAt": "2026-09-26T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 45,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 46.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 47.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 47.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 47.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 47.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 46,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 45.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 44.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 43,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 43,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 43.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4504-Q4",
+      "firmware": "1.2.0",
+      "installLocation": "Puri · warehouse A",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-21",
+      "type": "soil",
+      "label": "Soil · Stock A5",
+      "farmerId": null,
+      "unitId": "SM-4505",
+      "createdAt": "2026-09-07T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 37.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 38.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 38.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 38.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 38.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 37,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 36.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 35.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 34,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 34,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 34.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4505-Q5",
+      "firmware": "1.2.0",
+      "installLocation": "Puri · warehouse A",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-22",
+      "type": "soil",
+      "label": "Soil · Stock A6",
+      "farmerId": null,
+      "unitId": "SM-4506",
+      "createdAt": "2026-09-08T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 37,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 38.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 39.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 39.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 39.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 39.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 38,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 37.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 36.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 35,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 35,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 35.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4506-Q6",
+      "firmware": "1.2.0",
+      "installLocation": "Puri · warehouse B",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-23",
+      "type": "soil",
+      "label": "Soil · Stock A7",
+      "farmerId": null,
+      "unitId": "SM-4507",
+      "createdAt": "2026-09-09T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 38,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 39.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 40.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 40.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 40.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 40.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 39,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 38.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 37.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 36.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4507-Q7",
+      "firmware": "1.2.0",
+      "installLocation": "Puri · warehouse B",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-24",
+      "type": "soil",
+      "label": "Soil · Stock A8",
+      "farmerId": null,
+      "unitId": "SM-4508",
+      "createdAt": "2026-09-10T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 39,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 40.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 41.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 41.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 41.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 41.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 40,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 39.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 38.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 37,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 37,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 37.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4508-Q8",
+      "firmware": "1.2.0",
+      "installLocation": "Puri · warehouse B",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-25",
+      "type": "weather",
+      "label": "Weather · Stock B1",
+      "farmerId": null,
+      "unitId": "WX-2301",
+      "createdAt": "2026-09-11T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 26.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 26.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 25.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 25.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2301-R1",
+      "firmware": "1.1.4",
+      "installLocation": "Puri · warehouse A",
+      "powerSource": "solar",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-26",
+      "type": "weather",
+      "label": "Weather · Stock B2",
+      "farmerId": null,
+      "unitId": "WX-2302",
+      "createdAt": "2026-09-12T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 26.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 26.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2302-R2",
+      "firmware": "1.1.4",
+      "installLocation": "Puri · warehouse A",
+      "powerSource": "solar",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-27",
+      "type": "weather",
+      "label": "Weather · Stock B3",
+      "farmerId": null,
+      "unitId": "WX-2303",
+      "createdAt": "2026-09-13T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2303-R3",
+      "firmware": "1.1.4",
+      "installLocation": "Puri · warehouse B",
+      "powerSource": "solar",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-28",
+      "type": "weather",
+      "label": "Weather · Stock B4",
+      "farmerId": null,
+      "unitId": "WX-2304",
+      "createdAt": "2026-09-14T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2304-R4",
+      "firmware": "1.1.4",
+      "installLocation": "Puri · warehouse B",
+      "powerSource": "solar",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-29",
+      "type": "environment",
+      "label": "Env · Stock C1",
+      "farmerId": null,
+      "unitId": "EN-1201",
+      "createdAt": "2026-09-15T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.6,
+          "humidityPct": 50
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.1,
+          "humidityPct": 51
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.8,
+          "humidityPct": 53
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.7,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.4,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 58
+        }
+      ],
+      "model": "Kronis Sense Env",
+      "modelNo": "KS-E-310",
+      "serial": "EN-1201-S1",
+      "firmware": "1.0.8",
+      "installLocation": "Puri · warehouse A",
+      "powerSource": "wired",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-30",
+      "type": "environment",
+      "label": "Env · Stock C2",
+      "farmerId": null,
+      "unitId": "EN-1202",
+      "createdAt": "2026-09-16T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31.6,
+          "humidityPct": 50
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 31.1,
+          "humidityPct": 51
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.8,
+          "humidityPct": 53
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.7,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.4,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.2,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.2,
+          "humidityPct": 58
+        }
+      ],
+      "model": "Kronis Sense Env",
+      "modelNo": "KS-E-310",
+      "serial": "EN-1202-S2",
+      "firmware": "1.0.8",
+      "installLocation": "Puri · warehouse A",
+      "powerSource": "wired",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-31",
+      "type": "environment",
+      "label": "Env · Stock C3",
+      "farmerId": null,
+      "unitId": "EN-1203",
+      "createdAt": "2026-09-17T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.6,
+          "humidityPct": 50
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.1,
+          "humidityPct": 51
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.8,
+          "humidityPct": 53
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.7,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.4,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.2,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.2,
+          "humidityPct": 58
+        }
+      ],
+      "model": "Kronis Sense Env",
+      "modelNo": "KS-E-310",
+      "serial": "EN-1203-S3",
+      "firmware": "1.0.8",
+      "installLocation": "Puri · warehouse B",
+      "powerSource": "wired",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-32",
+      "type": "environment",
+      "label": "Env · Stock C4",
+      "farmerId": null,
+      "unitId": "EN-1204",
+      "createdAt": "2026-09-18T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.6,
+          "humidityPct": 50
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.1,
+          "humidityPct": 51
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.8,
+          "humidityPct": 53
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.4,
+          "humidityPct": 52
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.7,
+          "humidityPct": 54
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.4,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 55
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.2,
+          "humidityPct": 58
+        }
+      ],
+      "model": "Kronis Sense Env",
+      "modelNo": "KS-E-310",
+      "serial": "EN-1204-S4",
+      "firmware": "1.0.8",
+      "installLocation": "Puri · warehouse B",
+      "powerSource": "wired",
+      "notes": "Ready for assignment",
+      "lat": 19.8135,
+      "lng": 85.8312
+    },
+    {
+      "id": "os-33",
+      "type": "soil",
+      "label": "Soil · Stock A9",
+      "farmerId": null,
+      "unitId": "SM-4509",
+      "createdAt": "2026-09-19T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 38,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 39.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 40.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 40.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 40.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 40.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 39,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 38.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 37.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 36,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 36.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4509-Q9",
+      "firmware": "1.2.0",
+      "installLocation": "Chandanpur · staging",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 19.875,
+      "lng": 85.862
+    },
+    {
+      "id": "os-34",
+      "type": "soil",
+      "label": "Soil · Stock A10",
+      "farmerId": null,
+      "unitId": "SM-4510",
+      "createdAt": "2026-09-20T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": 39,
+          "tempC": 28.2,
+          "humidityPct": 56
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": 40.5,
+          "tempC": 28.3,
+          "humidityPct": 58
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": 41.7,
+          "tempC": 27.8,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": 41.3,
+          "tempC": 28,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": 41.7,
+          "tempC": 27.5,
+          "humidityPct": 59
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": 41.6,
+          "tempC": 27.6,
+          "humidityPct": 61
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": 40,
+          "tempC": 27.1,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": 39.3,
+          "tempC": 27.2,
+          "humidityPct": 64
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": 38.7,
+          "tempC": 26.8,
+          "humidityPct": 62
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": 37,
+          "tempC": 26.9,
+          "humidityPct": 63
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": 37,
+          "tempC": 26.4,
+          "humidityPct": 65
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": 37.5,
+          "tempC": 26.5,
+          "humidityPct": 67
+        }
+      ],
+      "model": "Kronis Sense Soil",
+      "modelNo": "KS-S-100",
+      "serial": "SM-4510-QA",
+      "firmware": "1.2.0",
+      "installLocation": "Nimapada · staging",
+      "powerSource": "battery",
+      "notes": "Ready for assignment",
+      "lat": 20.07,
+      "lng": 86.02
+    },
+    {
+      "id": "os-35",
+      "type": "weather",
+      "label": "Weather · Stock B5",
+      "farmerId": null,
+      "unitId": "WX-2305",
+      "createdAt": "2026-09-21T08:00:00.000Z",
+      "readings": [
+        {
+          "at": "2026-11-08T05:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 58,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T04:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 60,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T03:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30.1,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T02:00:00.000Z",
+          "soilPct": null,
+          "tempC": 30,
+          "humidityPct": 60,
+          "rainMm": 0.7
+        },
+        {
+          "at": "2026-11-08T01:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.9,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-08T00:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.7,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T23:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29.4,
+          "humidityPct": 61,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T22:00:00.000Z",
+          "soilPct": null,
+          "tempC": 29,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T21:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.6,
+          "humidityPct": 64,
+          "rainMm": 1.2
+        },
+        {
+          "at": "2026-11-07T20:00:00.000Z",
+          "soilPct": null,
+          "tempC": 28.1,
+          "humidityPct": 63,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T19:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.6,
+          "humidityPct": 64,
+          "rainMm": 0
+        },
+        {
+          "at": "2026-11-07T18:00:00.000Z",
+          "soilPct": null,
+          "tempC": 27.2,
+          "humidityPct": 66,
+          "rainMm": 0
+        }
+      ],
+      "model": "Kronis Sense Weather",
+      "modelNo": "KS-W-200",
+      "serial": "WX-2305-R5",
+      "firmware": "1.1.4",
+      "installLocation": "Konark · staging",
+      "powerSource": "solar",
+      "notes": "Ready for assignment",
+      "lat": 19.8878,
+      "lng": 86.0945
+    }
+  ],
+  "shares": [
+    {
+      "id": "share-1",
+      "token": "gv-ravi-soil",
+      "farmerId": "farmer-1",
+      "sensorIds": [
+        "os-1",
+        "os-2"
+      ],
+      "label": "Ravi field sensors",
+      "createdAt": "2026-10-20T12:00:00.000Z",
+      "expiresAt": null
+    },
+    {
+      "id": "share-2",
+      "token": "gv-anita-pipili",
+      "farmerId": "farmer-2",
+      "sensorIds": [
+        "os-3",
+        "os-14"
+      ],
+      "label": "Anita Pipili sensors",
+      "createdAt": "2026-10-22T12:00:00.000Z",
+      "expiresAt": null
+    },
+    {
+      "id": "share-3",
+      "token": "gv-bikash-orchard",
+      "farmerId": "farmer-3",
+      "sensorIds": [
+        "os-4",
+        "os-15"
+      ],
+      "label": "Mohanty orchard feed",
+      "createdAt": "2026-10-25T09:00:00.000Z",
+      "expiresAt": null
+    },
+    {
+      "id": "share-4",
+      "token": "gv-sita-konark",
+      "farmerId": "farmer-4",
+      "sensorIds": [
+        "os-5"
+      ],
+      "label": "Konark coastal weather",
+      "createdAt": "2026-10-28T10:00:00.000Z",
+      "expiresAt": null
+    },
+    {
+      "id": "share-5",
+      "token": "gv-delanga-block",
+      "farmerId": "farmer-5",
+      "sensorIds": [
+        "os-6",
+        "os-16"
+      ],
+      "label": "Delanga block share",
+      "createdAt": "2026-11-01T08:00:00.000Z",
+      "expiresAt": null
+    },
+    {
+      "id": "share-6",
+      "token": "gv-kakatpur",
+      "farmerId": "farmer-6",
+      "sensorIds": [
+        "os-7"
+      ],
+      "label": "Kakatpur soil API",
+      "createdAt": "2026-11-03T11:00:00.000Z",
+      "expiresAt": null
+    }
+  ]
+}
