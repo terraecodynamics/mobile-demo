@@ -8,6 +8,7 @@ import {
   SoilTargetSheet,
   type SoilTargetPayload,
 } from "@/components/pump/SoilTargetSheet";
+import { PumpMetricsSheet } from "@/components/pump/PumpMetricsSheet";
 import {
   WateringTimesSheet,
   type SchedulePayload,
@@ -18,13 +19,12 @@ import {
 } from "@/components/rental/PutOnRentSheet";
 import { HandoffKeySheet } from "@/components/rental/HandoffKeySheet";
 import { ActiveRenteesSheet } from "@/components/rental/ActiveRenteesSheet";
-import { SoftButton, SoftChip } from "@/components/ui/SoftUi";
-import { SheetModal } from "@/components/ui/SheetModal";
+import { SoftChip } from "@/components/ui/SoftUi";
 import {
   dummyNotifications,
   dummyPumps,
   dummyUser,
-  dummyWeeklyStats,
+  dummyWeather,
   type DummyPump,
 } from "@/data/dummy";
 import { getPublishedForPump, publishPumpForRent } from "@/lib/rentListings";
@@ -410,6 +410,7 @@ export default function HomePage() {
                     : String(displayFlow)
               }
               soil={String(pump.soilPct)}
+              rh={String(dummyWeather.humidity)}
               onMetrics={() => setMetricsOpen(true)}
               onOpenSoilMoisture={() => setSoilTargetOpen(true)}
               onOpenSchedule={() => setScheduleOpen(true)}
@@ -490,6 +491,7 @@ export default function HomePage() {
               onToggle={handleTogglePower}
               flow={offline ? "—" : displayFlow == null ? "—" : String(displayFlow)}
               soil={String(pump.soilPct)}
+              rh={String(dummyWeather.humidity)}
               onMetrics={() => setMetricsOpen(true)}
               onOpenSoilMoisture={() => setSoilTargetOpen(true)}
               onOpenSchedule={() => setScheduleOpen(true)}
@@ -552,46 +554,25 @@ export default function HomePage() {
         onViewAll={() => router.push("/profile")}
       />
 
-      <SheetModal
+      <PumpMetricsSheet
         open={metricsOpen}
         onClose={() => setMetricsOpen(false)}
-        dim
-        header={
-          <div>
-            <div className="text-[17px] font-extrabold" style={{ color: kronis.ink }}>
-              This week
-            </div>
-            <div className="mt-0.5 text-sm" style={{ color: kronis.inkMuted }}>
-              {pump.name}
-            </div>
-          </div>
+        pumpName={pump.name}
+        pumpSerial={pump.serial}
+        online={!offline}
+        running={running}
+        flowLpm={offline ? null : displayFlow}
+        soilPct={pump.soilPct}
+        moistureArmed={moistureRule.isEnabled}
+        moistureRange={
+          moistureRule.isEnabled
+            ? {
+                startBelow: moistureRule.startBelow,
+                stopAbove: moistureRule.stopAbove,
+              }
+            : null
         }
-      >
-        <div className="mb-5 flex h-28 items-end gap-2 px-1">
-          {dummyWeeklyStats.map((d, i) => (
-            <div key={d.day} className="flex flex-1 flex-col items-center gap-1">
-              <div
-                className="w-full origin-bottom rounded-t-md"
-                style={{
-                  height: `${Math.max(8, d.hours * 28)}px`,
-                  background: `linear-gradient(180deg, ${kronis.lime}, ${kronis.limeDark})`,
-                  animation: `kronis-bar-in 400ms cubic-bezier(0.22, 1.2, 0.36, 1) both`,
-                  animationDelay: `${i * 45}ms`,
-                }}
-              />
-              <span className="text-[10px] font-semibold" style={{ color: kronis.inkMuted }}>
-                {d.day}
-              </span>
-            </div>
-          ))}
-        </div>
-        <SoftButton
-          label="Close"
-          variant="soft"
-          className="w-full"
-          onClick={() => setMetricsOpen(false)}
-        />
-      </SheetModal>
+      />
 
       <SoilTargetSheet
         open={soilTargetOpen}
