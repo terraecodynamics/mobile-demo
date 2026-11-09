@@ -28,9 +28,9 @@ export type OrgMapSensor = {
 };
 
 const TYPE_COLOR: Record<OrgSensorType, string> = {
-  soil: "#7CB518",
-  weather: "#2F80ED",
-  environment: "#F2994A",
+  soil: "#1FA97A",
+  weather: "#1F8FBF",
+  environment: "#E8A317",
 };
 
 /** Rough center of Puri district coverage */

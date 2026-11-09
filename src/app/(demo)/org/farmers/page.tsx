@@ -1,13 +1,16 @@
 "use client";
 
+import { OnboardFarmerSheet } from "@/components/org/OnboardFarmerSheet";
 import { ViewModeToggle, type OrgListView } from "@/components/org/ViewModeToggle";
-import { SoftButton, SoftChip, SoftRaised } from "@/components/ui/SoftUi";
+import { SoftChip, SoftRaised } from "@/components/ui/SoftUi";
 import { useAppView } from "@/components/phone/AppViewProvider";
 import { kronis } from "@/lib/kronis";
 import type { OrgFarmer, OrgSensor } from "@/lib/orgTypes";
-import { ArrowLeft, ChevronRight, Plus } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+
+const PAGE_SIZE = 5;
 
 function OrgFarmersPageInner() {
   const router = useRouter();
@@ -23,13 +26,12 @@ function OrgFarmersPageInner() {
     shares: 0,
   });
   const [error, setError] = useState("");
+  const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
   const [showForm, setShowForm] = useState(search.get("onboard") === "1");
   const [view, setView] = useState<OrgListView>("card");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [village, setVillage] = useState("");
-  const [farmName, setFarmName] = useState("");
+  const [farmerSearch, setFarmerSearch] = useState("");
+  const [page, setPage] = useState(0);
 
   const load = useCallback(async () => {
     const orgRes = await fetch("/api/org", { cache: "no-store" });
@@ -62,6 +64,14 @@ function OrgFarmersPageInner() {
     if (search.get("onboard") === "1") setShowForm(true);
   }, [search]);
 
+  const closeForm = () => {
+    setShowForm(false);
+    setFormError("");
+    if (search.get("onboard") === "1") {
+      router.replace("/org/farmers");
+    }
+  };
+
   const counts = useMemo(() => {
     const map = new Map<string, number>();
     for (const s of sensors) {
@@ -71,30 +81,60 @@ function OrgFarmersPageInner() {
     return map;
   }, [sensors]);
 
-  const onboard = async () => {
-    if (!name.trim() || !phone.trim()) {
-      setError("Name and phone are required");
+  const filteredFarmers = useMemo(() => {
+    const q = farmerSearch.trim().toLowerCase();
+    if (!q) return farmers;
+    return farmers.filter((f) => {
+      const hay = [f.name, f.phone, f.village, f.farmName]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [farmers, farmerSearch]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredFarmers.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages - 1);
+  const pagedFarmers = useMemo(
+    () =>
+      filteredFarmers.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE),
+    [filteredFarmers, safePage]
+  );
+
+  useEffect(() => {
+    setPage(0);
+  }, [farmerSearch]);
+
+  useEffect(() => {
+    setPage((p) => Math.min(p, Math.max(0, totalPages - 1)));
+  }, [totalPages]);
+
+  const onboard = async (payload: {
+    name: string;
+    phone: string;
+    village: string;
+    farmName: string;
+  }) => {
+    if (!payload.name.trim() || !payload.phone.trim()) {
+      setFormError("Name and phone are required");
       return;
     }
     setBusy(true);
+    setFormError("");
     setError("");
     try {
       const res = await fetch("/api/org/farmers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, village, farmName }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Onboard failed");
-      setName("");
-      setPhone("");
-      setVillage("");
-      setFarmName("");
       setShowForm(false);
       await load();
       router.push(`/org/farmers/${json.farmer.id}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Onboard failed");
+      setFormError(e instanceof Error ? e.message : "Onboard failed");
     } finally {
       setBusy(false);
     }
@@ -114,7 +154,15 @@ function OrgFarmersPageInner() {
             Onboard farmers, then open one to see sensors and share data
           </div>
         </div>
-        <SoftChip icon={Plus} color={kronis.lime} label="Onboard" onClick={() => setShowForm((v) => !v)} />
+        <SoftChip
+          icon={Plus}
+          color={kronis.lime}
+          label="Onboard"
+          onClick={() => {
+            setFormError("");
+            setShowForm(true);
+          }}
+        />
       </header>
 
       <div className={`no-scrollbar min-h-0 flex-1 overflow-y-auto pb-8 ${isWeb ? "px-8" : "px-3.5"}`}>
@@ -122,50 +170,6 @@ function OrgFarmersPageInner() {
           <div className="mb-3 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold" style={{ background: kronis.alertBg, color: kronis.alert }}>
             {error}
           </div>
-        ) : null}
-
-        {showForm ? (
-          <SoftRaised className="mb-4 w-full p-4" radius={18}>
-            <div className="mb-3 text-[15px] font-extrabold" style={{ color: kronis.ink }}>
-              Onboard farmer
-            </div>
-            <div className={isWeb ? "grid grid-cols-2 gap-3" : "space-y-2.5"}>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Full name"
-                className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-              />
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Mobile"
-                className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-              />
-              <input
-                value={farmName}
-                onChange={(e) => setFarmName(e.target.value)}
-                placeholder="Farm name"
-                className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-              />
-              <input
-                value={village}
-                onChange={(e) => setVillage(e.target.value)}
-                placeholder="Village"
-                className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-              />
-            </div>
-            <SoftButton
-              label={busy ? "Saving…" : "Save farmer"}
-              variant="orange"
-              className="mt-3.5 w-full"
-              onClick={onboard}
-            />
-          </SoftRaised>
         ) : null}
 
         <div className={`mb-4 grid gap-2.5 ${isWeb ? "grid-cols-4" : "grid-cols-2"}`}>
@@ -188,111 +192,184 @@ function OrgFarmersPageInner() {
 
         <div className="mb-3 flex items-center justify-between gap-2">
           <div className="text-[12px] font-extrabold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
-            {farmers.length} farmer{farmers.length === 1 ? "" : "s"}
+            {farmerSearch.trim()
+              ? `${filteredFarmers.length} of ${farmers.length}`
+              : `${farmers.length} farmer${farmers.length === 1 ? "" : "s"}`}
           </div>
           <ViewModeToggle value={view} onChange={setView} />
         </div>
 
-        {view === "card" ? (
-          <div className="space-y-2.5">
-            {farmers.map((f) => {
-              const sensorCount = counts.get(f.id) ?? 0;
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => router.push(`/org/farmers/${f.id}`)}
-                  className="flex w-full items-center gap-3 rounded-[18px] border px-3.5 py-3.5 text-left"
-                  style={{ background: kronis.surface, borderColor: kronis.border }}
-                >
-                  <span
-                    className="grid h-11 w-11 place-items-center rounded-full text-[12px] font-extrabold"
-                    style={{ background: kronis.ink, color: kronis.lime }}
-                  >
-                    {f.name
-                      .split(" ")
-                      .slice(0, 2)
-                      .map((p) => p[0])
-                      .join("")}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[15px] font-extrabold" style={{ color: kronis.ink }}>
-                      {f.name}
-                    </span>
-                    <span className="block text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-                      {f.farmName} · {f.village} · {sensorCount} sensor{sensorCount === 1 ? "" : "s"}
-                    </span>
-                  </span>
-                  <ChevronRight size={18} color={kronis.inkMuted} />
-                </button>
-              );
-            })}
+        <div className="relative mb-3">
+          <Search
+            size={15}
+            color={kronis.inkMuted}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+          />
+          <input
+            type="search"
+            value={farmerSearch}
+            onChange={(e) => setFarmerSearch(e.target.value)}
+            placeholder="Search name, farm, village, phone…"
+            className="w-full rounded-xl border py-2.5 pl-9 pr-3 text-[13px] font-semibold outline-none"
+            style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
+          />
+        </div>
+
+        {farmers.length === 0 ? (
+          <div
+            className="rounded-[18px] border px-4 py-5 text-[13px] font-semibold"
+            style={{ background: kronis.surface, borderColor: kronis.border, color: kronis.inkMuted }}
+          >
+            No farmers onboarded yet.
+          </div>
+        ) : filteredFarmers.length === 0 ? (
+          <div
+            className="rounded-[18px] border px-4 py-5 text-[13px] font-semibold"
+            style={{ background: kronis.surface, borderColor: kronis.border, color: kronis.inkMuted }}
+          >
+            No farmers match “{farmerSearch.trim()}”.
           </div>
         ) : (
-          <div
-            className="overflow-hidden rounded-[18px] border"
-            style={{ background: "#fff", borderColor: kronis.border }}
-          >
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] border-collapse text-left">
-                <thead>
-                  <tr style={{ background: kronis.background }}>
-                    {["Farmer", "Farm", "Village", "Phone", "Sensors", ""].map((h) => (
-                      <th
-                        key={h || "action"}
-                        className="px-3.5 py-2.5 text-[10px] font-extrabold uppercase tracking-[0.1em]"
-                        style={{ color: kronis.inkMuted }}
+          <>
+            {view === "card" ? (
+              <div className="space-y-2.5">
+                {pagedFarmers.map((f) => {
+                  const sensorCount = counts.get(f.id) ?? 0;
+                  return (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => router.push(`/org/farmers/${f.id}`)}
+                      className="flex w-full items-center gap-3 rounded-[18px] border px-3.5 py-3.5 text-left"
+                      style={{ background: kronis.surface, borderColor: kronis.border }}
+                    >
+                      <span
+                        className="grid h-11 w-11 place-items-center rounded-full text-[12px] font-extrabold"
+                        style={{ background: kronis.ink, color: kronis.lime }}
                       >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {farmers.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-3.5 py-6 text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
-                        No farmers onboarded yet.
-                      </td>
-                    </tr>
-                  ) : (
-                    farmers.map((f) => {
-                      const sensorCount = counts.get(f.id) ?? 0;
-                      return (
-                        <tr
-                          key={f.id}
-                          className="cursor-pointer border-t transition-colors hover:bg-[rgba(23,26,18,0.02)]"
-                          style={{ borderColor: kronis.border }}
-                          onClick={() => router.push(`/org/farmers/${f.id}`)}
-                        >
-                          <td className="px-3.5 py-3 text-[13px] font-extrabold" style={{ color: kronis.ink }}>
-                            {f.name}
-                          </td>
-                          <td className="px-3.5 py-3 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-                            {f.farmName || "—"}
-                          </td>
-                          <td className="px-3.5 py-3 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-                            {f.village || "—"}
-                          </td>
-                          <td className="px-3.5 py-3 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-                            {f.phone || "—"}
-                          </td>
-                          <td className="px-3.5 py-3 text-[12px] font-extrabold" style={{ color: kronis.ink }}>
-                            {sensorCount}
-                          </td>
-                          <td className="px-3.5 py-3 text-right">
-                            <ChevronRight size={16} color={kronis.inkMuted} className="inline" />
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                        {f.name
+                          .split(" ")
+                          .slice(0, 2)
+                          .map((p) => p[0])
+                          .join("")}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[15px] font-extrabold" style={{ color: kronis.ink }}>
+                          {f.name}
+                        </span>
+                        <span className="block text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+                          {f.farmName} · {f.village} · {sensorCount} sensor{sensorCount === 1 ? "" : "s"}
+                        </span>
+                      </span>
+                      <ChevronRight size={18} color={kronis.inkMuted} />
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <div
+                className="overflow-hidden rounded-[18px] border"
+                style={{ background: "#fff", borderColor: kronis.border }}
+              >
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[640px] border-collapse text-left">
+                    <thead>
+                      <tr style={{ background: kronis.background }}>
+                        {["Farmer", "Farm", "Village", "Phone", "Sensors", ""].map((h) => (
+                          <th
+                            key={h || "action"}
+                            className="px-3.5 py-2.5 text-[10px] font-extrabold uppercase tracking-[0.1em]"
+                            style={{ color: kronis.inkMuted }}
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {pagedFarmers.map((f) => {
+                        const sensorCount = counts.get(f.id) ?? 0;
+                        return (
+                          <tr
+                            key={f.id}
+                            className="cursor-pointer border-t transition-colors hover:bg-[rgba(23,26,18,0.02)]"
+                            style={{ borderColor: kronis.border }}
+                            onClick={() => router.push(`/org/farmers/${f.id}`)}
+                          >
+                            <td className="px-3.5 py-3 text-[13px] font-extrabold" style={{ color: kronis.ink }}>
+                              {f.name}
+                            </td>
+                            <td className="px-3.5 py-3 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+                              {f.farmName || "—"}
+                            </td>
+                            <td className="px-3.5 py-3 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+                              {f.village || "—"}
+                            </td>
+                            <td className="px-3.5 py-3 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+                              {f.phone || "—"}
+                            </td>
+                            <td className="px-3.5 py-3 text-[12px] font-extrabold" style={{ color: kronis.ink }}>
+                              {sensorCount}
+                            </td>
+                            <td className="px-3.5 py-3 text-right">
+                              <ChevronRight size={16} color={kronis.inkMuted} className="inline" />
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {totalPages > 1 ? (
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  disabled={safePage <= 0}
+                  aria-label="Previous farmers page"
+                  className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-35"
+                  style={{
+                    background: "#fff",
+                    color: kronis.ink,
+                    boxShadow: "0 2px 8px rgba(23,26,18,0.06)",
+                  }}
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                >
+                  <ChevronLeft size={16} strokeWidth={2.4} />
+                </button>
+                <div className="text-[11px] font-extrabold" style={{ color: kronis.inkMuted }}>
+                  {safePage + 1} / {totalPages}
+                  <span className="ml-1.5 font-semibold">· {filteredFarmers.length} total</span>
+                </div>
+                <button
+                  type="button"
+                  disabled={safePage >= totalPages - 1}
+                  aria-label="Next farmers page"
+                  className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-35"
+                  style={{
+                    background: "#fff",
+                    color: kronis.ink,
+                    boxShadow: "0 2px 8px rgba(23,26,18,0.06)",
+                  }}
+                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                >
+                  <ChevronRight size={16} strokeWidth={2.4} />
+                </button>
+              </div>
+            ) : null}
+          </>
         )}
       </div>
+
+      <OnboardFarmerSheet
+        open={showForm}
+        busy={busy}
+        error={formError}
+        onClose={closeForm}
+        onSave={onboard}
+      />
     </div>
   );
 }

@@ -10,15 +10,20 @@ import type { OrgFarmer, OrgInventoryItem, OrgSensor, OrgShare } from "@/lib/org
 import {
   ArrowLeft,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   ExternalLink,
   Link2,
   Plus,
   Radio,
+  Search,
   Share2,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+
+const STOCK_PAGE_SIZE = 5;
 
 type OrgPayload = {
   farmers: OrgFarmer[];
@@ -91,6 +96,9 @@ function OrgSensorsPageInner() {
   } | null>(null);
   const [shareFarmerFilter, setShareFarmerFilter] = useState("");
   const [shareLocationFilter, setShareLocationFilter] = useState("");
+  const [stockPage, setStockPage] = useState(0);
+  const [stockSearch, setStockSearch] = useState("");
+  const [inventorySearch, setInventorySearch] = useState("");
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -129,10 +137,75 @@ function OrgSensorsPageInner() {
     return map;
   }, [data]);
 
+  const filteredInventorySensors = useMemo(() => {
+    const sensors = data?.sensors ?? [];
+    const q = inventorySearch.trim().toLowerCase();
+    if (!q) return sensors;
+    return sensors.filter((s) => {
+      const farmer = s.farmerId ? farmersById.get(s.farmerId) : null;
+      const hay = [
+        s.label,
+        s.type,
+        s.model,
+        s.modelNo,
+        s.serial,
+        s.unitId,
+        s.installLocation,
+        farmer?.name,
+        farmer?.farmName,
+        farmer?.village,
+        s.farmerId ? null : "in stock",
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [data?.sensors, farmersById, inventorySearch]);
+
   const unassigned = useMemo(
     () => data?.sensors.filter((s) => !s.farmerId) ?? [],
     [data]
   );
+
+  const filteredUnassigned = useMemo(() => {
+    const q = stockSearch.trim().toLowerCase();
+    if (!q) return unassigned;
+    return unassigned.filter((s) => {
+      const hay = [
+        s.label,
+        s.type,
+        s.model,
+        s.modelNo,
+        s.serial,
+        s.unitId,
+        s.installLocation,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  }, [unassigned, stockSearch]);
+
+  const stockTotalPages = Math.max(1, Math.ceil(filteredUnassigned.length / STOCK_PAGE_SIZE));
+  const safeStockPage = Math.min(stockPage, stockTotalPages - 1);
+  const pagedUnassigned = useMemo(
+    () =>
+      filteredUnassigned.slice(
+        safeStockPage * STOCK_PAGE_SIZE,
+        safeStockPage * STOCK_PAGE_SIZE + STOCK_PAGE_SIZE
+      ),
+    [filteredUnassigned, safeStockPage]
+  );
+
+  useEffect(() => {
+    setStockPage(0);
+  }, [stockSearch]);
+
+  useEffect(() => {
+    setStockPage((p) => Math.min(p, Math.max(0, stockTotalPages - 1)));
+  }, [stockTotalPages]);
 
   const farmerSensors = useMemo(
     () =>
@@ -729,15 +802,50 @@ function OrgSensorsPageInner() {
 
             <section className="flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
               <div className="mb-2 flex shrink-0 items-center justify-between gap-2">
-                <div className="text-[12px] font-extrabold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
-                  All sensors
+                <div>
+                  <div className="text-[12px] font-extrabold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
+                    All sensors
+                  </div>
+                  {inventorySearch.trim() ? (
+                    <div className="mt-0.5 text-[11px] font-semibold" style={{ color: kronis.inkMuted }}>
+                      {filteredInventorySensors.length} of {data.sensors.length}
+                    </div>
+                  ) : null}
                 </div>
                 <ViewModeToggle value={listView} onChange={setListView} />
               </div>
+              <div className="relative mb-2 shrink-0">
+                <Search
+                  size={15}
+                  color={kronis.inkMuted}
+                  className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+                />
+                <input
+                  type="search"
+                  value={inventorySearch}
+                  onChange={(e) => setInventorySearch(e.target.value)}
+                  placeholder="Search label, model, serial, farmer…"
+                  className="w-full rounded-xl border py-2.5 pl-9 pr-3 text-[13px] font-semibold outline-none"
+                  style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
+                />
+              </div>
               <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto pb-2">
-                {listView === "card" ? (
+                {filteredInventorySensors.length === 0 ? (
+                  <div
+                    className="rounded-[18px] border px-4 py-4 text-[13px] font-semibold"
+                    style={{
+                      background: kronis.surface,
+                      borderColor: kronis.border,
+                      color: kronis.inkMuted,
+                    }}
+                  >
+                    {inventorySearch.trim()
+                      ? `No sensors match “${inventorySearch.trim()}”.`
+                      : "No sensors yet."}
+                  </div>
+                ) : listView === "card" ? (
                   <div className="space-y-2">
-                    {data.sensors.map((s) => {
+                    {filteredInventorySensors.map((s) => {
                       const farmer = s.farmerId ? farmersById.get(s.farmerId) : null;
                       const latest = s.readings[0];
                       const pickFarmer = inlineAssign[s.id] ?? "";
@@ -870,7 +978,7 @@ function OrgSensorsPageInner() {
                           </tr>
                         </thead>
                         <tbody>
-                          {data.sensors.map((s) => {
+                          {filteredInventorySensors.map((s) => {
                             const farmer = s.farmerId ? farmersById.get(s.farmerId) : null;
                             const latest = s.readings[0];
                             const pickFarmer = inlineAssign[s.id] ?? "";
@@ -986,8 +1094,17 @@ function OrgSensorsPageInner() {
               </SoftRaised>
 
               <div>
-                <div className="mb-2 text-[12px] font-extrabold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
-                  Stock — give a sensor
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <div className="text-[12px] font-extrabold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
+                    Stock — give a sensor
+                  </div>
+                  {assignFarmerId && unassigned.length > 0 ? (
+                    <div className="text-[11px] font-semibold" style={{ color: kronis.inkMuted }}>
+                      {stockSearch.trim()
+                        ? `${filteredUnassigned.length} of ${unassigned.length}`
+                        : `${unassigned.length} in stock`}
+                    </div>
+                  ) : null}
                 </div>
                 {!assignFarmerId ? (
                   <div className="rounded-[18px] border px-4 py-4 text-[13px] font-semibold" style={{ background: kronis.surface, borderColor: kronis.border, color: kronis.inkMuted }}>
@@ -999,28 +1116,96 @@ function OrgSensorsPageInner() {
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    {unassigned.map((s) => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        disabled={busy}
-                        onClick={() => assign(s.id, assignFarmerId)}
-                        className="flex w-full items-center justify-between rounded-[18px] border px-3.5 py-3 text-left"
-                        style={{ background: kronis.surface, borderColor: kronis.border }}
+                    <div className="relative">
+                      <Search
+                        size={15}
+                        color={kronis.inkMuted}
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+                      />
+                      <input
+                        type="search"
+                        value={stockSearch}
+                        onChange={(e) => setStockSearch(e.target.value)}
+                        placeholder="Search label, model, serial…"
+                        className="w-full rounded-xl border py-2.5 pl-9 pr-3 text-[13px] font-semibold outline-none"
+                        style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
+                      />
+                    </div>
+                    {filteredUnassigned.length === 0 ? (
+                      <div
+                        className="rounded-[18px] border px-4 py-4 text-[13px] font-semibold"
+                        style={{
+                          background: kronis.surface,
+                          borderColor: kronis.border,
+                          color: kronis.inkMuted,
+                        }}
                       >
-                        <span>
-                          <span className="block text-[14px] font-extrabold" style={{ color: kronis.ink }}>
-                            {s.label}
-                          </span>
-                          <span className="block text-[11px] font-semibold" style={{ color: kronis.inkMuted }}>
-                            {(s.modelNo || s.type) + ` · ${s.serial || s.unitId}`}
-                          </span>
-                        </span>
-                        <span className="text-[12px] font-bold" style={{ color: kronis.lime }}>
-                          Assign
-                        </span>
-                      </button>
-                    ))}
+                        No sensors match “{stockSearch.trim()}”.
+                      </div>
+                    ) : (
+                      <>
+                        {pagedUnassigned.map((s) => (
+                          <button
+                            key={s.id}
+                            type="button"
+                            disabled={busy}
+                            onClick={() => assign(s.id, assignFarmerId)}
+                            className="flex w-full items-center justify-between rounded-[18px] border px-3.5 py-3 text-left"
+                            style={{ background: kronis.surface, borderColor: kronis.border }}
+                          >
+                            <span>
+                              <span className="block text-[14px] font-extrabold" style={{ color: kronis.ink }}>
+                                {s.label}
+                              </span>
+                              <span className="block text-[11px] font-semibold" style={{ color: kronis.inkMuted }}>
+                                {(s.modelNo || s.type) + ` · ${s.serial || s.unitId}`}
+                              </span>
+                            </span>
+                            <span className="text-[12px] font-bold" style={{ color: kronis.lime }}>
+                              Assign
+                            </span>
+                          </button>
+                        ))}
+                        {stockTotalPages > 1 ? (
+                          <div className="flex items-center justify-between gap-2 pt-1">
+                            <button
+                              type="button"
+                              disabled={safeStockPage <= 0}
+                              aria-label="Previous stock page"
+                              className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-35"
+                              style={{
+                                background: "#fff",
+                                color: kronis.ink,
+                                boxShadow: "0 2px 8px rgba(23,26,18,0.06)",
+                              }}
+                              onClick={() => setStockPage((p) => Math.max(0, p - 1))}
+                            >
+                              <ChevronLeft size={16} strokeWidth={2.4} />
+                            </button>
+                            <div className="text-[11px] font-extrabold" style={{ color: kronis.inkMuted }}>
+                              {safeStockPage + 1} / {stockTotalPages}
+                              <span className="ml-1.5 font-semibold">
+                                · {filteredUnassigned.length} total
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              disabled={safeStockPage >= stockTotalPages - 1}
+                              aria-label="Next stock page"
+                              className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-35"
+                              style={{
+                                background: "#fff",
+                                color: kronis.ink,
+                                boxShadow: "0 2px 8px rgba(23,26,18,0.06)",
+                              }}
+                              onClick={() => setStockPage((p) => Math.min(stockTotalPages - 1, p + 1))}
+                            >
+                              <ChevronRight size={16} strokeWidth={2.4} />
+                            </button>
+                          </div>
+                        ) : null}
+                      </>
+                    )}
                   </div>
                 )}
               </div>
