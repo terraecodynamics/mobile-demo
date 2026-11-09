@@ -125,42 +125,79 @@ function BarChart({
   );
 }
 
-function ColumnChart({
+function TypeDeployRows({
   items,
 }: {
-  items: { label: string; value: number; color: string; soft: string; meta?: string }[];
+  items: {
+    label: string;
+    value: number;
+    active: number;
+    stock: number;
+    color: string;
+    soft: string;
+  }[];
 }) {
-  const max = Math.max(1, ...items.map((x) => x.value));
   return (
-    <div className="flex items-end justify-between gap-3 pt-1">
+    <div className="space-y-2">
       {items.map((item) => {
-        const h = Math.max(18, Math.round((item.value / max) * 112));
+        const total = Math.max(1, item.value);
+        const livePct = Math.round((item.active / total) * 100);
+        const stockPct = 100 - livePct;
         return (
-          <div key={item.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
-            <div className="text-[13px] font-extrabold" style={{ color: kronis.ink }}>
-              {item.value}
+          <div
+            key={item.label}
+            className="rounded-2xl px-3 py-2.5"
+            style={{ background: item.soft }}
+          >
+            <div className="mb-1.5 flex items-center justify-between gap-2">
+              <div className="flex min-w-0 items-center gap-2">
+                <span
+                  className="h-2 w-2 shrink-0 rounded-full"
+                  style={{ background: item.color }}
+                />
+                <span className="truncate text-[12px] font-extrabold" style={{ color: kronis.ink }}>
+                  {item.label}
+                </span>
+                <span className="text-[11px] font-bold" style={{ color: kronis.inkMuted }}>
+                  {item.value}
+                </span>
+              </div>
+              <div className="flex shrink-0 items-center gap-1.5 text-[10px] font-bold">
+                <span
+                  className="rounded-full px-2 py-0.5"
+                  style={{ background: "#fff", color: item.color }}
+                >
+                  {item.active} live
+                </span>
+                <span
+                  className="rounded-full px-2 py-0.5"
+                  style={{ background: "rgba(255,255,255,0.7)", color: kronis.inkMuted }}
+                >
+                  {item.stock} stock
+                </span>
+              </div>
             </div>
             <div
-              className="relative flex w-full max-w-[72px] items-end justify-center rounded-2xl px-2 pb-2 pt-3"
-              style={{ background: item.soft, height: 132 }}
+              className="flex h-2 overflow-hidden rounded-full"
+              style={{ background: "rgba(23,26,18,0.08)" }}
             >
-              <div
-                className="w-full max-w-[36px] rounded-t-[14px] rounded-b-[8px] transition-[height] duration-700 ease-out"
-                style={{
-                  height: h,
-                  background: `linear-gradient(180deg, ${item.color} 0%, ${item.color}cc 70%, ${item.color}99 100%)`,
-                  boxShadow: `0 8px 18px ${item.color}40`,
-                }}
-              />
-            </div>
-            <div className="text-center">
-              <div className="text-[11px] font-extrabold" style={{ color: kronis.ink }}>
-                {item.label}
-              </div>
-              {item.meta ? (
-                <div className="mt-0.5 text-[10px] font-semibold" style={{ color: kronis.inkMuted }}>
-                  {item.meta}
-                </div>
+              {item.active > 0 ? (
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${livePct}%`,
+                    background: item.color,
+                  }}
+                />
+              ) : null}
+              {item.stock > 0 ? (
+                <div
+                  className="h-full"
+                  style={{
+                    width: `${stockPct}%`,
+                    background: "rgba(23,26,18,0.14)",
+                  }}
+                />
               ) : null}
             </div>
           </div>
@@ -558,13 +595,17 @@ export default function OrgDashboardPage() {
                 }))}
               />
               <div className="mt-4">
-                <ColumnChart
+                <div className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
+                  Live vs stock
+                </div>
+                <TypeDeployRows
                   items={charts.byType.map((t) => ({
                     label: t.label,
                     value: t.value,
+                    active: t.active,
+                    stock: t.stock,
                     color: t.color,
                     soft: TYPE_SOFT[t.label.toLowerCase() as keyof typeof TYPE_SOFT] ?? CHART.slateSoft,
-                    meta: `${t.active} live · ${t.stock} stock`,
                   }))}
                 />
               </div>
