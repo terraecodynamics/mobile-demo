@@ -1,7 +1,8 @@
 "use client";
 
+import { OnboardFarmerSheet } from "@/components/org/OnboardFarmerSheet";
 import { ViewModeToggle, type OrgListView } from "@/components/org/ViewModeToggle";
-import { SoftButton, SoftChip, SoftRaised } from "@/components/ui/SoftUi";
+import { SoftChip, SoftRaised } from "@/components/ui/SoftUi";
 import { useAppView } from "@/components/phone/AppViewProvider";
 import { kronis } from "@/lib/kronis";
 import type { OrgFarmer, OrgSensor } from "@/lib/orgTypes";
@@ -23,13 +24,10 @@ function OrgFarmersPageInner() {
     shares: 0,
   });
   const [error, setError] = useState("");
+  const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
   const [showForm, setShowForm] = useState(search.get("onboard") === "1");
   const [view, setView] = useState<OrgListView>("card");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [village, setVillage] = useState("");
-  const [farmName, setFarmName] = useState("");
 
   const load = useCallback(async () => {
     const orgRes = await fetch("/api/org", { cache: "no-store" });
@@ -62,6 +60,14 @@ function OrgFarmersPageInner() {
     if (search.get("onboard") === "1") setShowForm(true);
   }, [search]);
 
+  const closeForm = () => {
+    setShowForm(false);
+    setFormError("");
+    if (search.get("onboard") === "1") {
+      router.replace("/org/farmers");
+    }
+  };
+
   const counts = useMemo(() => {
     const map = new Map<string, number>();
     for (const s of sensors) {
@@ -71,30 +77,32 @@ function OrgFarmersPageInner() {
     return map;
   }, [sensors]);
 
-  const onboard = async () => {
-    if (!name.trim() || !phone.trim()) {
-      setError("Name and phone are required");
+  const onboard = async (payload: {
+    name: string;
+    phone: string;
+    village: string;
+    farmName: string;
+  }) => {
+    if (!payload.name.trim() || !payload.phone.trim()) {
+      setFormError("Name and phone are required");
       return;
     }
     setBusy(true);
+    setFormError("");
     setError("");
     try {
       const res = await fetch("/api/org/farmers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, village, farmName }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Onboard failed");
-      setName("");
-      setPhone("");
-      setVillage("");
-      setFarmName("");
       setShowForm(false);
       await load();
       router.push(`/org/farmers/${json.farmer.id}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Onboard failed");
+      setFormError(e instanceof Error ? e.message : "Onboard failed");
     } finally {
       setBusy(false);
     }
@@ -114,7 +122,15 @@ function OrgFarmersPageInner() {
             Onboard farmers, then open one to see sensors and share data
           </div>
         </div>
-        <SoftChip icon={Plus} color={kronis.lime} label="Onboard" onClick={() => setShowForm((v) => !v)} />
+        <SoftChip
+          icon={Plus}
+          color={kronis.lime}
+          label="Onboard"
+          onClick={() => {
+            setFormError("");
+            setShowForm(true);
+          }}
+        />
       </header>
 
       <div className={`no-scrollbar min-h-0 flex-1 overflow-y-auto pb-8 ${isWeb ? "px-8" : "px-3.5"}`}>
@@ -122,50 +138,6 @@ function OrgFarmersPageInner() {
           <div className="mb-3 rounded-2xl px-3.5 py-2.5 text-[13px] font-semibold" style={{ background: kronis.alertBg, color: kronis.alert }}>
             {error}
           </div>
-        ) : null}
-
-        {showForm ? (
-          <SoftRaised className="mb-4 w-full p-4" radius={18}>
-            <div className="mb-3 text-[15px] font-extrabold" style={{ color: kronis.ink }}>
-              Onboard farmer
-            </div>
-            <div className={isWeb ? "grid grid-cols-2 gap-3" : "space-y-2.5"}>
-              <input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Full name"
-                className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-              />
-              <input
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="Mobile"
-                className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-              />
-              <input
-                value={farmName}
-                onChange={(e) => setFarmName(e.target.value)}
-                placeholder="Farm name"
-                className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-              />
-              <input
-                value={village}
-                onChange={(e) => setVillage(e.target.value)}
-                placeholder="Village"
-                className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-              />
-            </div>
-            <SoftButton
-              label={busy ? "Saving…" : "Save farmer"}
-              variant="orange"
-              className="mt-3.5 w-full"
-              onClick={onboard}
-            />
-          </SoftRaised>
         ) : null}
 
         <div className={`mb-4 grid gap-2.5 ${isWeb ? "grid-cols-4" : "grid-cols-2"}`}>
@@ -293,6 +265,14 @@ function OrgFarmersPageInner() {
           </div>
         )}
       </div>
+
+      <OnboardFarmerSheet
+        open={showForm}
+        busy={busy}
+        error={formError}
+        onClose={closeForm}
+        onSave={onboard}
+      />
     </div>
   );
 }

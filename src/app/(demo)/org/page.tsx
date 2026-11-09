@@ -33,11 +33,36 @@ type OrgOverview = {
   summary: OrgSummary;
 };
 
-const TYPE_COLORS = {
-  soil: "#7CB518",
-  weather: "#2F80ED",
-  environment: "#F2994A",
+const CHART = {
+  soil: "#1FA97A",
+  soilSoft: "#E6F7F0",
+  weather: "#1F8FBF",
+  weatherSoft: "#E5F4FB",
+  environment: "#E8A317",
+  environmentSoft: "#FBF3DE",
+  brand: kronis.lime,
+  brandDeep: "#E85A2B",
+  brandSoft: kronis.limeSoft,
+  slate: "#5B6B7C",
+  slateSoft: "#EEF1F4",
+  inkTrack: "rgba(23,26,18,0.07)",
 } as const;
+
+const TYPE_COLORS = {
+  soil: CHART.soil,
+  weather: CHART.weather,
+  environment: CHART.environment,
+} as const;
+
+const TYPE_SOFT = {
+  soil: CHART.soilSoft,
+  weather: CHART.weatherSoft,
+  environment: CHART.environmentSoft,
+} as const;
+
+function barGradient(hex: string) {
+  return `linear-gradient(90deg, ${hex} 0%, ${hex}cc 55%, ${hex}88 100%)`;
+}
 
 function inr(n: number) {
   return new Intl.NumberFormat("en-IN", {
@@ -50,7 +75,7 @@ function inr(n: number) {
 function BarChart({
   items,
   max,
-  color = kronis.lime,
+  color = CHART.brand,
   valueFormat,
 }: {
   items: { label: string; value: number; color?: string; hint?: string }[];
@@ -60,33 +85,87 @@ function BarChart({
 }) {
   const scale = max > 0 ? max : 1;
   return (
-    <div className="space-y-2.5">
-      {items.map((item) => (
-        <div key={item.label}>
-          <div className="mb-1 flex items-baseline justify-between gap-2">
-            <span className="min-w-0 truncate text-[12px] font-bold" style={{ color: kronis.ink }}>
-              {item.label}
-              {item.hint ? (
-                <span className="ml-1.5 font-semibold" style={{ color: kronis.inkMuted }}>
-                  {item.hint}
-                </span>
-              ) : null}
-            </span>
-            <span className="shrink-0 text-[12px] font-extrabold" style={{ color: kronis.inkMuted }}>
-              {valueFormat ? valueFormat(item.value) : item.value}
-            </span>
+    <div className="space-y-3">
+      {items.map((item, i) => {
+        const fill = item.color ?? color;
+        const pct = Math.max(6, (item.value / scale) * 100);
+        return (
+          <div key={item.label}>
+            <div className="mb-1.5 flex items-baseline justify-between gap-2">
+              <span className="min-w-0 truncate text-[12px] font-bold" style={{ color: kronis.ink }}>
+                {item.label}
+                {item.hint ? (
+                  <span className="ml-1.5 font-semibold" style={{ color: kronis.inkMuted }}>
+                    {item.hint}
+                  </span>
+                ) : null}
+              </span>
+              <span
+                className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-extrabold"
+                style={{ background: "#fff", color: kronis.ink, boxShadow: "0 1px 4px rgba(23,26,18,0.06)" }}
+              >
+                {valueFormat ? valueFormat(item.value) : item.value}
+              </span>
+            </div>
+            <div className="h-3.5 overflow-hidden rounded-full" style={{ background: CHART.inkTrack }}>
+              <div
+                className="relative h-full rounded-full transition-[width] duration-700 ease-out"
+                style={{
+                  width: `${pct}%`,
+                  background: barGradient(fill),
+                  boxShadow: `0 0 12px ${fill}33`,
+                  animationDelay: `${i * 40}ms`,
+                }}
+              />
+            </div>
           </div>
-          <div className="h-2.5 overflow-hidden rounded-full" style={{ background: "rgba(23,26,18,0.06)" }}>
+        );
+      })}
+    </div>
+  );
+}
+
+function ColumnChart({
+  items,
+}: {
+  items: { label: string; value: number; color: string; soft: string; meta?: string }[];
+}) {
+  const max = Math.max(1, ...items.map((x) => x.value));
+  return (
+    <div className="flex items-end justify-between gap-3 pt-1">
+      {items.map((item) => {
+        const h = Math.max(18, Math.round((item.value / max) * 112));
+        return (
+          <div key={item.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
+            <div className="text-[13px] font-extrabold" style={{ color: kronis.ink }}>
+              {item.value}
+            </div>
             <div
-              className="h-full rounded-full transition-[width] duration-500"
-              style={{
-                width: `${Math.max(4, (item.value / scale) * 100)}%`,
-                background: item.color ?? color,
-              }}
-            />
+              className="relative flex w-full max-w-[72px] items-end justify-center rounded-2xl px-2 pb-2 pt-3"
+              style={{ background: item.soft, height: 132 }}
+            >
+              <div
+                className="w-full max-w-[36px] rounded-t-[14px] rounded-b-[8px] transition-[height] duration-700 ease-out"
+                style={{
+                  height: h,
+                  background: `linear-gradient(180deg, ${item.color} 0%, ${item.color}cc 70%, ${item.color}99 100%)`,
+                  boxShadow: `0 8px 18px ${item.color}40`,
+                }}
+              />
+            </div>
+            <div className="text-center">
+              <div className="text-[11px] font-extrabold" style={{ color: kronis.ink }}>
+                {item.label}
+              </div>
+              {item.meta ? (
+                <div className="mt-0.5 text-[10px] font-semibold" style={{ color: kronis.inkMuted }}>
+                  {item.meta}
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -168,57 +247,88 @@ function Donut({
   centerValue: string | number;
 }) {
   const total = segments.reduce((s, x) => s + x.value, 0) || 1;
-  const r = 42;
+  const r = 44;
   const c = 2 * Math.PI * r;
   let offset = 0;
+  const gap = 3;
   return (
     <div className="flex items-center gap-4">
-      <div className="relative h-[120px] w-[120px] shrink-0">
-        <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
-          <circle cx="60" cy="60" r={r} fill="none" stroke="rgba(23,26,18,0.06)" strokeWidth="14" />
+      <div className="relative h-[136px] w-[136px] shrink-0">
+        <div
+          className="absolute inset-[10px] rounded-full"
+          style={{
+            background: "radial-gradient(circle at 40% 35%, #ffffff 0%, #f3f5f8 70%, #e8ecf1 100%)",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,0.9), 0 10px 24px rgba(23,26,18,0.06)",
+          }}
+        />
+        <svg viewBox="0 0 136 136" className="relative h-full w-full -rotate-90">
+          <circle
+            cx="68"
+            cy="68"
+            r={r}
+            fill="none"
+            stroke="rgba(23,26,18,0.06)"
+            strokeWidth="16"
+          />
           {segments.map((seg) => {
-            const len = (seg.value / total) * c;
+            if (seg.value <= 0) return null;
+            const raw = (seg.value / total) * c;
+            const len = Math.max(0, raw - gap);
             const el = (
               <circle
                 key={seg.label}
-                cx="60"
-                cy="60"
+                cx="68"
+                cy="68"
                 r={r}
                 fill="none"
                 stroke={seg.color}
-                strokeWidth="14"
+                strokeWidth="16"
                 strokeDasharray={`${len} ${c - len}`}
                 strokeDashoffset={-offset}
-                strokeLinecap="butt"
+                strokeLinecap="round"
+                style={{ filter: `drop-shadow(0 2px 4px ${seg.color}55)` }}
               />
             );
-            offset += len;
+            offset += raw;
             return el;
           })}
         </svg>
         <div className="absolute inset-0 grid place-items-center text-center">
           <div>
-            <div className="text-[18px] font-extrabold leading-none" style={{ color: kronis.ink }}>
+            <div className="text-[22px] font-extrabold leading-none tracking-[-0.4px]" style={{ color: kronis.ink }}>
               {centerValue}
             </div>
-            <div className="mt-0.5 text-[9px] font-bold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
+            <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.1em]" style={{ color: kronis.inkMuted }}>
               {centerLabel}
             </div>
           </div>
         </div>
       </div>
       <div className="min-w-0 flex-1 space-y-2">
-        {segments.map((seg) => (
-          <div key={seg.label} className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: seg.color }} />
-            <span className="min-w-0 flex-1 truncate text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-              {seg.label}
-            </span>
-            <span className="text-[12px] font-extrabold" style={{ color: kronis.ink }}>
-              {seg.value}
-            </span>
-          </div>
-        ))}
+        {segments.map((seg) => {
+          const pct = Math.round((seg.value / total) * 100);
+          return (
+            <div
+              key={seg.label}
+              className="flex items-center gap-2.5 rounded-xl px-2.5 py-2"
+              style={{ background: "#fff", boxShadow: "0 1px 4px rgba(23,26,18,0.04)" }}
+            >
+              <span
+                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                style={{ background: seg.color, boxShadow: `0 0 0 3px ${seg.color}22` }}
+              />
+              <span className="min-w-0 flex-1 truncate text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+                {seg.label}
+              </span>
+              <span className="text-[12px] font-extrabold" style={{ color: kronis.ink }}>
+                {seg.value}
+              </span>
+              <span className="text-[10px] font-bold" style={{ color: kronis.inkMuted }}>
+                {pct}%
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -352,7 +462,6 @@ export default function OrgDashboardPage() {
     );
   }
 
-  const typeMax = Math.max(1, ...charts.byType.map((x) => x.value));
   const modelMax = Math.max(1, ...charts.byModel.map((x) => x.value), 1);
 
   return (
@@ -364,9 +473,6 @@ export default function OrgDashboardPage() {
           </div>
           <div className="mt-1 text-[22px] font-extrabold tracking-[-0.3px]" style={{ color: kronis.ink }}>
             {data.organization.name}
-          </div>
-          <div className="mt-0.5 text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
-            Devices · inventory finance · locations · live map
           </div>
         </div>
         <SoftChip
@@ -386,16 +492,16 @@ export default function OrgDashboardPage() {
 
         <div className={`mb-5 grid gap-2.5 ${isWeb ? "grid-cols-4" : "grid-cols-2"}`}>
           {[
-            { label: "Farmers", value: data.summary.farmers, Icon: Users, href: "/org/farmers" },
-            { label: "Sensors", value: data.summary.sensors, Icon: Radio, href: "/org/sensors" },
-            { label: "In stock", value: data.summary.unassignedSensors, Icon: Radio, href: "/org/sensors" },
-            { label: "Shares", value: data.summary.shares, Icon: Share2, href: "/org/sensors?tab=shares" },
+            { label: "Farmers", value: data.summary.farmers, Icon: Users, href: "/org/farmers", soft: CHART.brandSoft, color: CHART.brand },
+            { label: "Sensors", value: data.summary.sensors, Icon: Radio, href: "/org/sensors", soft: CHART.soilSoft, color: CHART.soil },
+            { label: "In stock", value: data.summary.unassignedSensors, Icon: Radio, href: "/org/sensors", soft: CHART.weatherSoft, color: CHART.weather },
+            { label: "Shares", value: data.summary.shares, Icon: Share2, href: "/org/sensors?tab=shares", soft: CHART.environmentSoft, color: CHART.environment },
           ].map((s) => (
             <button key={s.label} type="button" onClick={() => router.push(s.href)} className="text-left">
               <SoftRaised className="w-full p-3.5" radius={18}>
                 <div className="flex items-center gap-2">
-                  <span className="grid h-9 w-9 place-items-center rounded-xl" style={{ background: kronis.limeSoft }}>
-                    <s.Icon size={18} color={kronis.lime} />
+                  <span className="grid h-9 w-9 place-items-center rounded-xl" style={{ background: s.soft }}>
+                    <s.Icon size={18} color={s.color} />
                   </span>
                   <div className="min-w-0">
                     <div className="truncate text-[16px] font-extrabold" style={{ color: kronis.ink }}>
@@ -451,25 +557,27 @@ export default function OrgDashboardPage() {
                   color: t.color,
                 }))}
               />
-              <div className="mt-3 space-y-1.5">
-                {charts.byType.map((t) => (
-                  <div
-                    key={t.label}
-                    className="flex items-center justify-between rounded-xl px-3 py-2 text-[11px] font-bold"
-                    style={{ background: kronis.background }}
-                  >
-                    <span style={{ color: kronis.ink }}>{t.label}</span>
-                    <span style={{ color: kronis.inkMuted }}>
-                      {t.active} active · {t.stock} stock
-                    </span>
-                  </div>
-                ))}
+              <div className="mt-4">
+                <ColumnChart
+                  items={charts.byType.map((t) => ({
+                    label: t.label,
+                    value: t.value,
+                    color: t.color,
+                    soft: TYPE_SOFT[t.label.toLowerCase() as keyof typeof TYPE_SOFT] ?? CHART.slateSoft,
+                    meta: `${t.active} live · ${t.stock} stock`,
+                  }))}
+                />
               </div>
             </SoftRaised>
 
             <SoftRaised className="w-full p-4" radius={18}>
-              <div className="mb-3 text-[14px] font-extrabold" style={{ color: kronis.ink }}>
-                Models in use
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <div className="text-[14px] font-extrabold" style={{ color: kronis.ink }}>
+                  Models in use
+                </div>
+                <span className="text-[11px] font-bold" style={{ color: kronis.inkMuted }}>
+                  {charts.byModel.length} SKUs
+                </span>
               </div>
               <BarChart items={charts.byModel} max={modelMax} />
             </SoftRaised>
@@ -485,35 +593,35 @@ export default function OrgDashboardPage() {
               <Share2 size={16} color={kronis.inkMuted} />
             </div>
             <div className="mb-3 grid grid-cols-2 gap-2.5">
-              <div className="rounded-2xl px-3 py-3" style={{ background: kronis.limeSoft }}>
+              <div className="rounded-2xl px-3 py-3" style={{ background: CHART.brandSoft }}>
                 <div className="text-[11px] font-bold" style={{ color: kronis.inkMuted }}>
                   Stock cost
                 </div>
-                <div className="mt-0.5 text-[18px] font-extrabold" style={{ color: kronis.ink }}>
+                <div className="mt-0.5 text-[18px] font-extrabold" style={{ color: CHART.brandDeep }}>
                   {inr(charts.finance.stockCost)}
                 </div>
               </div>
-              <div className="rounded-2xl bg-white px-3 py-3">
+              <div className="rounded-2xl px-3 py-3" style={{ background: CHART.soilSoft }}>
                 <div className="text-[11px] font-bold" style={{ color: kronis.inkMuted }}>
                   Retail value
                 </div>
-                <div className="mt-0.5 text-[18px] font-extrabold" style={{ color: kronis.ink }}>
+                <div className="mt-0.5 text-[18px] font-extrabold" style={{ color: CHART.soil }}>
                   {inr(charts.finance.stockRetail)}
                 </div>
               </div>
-              <div className="rounded-2xl bg-white px-3 py-3">
+              <div className="rounded-2xl px-3 py-3" style={{ background: CHART.environmentSoft }}>
                 <div className="text-[11px] font-bold" style={{ color: kronis.inkMuted }}>
                   Margin potential
                 </div>
-                <div className="mt-0.5 text-[18px] font-extrabold" style={{ color: kronis.ink }}>
+                <div className="mt-0.5 text-[18px] font-extrabold" style={{ color: "#B87A0A" }}>
                   {inr(charts.finance.marginPotential)}
                 </div>
               </div>
-              <div className="rounded-2xl bg-white px-3 py-3">
+              <div className="rounded-2xl px-3 py-3" style={{ background: CHART.weatherSoft }}>
                 <div className="text-[11px] font-bold" style={{ color: kronis.inkMuted }}>
                   Sensors in stock
                 </div>
-                <div className="mt-0.5 text-[18px] font-extrabold" style={{ color: kronis.ink }}>
+                <div className="mt-0.5 text-[18px] font-extrabold" style={{ color: CHART.weather }}>
                   {charts.finance.sensorInStock}
                 </div>
               </div>
@@ -579,7 +687,7 @@ export default function OrgDashboardPage() {
               </div>
               <PaginatedBarChart
                 items={charts.byLocation}
-                color="#2F80ED"
+                color={CHART.weather}
                 emptyText="Assign sensors to see install locations."
               />
             </SoftRaised>
@@ -590,6 +698,7 @@ export default function OrgDashboardPage() {
               </div>
               <PaginatedBarChart
                 items={charts.byVillage}
+                color={CHART.brand}
                 emptyText="No village coverage yet."
               />
             </SoftRaised>
@@ -600,12 +709,15 @@ export default function OrgDashboardPage() {
               </div>
               <BarChart
                 items={[
-                  { label: "Assigned", value: charts.assigned, color: kronis.lime },
-                  { label: "In stock", value: charts.stock, color: "#A0A8B0" },
+                  { label: "Assigned", value: charts.assigned, color: CHART.brand },
+                  { label: "In stock", value: charts.stock, color: CHART.slate },
                 ]}
                 max={Math.max(1, charts.assigned, charts.stock)}
               />
-              <div className="mt-3 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+              <div
+                className="mt-3 rounded-xl px-3 py-2 text-[12px] font-semibold"
+                style={{ background: CHART.brandSoft, color: kronis.inkMuted }}
+              >
                 {data.summary.shares} active share link{data.summary.shares === 1 ? "" : "s"}
               </div>
             </SoftRaised>
