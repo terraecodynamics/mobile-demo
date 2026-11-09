@@ -22,6 +22,7 @@ type Props = {
   onToggle: () => void;
   flow: string;
   soil: string;
+  rh: string;
   onMetrics?: () => void;
   onOpenSoilMoisture?: () => void;
   onOpenSchedule?: () => void;
@@ -118,6 +119,7 @@ export function PumpControlSheet({
   onToggle,
   flow,
   soil,
+  rh,
   onMetrics,
   onOpenSoilMoisture,
   onOpenSchedule,
@@ -322,6 +324,7 @@ export function PumpControlSheet({
           <MetricsPill
             flow={flow}
             soil={soil}
+            rh={rh}
             offline={offline}
             onClick={onMetrics}
           />
