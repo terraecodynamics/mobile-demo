@@ -85,10 +85,13 @@ export function OrgActiveSensorsMap({
   sensors,
   height = 320,
   className,
+  fill = false,
 }: {
   sensors: OrgMapSensor[];
   height?: number;
   className?: string;
+  /** Stretch to parent height (use with a sized flex/absolute parent). */
+  fill?: boolean;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<OlMap | null>(null);
@@ -209,7 +212,13 @@ export function OrgActiveSensorsMap({
   return (
     <div
       className={`relative overflow-hidden rounded-[18px] ${className ?? ""}`}
-      style={height != null ? { height } : { height: "100%", minHeight: 440 }}
+      style={
+        fill
+          ? { height: "100%", minHeight: 0 }
+          : height != null
+            ? { height }
+            : { height: "100%", minHeight: 440 }
+      }
     >
       <div ref={hostRef} className="h-full w-full" />
       <div className="pointer-events-none absolute left-3 top-3 flex flex-wrap gap-1.5">

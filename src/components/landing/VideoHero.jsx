@@ -79,6 +79,24 @@ export default function VideoHero({ dmSansFamily }) {
     let raf = 0;
     const ctx = canvas.getContext('2d', { alpha: false });
 
+    /** Match preferNativeLandingScroll — tall scrub track on phone/tablet; 100svh when GSAP pins. */
+    const syncSectionLayout = () => {
+      const native = preferNativeLandingScroll();
+      section.classList.toggle('assembly-hero--native', native);
+      section.classList.toggle('assembly-hero--pinned', !native);
+      const stage = stageRef.current;
+      if (!stage) return;
+      if (!native) {
+        stage.style.position = '';
+        stage.style.top = '';
+        stage.style.bottom = '';
+        stage.style.height = '';
+        stage.style.width = '';
+        stage.style.left = '';
+        stage.style.right = '';
+      }
+    };
+
     const drawFrame = (index) => {
       const img = imagesRef.current[index];
       if (!img || !img.complete || !img.naturalWidth) return;
@@ -96,9 +114,9 @@ export default function VideoHero({ dmSansFamily }) {
       ctx.fillStyle = ASSEMBLY_BG;
       ctx.fillRect(0, 0, w, h);
 
-      // Desktop: contain the full exploded plate. Mobile: zoom so the pump fills the phone.
+      // Phone: zoom in. Tablet: mild zoom. Desktop (GSAP pin): full plate.
       const fit = Math.min(w / img.naturalWidth, h / img.naturalHeight);
-      const zoom = w < 768 ? 1.55 : 1;
+      const zoom = w < 768 ? 1.55 : w < 1024 ? 1.2 : 1;
       const scale = fit * zoom;
       const dw = img.naturalWidth * scale;
       const dh = img.naturalHeight * scale;
@@ -145,17 +163,23 @@ export default function VideoHero({ dmSansFamily }) {
 
     const bindScroll = () => {
       trigger?.kill();
+      bindScroll.teardown?.();
+      bindScroll.teardown = undefined;
+      syncSectionLayout();
       const native = preferNativeLandingScroll();
 
       if (native) {
         const stage = stageRef.current;
+        const viewHeight = () =>
+          Math.round(window.visualViewport?.height || window.innerHeight);
         const pinStage = (rect, viewH) => {
           if (!stage) return;
           stage.style.left = '0px';
           stage.style.right = '0px';
           stage.style.width = '100%';
           stage.style.height = `${viewH}px`;
-          if (rect.top <= 0 && rect.bottom > viewH) {
+          // Keep stage pinned while the tall scrub track is in view.
+          if (rect.top <= 0 && rect.bottom > viewH + 1) {
             stage.style.position = 'fixed';
             stage.style.top = '0px';
             stage.style.bottom = 'auto';
@@ -173,11 +197,10 @@ export default function VideoHero({ dmSansFamily }) {
           if (raf) return;
           raf = window.requestAnimationFrame(() => {
             raf = 0;
-            const viewH = window.innerHeight;
+            const viewH = viewHeight();
             const rect = section.getBoundingClientRect();
             pinStage(rect, viewH);
-            const total = section.offsetHeight - viewH;
-            if (total <= 0) return;
+            const total = Math.max(1, section.offsetHeight - viewH);
             const progress = Math.min(1, Math.max(0, -rect.top / total));
             applyProgress(progress);
           });
@@ -238,17 +261,46 @@ export default function VideoHero({ dmSansFamily }) {
       });
     });
 
-    const onResize = () => {
+    let lastNative = preferNativeLandingScroll();
+    syncSectionLayout();
+
+    const rebindScroll = () => {
+      trigger?.kill();
+      bindScroll.teardown?.();
+      bindScroll.teardown = undefined;
+      trigger = undefined;
+      if (!imagesRef.current.length) return;
+      bindScroll();
       drawFrame(frameIndexRef.current);
-      if (!preferNativeLandingScroll()) ScrollTrigger.refresh();
+    };
+
+    const onResize = () => {
+      const native = preferNativeLandingScroll();
+      syncSectionLayout();
+      drawFrame(frameIndexRef.current);
+      if (native !== lastNative) {
+        lastNative = native;
+        rebindScroll();
+        return;
+      }
+      if (!native) ScrollTrigger.refresh();
+    };
+    const mq = window.matchMedia('(max-width: 1023px), (hover: none) and (pointer: coarse)');
+    const onModeChange = () => {
+      lastNative = preferNativeLandingScroll();
+      rebindScroll();
     };
     window.addEventListener('resize', onResize);
     window.addEventListener('load', onResize);
+    if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onModeChange);
+    else mq.addListener(onModeChange);
 
     return () => {
       cancelled = true;
       window.removeEventListener('resize', onResize);
       window.removeEventListener('load', onResize);
+      if (typeof mq.removeEventListener === 'function') mq.removeEventListener('change', onModeChange);
+      else mq.removeListener(onModeChange);
       trigger?.kill();
       bindScroll.teardown?.();
       if (raf) window.cancelAnimationFrame(raf);
@@ -261,13 +313,13 @@ export default function VideoHero({ dmSansFamily }) {
     <section
       id="home"
       ref={sectionRef}
-      className="relative h-[320svh] w-full overflow-visible md:h-[100svh] md:max-h-[100svh] md:overflow-hidden"
+      className="assembly-hero assembly-hero--native relative w-full"
       style={{ fontFamily: dmSansFamily, backgroundColor: ASSEMBLY_BG }}
       aria-label="Pump assembly scroll sequence"
     >
       <div
         ref={stageRef}
-        className="absolute inset-x-0 top-0 h-[100svh] w-full overflow-hidden md:inset-0 md:h-auto"
+        className="assembly-hero__stage absolute inset-x-0 top-0 h-[100svh] w-full overflow-hidden"
       >
       <canvas
         ref={canvasRef}
@@ -352,6 +404,26 @@ export default function VideoHero({ dmSansFamily }) {
         }
         .assembly-caption {
           animation: assemblyCaptionIn 0.42s ease-out;
+        }
+        /* Native scrub (phone + tablet): tall scroll track, sticky stage via JS. */
+        .assembly-hero--native {
+          height: 320svh;
+          overflow: visible;
+        }
+        .assembly-hero--native .assembly-hero__stage {
+          inset-inline: 0;
+          top: 0;
+          height: 100svh;
+        }
+        /* Desktop GSAP pin: one viewport; ScrollTrigger adds pin spacing. */
+        .assembly-hero--pinned {
+          height: 100svh;
+          max-height: 100svh;
+          overflow: hidden;
+        }
+        .assembly-hero--pinned .assembly-hero__stage {
+          inset: 0;
+          height: auto;
         }
       `}</style>
     </section>
