@@ -9,9 +9,6 @@ import { defaultSensorPrices } from "@/lib/orgPricing";
 import type { OrgFarmer, OrgInventoryItem, OrgSensor, OrgShare } from "@/lib/orgTypes";
 import {
   ArrowLeft,
-  Check,
-  ChevronLeft,
-  ChevronRight,
   Copy,
   ExternalLink,
   Link2,
@@ -22,8 +19,6 @@ import {
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-
-const STOCK_PAGE_SIZE = 5;
 
 type OrgPayload = {
   farmers: OrgFarmer[];
@@ -48,7 +43,7 @@ function inr(n: number) {
   }).format(n);
 }
 
-type Tab = "inventory" | "assign" | "shares";
+type Tab = "inventory" | "shares";
 
 function OrgSensorsPageInner() {
   const router = useRouter();
@@ -56,12 +51,7 @@ function OrgSensorsPageInner() {
   const isWeb = useAppView() === "web";
   const presetFarmer = search.get("farmerId");
   const presetTab = search.get("tab");
-  const initialTab: Tab =
-    presetFarmer
-      ? "assign"
-      : presetTab === "assign" || presetTab === "shares" || presetTab === "inventory"
-        ? presetTab
-        : "inventory";
+  const initialTab: Tab = presetTab === "shares" ? "shares" : "inventory";
 
   const [data, setData] = useState<OrgPayload | null>(null);
   const [tab, setTab] = useState<Tab>(initialTab);
@@ -82,11 +72,7 @@ function OrgSensorsPageInner() {
   const [sensorCost, setSensorCost] = useState(String(defaultSensorPrices({ type: "soil" }).unitCost));
   const [sensorPrice, setSensorPrice] = useState(String(defaultSensorPrices({ type: "soil" }).unitPrice));
   const [sensorType, setSensorType] = useState<"soil" | "weather" | "environment">("soil");
-  const [assignFarmerId, setAssignFarmerId] = useState(presetFarmer ?? "");
-  const [onboardFarmerId, setOnboardFarmerId] = useState("");
-  const [inlineAssign, setInlineAssign] = useState<Record<string, string>>({});
-  const [assigningId, setAssigningId] = useState<string | null>(null);
-  const [selectedSensors, setSelectedSensors] = useState<string[]>([]);
+  const [returningId, setReturningId] = useState<string | null>(null);
   const [lastShare, setLastShare] = useState<{
     token: string;
     apiUrl: string;
@@ -96,8 +82,6 @@ function OrgSensorsPageInner() {
   } | null>(null);
   const [shareFarmerFilter, setShareFarmerFilter] = useState("");
   const [shareLocationFilter, setShareLocationFilter] = useState("");
-  const [stockPage, setStockPage] = useState(0);
-  const [stockSearch, setStockSearch] = useState("");
   const [inventorySearch, setInventorySearch] = useState("");
 
   const showToast = (msg: string) => {
@@ -122,14 +106,13 @@ function OrgSensorsPageInner() {
 
   useEffect(() => {
     if (presetFarmer) {
-      setAssignFarmerId(presetFarmer);
-      setTab("assign");
+      router.replace(`/org/farmers/${presetFarmer}`);
       return;
     }
-    if (presetTab === "assign" || presetTab === "shares" || presetTab === "inventory") {
+    if (presetTab === "shares" || presetTab === "inventory") {
       setTab(presetTab);
     }
-  }, [presetFarmer, presetTab]);
+  }, [presetFarmer, presetTab, router]);
 
   const farmersById = useMemo(() => {
     const map = new Map<string, OrgFarmer>();
@@ -162,56 +145,6 @@ function OrgSensorsPageInner() {
       return hay.includes(q);
     });
   }, [data?.sensors, farmersById, inventorySearch]);
-
-  const unassigned = useMemo(
-    () => data?.sensors.filter((s) => !s.farmerId) ?? [],
-    [data]
-  );
-
-  const filteredUnassigned = useMemo(() => {
-    const q = stockSearch.trim().toLowerCase();
-    if (!q) return unassigned;
-    return unassigned.filter((s) => {
-      const hay = [
-        s.label,
-        s.type,
-        s.model,
-        s.modelNo,
-        s.serial,
-        s.unitId,
-        s.installLocation,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-      return hay.includes(q);
-    });
-  }, [unassigned, stockSearch]);
-
-  const stockTotalPages = Math.max(1, Math.ceil(filteredUnassigned.length / STOCK_PAGE_SIZE));
-  const safeStockPage = Math.min(stockPage, stockTotalPages - 1);
-  const pagedUnassigned = useMemo(
-    () =>
-      filteredUnassigned.slice(
-        safeStockPage * STOCK_PAGE_SIZE,
-        safeStockPage * STOCK_PAGE_SIZE + STOCK_PAGE_SIZE
-      ),
-    [filteredUnassigned, safeStockPage]
-  );
-
-  useEffect(() => {
-    setStockPage(0);
-  }, [stockSearch]);
-
-  useEffect(() => {
-    setStockPage((p) => Math.min(p, Math.max(0, stockTotalPages - 1)));
-  }, [stockTotalPages]);
-
-  const farmerSensors = useMemo(
-    () =>
-      data?.sensors.filter((s) => assignFarmerId && s.farmerId === assignFarmerId) ?? [],
-    [data, assignFarmerId]
-  );
 
   const shareRows = useMemo(() => {
     if (!data) return [];
@@ -261,10 +194,6 @@ function OrgSensorsPageInner() {
       farmerName: first.farmer?.name,
     });
   }, [tab, filteredShareRows, lastShare]);
-
-  useEffect(() => {
-    setSelectedSensors(farmerSensors.map((s) => s.id));
-  }, [farmerSensors]);
 
   const defaultModelFor = (type: "soil" | "weather" | "environment") =>
     type === "soil"
@@ -328,7 +257,7 @@ function OrgSensorsPageInner() {
           notes: sensorNotes,
           unitCost,
           unitPrice,
-          farmerId: onboardFarmerId || null,
+          farmerId: null,
         }),
       });
       const json = await res.json();
@@ -343,10 +272,8 @@ function OrgSensorsPageInner() {
       setSensorNotes("");
       setSensorModel(defaultModelFor(sensorType));
       applyCatalogPrices(sensorType, defaultModelNoFor(sensorType));
-      const givenTo = onboardFarmerId;
-      setOnboardFarmerId("");
       await load();
-      showToast(givenTo ? "Sensor onboarded for farmer" : "Sensor onboarded to inventory");
+      showToast("Sensor onboarded to inventory");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not add sensor");
     } finally {
@@ -354,13 +281,9 @@ function OrgSensorsPageInner() {
     }
   };
 
-  const assign = async (sensorId: string, farmerId: string | null) => {
-    if (farmerId !== null && !farmerId.trim()) {
-      setError("Pick a farmer to assign");
-      return;
-    }
+  const returnToStock = async (sensorId: string) => {
     setBusy(true);
-    setAssigningId(sensorId);
+    setReturningId(sensorId);
     setError("");
     try {
       const res = await fetch("/api/org/devices", {
@@ -370,70 +293,18 @@ function OrgSensorsPageInner() {
           action: "assign",
           kind: "sensor",
           deviceId: sensorId,
-          farmerId,
+          farmerId: null,
         }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Assign failed");
-      setInlineAssign((prev) => {
-        const next = { ...prev };
-        delete next[sensorId];
-        return next;
-      });
+      if (!res.ok) throw new Error(json.error || "Return failed");
       await load();
-      showToast(farmerId ? "Sensor assigned to farmer" : "Sensor returned to inventory");
+      showToast("Sensor returned to inventory");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Assign failed");
+      setError(e instanceof Error ? e.message : "Return failed");
     } finally {
       setBusy(false);
-      setAssigningId(null);
-    }
-  };
-
-  const toggleSensor = (id: string) => {
-    setSelectedSensors((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  const createShare = async () => {
-    if (!assignFarmerId) {
-      setError("Pick a farmer first");
-      return;
-    }
-    if (!selectedSensors.length) {
-      setError("Select at least one sensor to share");
-      return;
-    }
-    setBusy(true);
-    setError("");
-    try {
-      const farmer = farmersById.get(assignFarmerId);
-      const res = await fetch("/api/org/share", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          farmerId: assignFarmerId,
-          sensorIds: selectedSensors,
-          label: `${farmer?.name ?? "Farmer"} sensors`,
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Share failed");
-      setLastShare({
-        token: json.share.token,
-        apiUrl: json.apiUrl,
-        viewUrl: json.viewUrl,
-        label: json.share.label ?? `${farmer?.name ?? "Farmer"} sensors`,
-        farmerName: farmer?.name,
-      });
-      setTab("shares");
-      await load();
-      showToast("Share link ready");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Share failed");
-    } finally {
-      setBusy(false);
+      setReturningId(null);
     }
   };
 
@@ -460,7 +331,6 @@ function OrgSensorsPageInner() {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "inventory", label: "Inventory" },
-    { id: "assign", label: "Assign to farmer" },
     { id: "shares", label: "Share" },
   ];
 
@@ -476,9 +346,6 @@ function OrgSensorsPageInner() {
           </div>
           <div className="mt-1 text-[22px] font-extrabold tracking-[-0.3px]" style={{ color: kronis.ink }}>
             Sensor inventory
-          </div>
-          <div className="text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
-            Stock sensors, give them to farmers, manage share links
           </div>
         </div>
         <SoftChip
@@ -773,24 +640,9 @@ function OrgSensorsPageInner() {
                   />
                 </div>
 
-                <div>
-                  <label className="mb-1 block text-[12px] font-bold" style={{ color: kronis.inkMuted }}>
-                    Assign to farmer (optional)
-                  </label>
-                  <select
-                    value={onboardFarmerId}
-                    onChange={(e) => setOnboardFarmerId(e.target.value)}
-                    className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                    style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-                  >
-                    <option value="">Keep in inventory</option>
-                    {data.farmers.map((f) => (
-                      <option key={f.id} value={f.id}>
-                        {f.name} · {f.farmName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <p className="rounded-xl px-3 py-2.5 text-[12px] font-semibold" style={{ background: kronis.background, color: kronis.inkMuted }}>
+                  Sensors stay in stock here. Open a farmer to assign from stock.
+                </p>
               </div>
               <SoftButton
                 label={busy ? "Saving…" : "Onboard sensor"}
@@ -848,8 +700,7 @@ function OrgSensorsPageInner() {
                     {filteredInventorySensors.map((s) => {
                       const farmer = s.farmerId ? farmersById.get(s.farmerId) : null;
                       const latest = s.readings[0];
-                      const pickFarmer = inlineAssign[s.id] ?? "";
-                      const isAssigning = assigningId === s.id;
+                      const isReturning = returningId === s.id;
                       return (
                         <SoftRaised key={s.id} className="w-full p-3.5" radius={18}>
                           <div className="flex items-start gap-3">
@@ -884,71 +735,38 @@ function OrgSensorsPageInner() {
                                 </div>
                               ) : null}
 
-                              {!s.farmerId ? (
-                                <div className="mt-2.5 flex flex-col gap-2 sm:flex-row sm:items-center">
-                                  <select
-                                    value={pickFarmer}
-                                    onChange={(e) =>
-                                      setInlineAssign((prev) => ({ ...prev, [s.id]: e.target.value }))
-                                    }
-                                    className="min-w-0 flex-1 rounded-xl border px-2.5 py-2 text-[12px] font-semibold outline-none"
-                                    style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-                                  >
-                                    <option value="">Assign to farmer…</option>
-                                    {data.farmers.map((f) => (
-                                      <option key={f.id} value={f.id}>
-                                        {f.name} · {f.farmName}
-                                      </option>
-                                    ))}
-                                  </select>
-                                  <button
-                                    type="button"
-                                    disabled={busy || !pickFarmer}
-                                    className="shrink-0 rounded-full px-3.5 py-2 text-[11px] font-extrabold disabled:opacity-40"
-                                    style={{ background: kronis.lime, color: "#fff" }}
-                                    onClick={() => assign(s.id, pickFarmer)}
-                                  >
-                                    {isAssigning ? "Assigning…" : "Assign"}
-                                  </button>
-                                </div>
-                              ) : (
-                                <div className="mt-2.5 flex flex-col gap-2 sm:flex-row sm:items-center">
-                                  <select
-                                    value={pickFarmer || s.farmerId}
-                                    onChange={(e) =>
-                                      setInlineAssign((prev) => ({ ...prev, [s.id]: e.target.value }))
-                                    }
-                                    className="min-w-0 flex-1 rounded-xl border px-2.5 py-2 text-[12px] font-semibold outline-none"
-                                    style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-                                  >
-                                    {data.farmers.map((f) => (
-                                      <option key={f.id} value={f.id}>
-                                        {f.name} · {f.farmName}
-                                      </option>
-                                    ))}
-                                  </select>
-                                  <div className="flex shrink-0 gap-2">
+                              <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                                {farmer ? (
+                                  <>
                                     <button
                                       type="button"
-                                      disabled={busy || !(pickFarmer && pickFarmer !== s.farmerId)}
-                                      className="rounded-full px-3.5 py-2 text-[11px] font-extrabold disabled:opacity-40"
+                                      className="rounded-full px-3.5 py-2 text-[11px] font-extrabold"
                                       style={{ background: kronis.ink, color: "#fff" }}
-                                      onClick={() => assign(s.id, pickFarmer || s.farmerId)}
+                                      onClick={() => router.push(`/org/farmers/${farmer.id}`)}
                                     >
-                                      {isAssigning ? "…" : "Reassign"}
+                                      Open farmer
                                     </button>
                                     <button
                                       type="button"
                                       disabled={busy}
-                                      className="rounded-full px-3.5 py-2 text-[11px] font-extrabold"
+                                      className="rounded-full px-3.5 py-2 text-[11px] font-extrabold disabled:opacity-40"
                                       style={{ background: "#fff", color: kronis.inkMuted, boxShadow: "0 2px 8px rgba(23,26,18,0.06)" }}
-                                      onClick={() => assign(s.id, null)}
+                                      onClick={() => returnToStock(s.id)}
                                     >
-                                      Return
+                                      {isReturning ? "…" : "Return to stock"}
                                     </button>
-                                  </div>
-                                </div>
-                              )}
+                                  </>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="rounded-full px-3.5 py-2 text-[11px] font-extrabold"
+                                    style={{ background: kronis.lime, color: "#fff" }}
+                                    onClick={() => router.push("/org/farmers")}
+                                  >
+                                    Assign on farmer page
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </SoftRaised>
@@ -961,7 +779,7 @@ function OrgSensorsPageInner() {
                     style={{ background: "#fff", borderColor: kronis.border }}
                   >
                     <div className="h-full overflow-auto">
-                      <table className="w-full min-w-[820px] border-collapse text-left">
+                      <table className="w-full min-w-[760px] border-collapse text-left">
                         <thead className="sticky top-0 z-[1]">
                           <tr style={{ background: kronis.background }}>
                             {["Sensor", "Model no.", "Serial", "Cost", "Price", "Farmer", "Reading", "Action"].map(
@@ -981,8 +799,7 @@ function OrgSensorsPageInner() {
                           {filteredInventorySensors.map((s) => {
                             const farmer = s.farmerId ? farmersById.get(s.farmerId) : null;
                             const latest = s.readings[0];
-                            const pickFarmer = inlineAssign[s.id] ?? "";
-                            const isAssigning = assigningId === s.id;
+                            const isReturning = returningId === s.id;
                             const reading =
                               latest == null
                                 ? "—"
@@ -1010,52 +827,44 @@ function OrgSensorsPageInner() {
                                 <td className="px-3 py-2.5 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
                                   {s.unitPrice != null ? inr(s.unitPrice) : "—"}
                                 </td>
-                                <td className="px-3 py-2.5">
-                                  <select
-                                    value={pickFarmer || s.farmerId || ""}
-                                    onChange={(e) =>
-                                      setInlineAssign((prev) => ({ ...prev, [s.id]: e.target.value }))
-                                    }
-                                    className="max-w-[140px] rounded-lg border px-2 py-1.5 text-[11px] font-semibold outline-none"
-                                    style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-                                  >
-                                    <option value="">In stock</option>
-                                    {data.farmers.map((f) => (
-                                      <option key={f.id} value={f.id}>
-                                        {f.name}
-                                      </option>
-                                    ))}
-                                  </select>
+                                <td className="px-3 py-2.5 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+                                  {farmer ? farmer.name : "In stock"}
                                 </td>
                                 <td className="px-3 py-2.5 text-[11px] font-semibold" style={{ color: kronis.inkMuted }}>
                                   {reading}
                                 </td>
                                 <td className="px-3 py-2.5">
                                   <div className="flex items-center gap-1.5">
-                                    <button
-                                      type="button"
-                                      disabled={
-                                        busy ||
-                                        !(pickFarmer || s.farmerId) ||
-                                        (pickFarmer || "") === (s.farmerId || "")
-                                      }
-                                      className="rounded-full px-2.5 py-1 text-[10px] font-extrabold disabled:opacity-40"
-                                      style={{ background: kronis.lime, color: "#fff" }}
-                                      onClick={() => assign(s.id, pickFarmer || s.farmerId)}
-                                    >
-                                      {isAssigning ? "…" : s.farmerId ? "Update" : "Assign"}
-                                    </button>
-                                    {s.farmerId ? (
+                                    {farmer ? (
+                                      <>
+                                        <button
+                                          type="button"
+                                          className="rounded-full px-2.5 py-1 text-[10px] font-extrabold"
+                                          style={{ background: kronis.ink, color: "#fff" }}
+                                          onClick={() => router.push(`/org/farmers/${farmer.id}`)}
+                                        >
+                                          Farmer
+                                        </button>
+                                        <button
+                                          type="button"
+                                          disabled={busy}
+                                          className="rounded-full px-2.5 py-1 text-[10px] font-extrabold disabled:opacity-40"
+                                          style={{ background: kronis.background, color: kronis.inkMuted }}
+                                          onClick={() => returnToStock(s.id)}
+                                        >
+                                          {isReturning ? "…" : "Return"}
+                                        </button>
+                                      </>
+                                    ) : (
                                       <button
                                         type="button"
-                                        disabled={busy}
                                         className="rounded-full px-2.5 py-1 text-[10px] font-extrabold"
-                                        style={{ background: kronis.background, color: kronis.inkMuted }}
-                                        onClick={() => assign(s.id, null)}
+                                        style={{ background: kronis.lime, color: "#fff" }}
+                                        onClick={() => router.push("/org/farmers")}
                                       >
-                                        Return
+                                        Assign
                                       </button>
-                                    ) : null}
+                                    )}
                                   </div>
                                 </td>
                               </tr>
@@ -1067,238 +876,6 @@ function OrgSensorsPageInner() {
                   </div>
                 )}
               </div>
-            </section>
-          </div>
-        ) : null}
-
-        {tab === "assign" ? (
-          <div className={isWeb ? "grid grid-cols-2 gap-5" : "space-y-4"}>
-            <section className="space-y-3">
-              <SoftRaised className="w-full p-4" radius={18}>
-                <div className="mb-2 text-[15px] font-extrabold" style={{ color: kronis.ink }}>
-                  Choose farmer
-                </div>
-                <select
-                  value={assignFarmerId}
-                  onChange={(e) => setAssignFarmerId(e.target.value)}
-                  className="w-full rounded-xl border px-3 py-2.5 text-[14px] font-semibold outline-none"
-                  style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-                >
-                  <option value="">Select farmer</option>
-                  {data.farmers.map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.name} · {f.farmName}
-                    </option>
-                  ))}
-                </select>
-              </SoftRaised>
-
-              <div>
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <div className="text-[12px] font-extrabold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
-                    Stock — give a sensor
-                  </div>
-                  {assignFarmerId && unassigned.length > 0 ? (
-                    <div className="text-[11px] font-semibold" style={{ color: kronis.inkMuted }}>
-                      {stockSearch.trim()
-                        ? `${filteredUnassigned.length} of ${unassigned.length}`
-                        : `${unassigned.length} in stock`}
-                    </div>
-                  ) : null}
-                </div>
-                {!assignFarmerId ? (
-                  <div className="rounded-[18px] border px-4 py-4 text-[13px] font-semibold" style={{ background: kronis.surface, borderColor: kronis.border, color: kronis.inkMuted }}>
-                    Select a farmer first.
-                  </div>
-                ) : unassigned.length === 0 ? (
-                  <div className="rounded-[18px] border px-4 py-4 text-[13px] font-semibold" style={{ background: kronis.surface, borderColor: kronis.border, color: kronis.inkMuted }}>
-                    No free sensors. Add one in Inventory.
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="relative">
-                      <Search
-                        size={15}
-                        color={kronis.inkMuted}
-                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-                      />
-                      <input
-                        type="search"
-                        value={stockSearch}
-                        onChange={(e) => setStockSearch(e.target.value)}
-                        placeholder="Search label, model, serial…"
-                        className="w-full rounded-xl border py-2.5 pl-9 pr-3 text-[13px] font-semibold outline-none"
-                        style={{ background: "#fff", borderColor: kronis.border, color: kronis.ink }}
-                      />
-                    </div>
-                    {filteredUnassigned.length === 0 ? (
-                      <div
-                        className="rounded-[18px] border px-4 py-4 text-[13px] font-semibold"
-                        style={{
-                          background: kronis.surface,
-                          borderColor: kronis.border,
-                          color: kronis.inkMuted,
-                        }}
-                      >
-                        No sensors match “{stockSearch.trim()}”.
-                      </div>
-                    ) : (
-                      <>
-                        {pagedUnassigned.map((s) => (
-                          <button
-                            key={s.id}
-                            type="button"
-                            disabled={busy}
-                            onClick={() => assign(s.id, assignFarmerId)}
-                            className="flex w-full items-center justify-between rounded-[18px] border px-3.5 py-3 text-left"
-                            style={{ background: kronis.surface, borderColor: kronis.border }}
-                          >
-                            <span>
-                              <span className="block text-[14px] font-extrabold" style={{ color: kronis.ink }}>
-                                {s.label}
-                              </span>
-                              <span className="block text-[11px] font-semibold" style={{ color: kronis.inkMuted }}>
-                                {(s.modelNo || s.type) + ` · ${s.serial || s.unitId}`}
-                              </span>
-                            </span>
-                            <span className="text-[12px] font-bold" style={{ color: kronis.lime }}>
-                              Assign
-                            </span>
-                          </button>
-                        ))}
-                        {stockTotalPages > 1 ? (
-                          <div className="flex items-center justify-between gap-2 pt-1">
-                            <button
-                              type="button"
-                              disabled={safeStockPage <= 0}
-                              aria-label="Previous stock page"
-                              className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-35"
-                              style={{
-                                background: "#fff",
-                                color: kronis.ink,
-                                boxShadow: "0 2px 8px rgba(23,26,18,0.06)",
-                              }}
-                              onClick={() => setStockPage((p) => Math.max(0, p - 1))}
-                            >
-                              <ChevronLeft size={16} strokeWidth={2.4} />
-                            </button>
-                            <div className="text-[11px] font-extrabold" style={{ color: kronis.inkMuted }}>
-                              {safeStockPage + 1} / {stockTotalPages}
-                              <span className="ml-1.5 font-semibold">
-                                · {filteredUnassigned.length} total
-                              </span>
-                            </div>
-                            <button
-                              type="button"
-                              disabled={safeStockPage >= stockTotalPages - 1}
-                              aria-label="Next stock page"
-                              className="grid h-8 w-8 place-items-center rounded-full disabled:opacity-35"
-                              style={{
-                                background: "#fff",
-                                color: kronis.ink,
-                                boxShadow: "0 2px 8px rgba(23,26,18,0.06)",
-                              }}
-                              onClick={() => setStockPage((p) => Math.min(stockTotalPages - 1, p + 1))}
-                            >
-                              <ChevronRight size={16} strokeWidth={2.4} />
-                            </button>
-                          </div>
-                        ) : null}
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            </section>
-
-            <section>
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <div className="text-[12px] font-extrabold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
-                  Sensors with this farmer
-                </div>
-                {assignFarmerId ? (
-                  <button
-                    type="button"
-                    className="text-[12px] font-bold"
-                    style={{ color: kronis.lime }}
-                    onClick={() => router.push(`/org/farmers/${assignFarmerId}`)}
-                  >
-                    Farmer page
-                  </button>
-                ) : null}
-              </div>
-
-              {!assignFarmerId ? (
-                <div className="rounded-[18px] border px-4 py-4 text-[13px] font-semibold" style={{ background: kronis.surface, borderColor: kronis.border, color: kronis.inkMuted }}>
-                  Pick a farmer to see their sensors.
-                </div>
-              ) : farmerSensors.length === 0 ? (
-                <div className="rounded-[18px] border px-4 py-4 text-[13px] font-semibold" style={{ background: kronis.surface, borderColor: kronis.border, color: kronis.inkMuted }}>
-                  No sensors given yet.
-                </div>
-              ) : (
-                <div className="space-y-2.5">
-                  {farmerSensors.map((s) => {
-                    const selected = selectedSensors.includes(s.id);
-                    const latest = s.readings[0];
-                    return (
-                      <SoftRaised key={s.id} className="w-full p-3.5" radius={18}>
-                        <div className="flex items-start gap-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleSensor(s.id)}
-                            className="mt-0.5 grid h-6 w-6 place-items-center rounded-full"
-                            style={{
-                              background: selected ? kronis.lime : "#fff",
-                              boxShadow: selected ? "none" : "inset 0 0 0 1.5px rgba(23,26,18,0.2)",
-                            }}
-                            aria-label={selected ? "Selected for share" : "Select for share"}
-                          >
-                            {selected ? <Check size={14} color="#fff" strokeWidth={3} /> : null}
-                          </button>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-[14px] font-extrabold" style={{ color: kronis.ink }}>
-                              {s.label}
-                            </div>
-                            <div className="text-[11px] font-semibold uppercase tracking-[0.08em]" style={{ color: kronis.inkMuted }}>
-                              {(s.modelNo || s.type) + ` · ${s.serial || s.unitId}`}
-                            </div>
-                            {latest ? (
-                              <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-bold">
-                                {latest.soilPct != null ? (
-                                  <span className="rounded-full bg-white px-2 py-1">Soil {latest.soilPct}%</span>
-                                ) : null}
-                                {latest.tempC != null ? (
-                                  <span className="rounded-full bg-white px-2 py-1">{latest.tempC}°C</span>
-                                ) : null}
-                                {latest.humidityPct != null ? (
-                                  <span className="rounded-full bg-white px-2 py-1">RH {latest.humidityPct}%</span>
-                                ) : null}
-                              </div>
-                            ) : null}
-                          </div>
-                          <button
-                            type="button"
-                            disabled={busy}
-                            className="text-[11px] font-bold"
-                            style={{ color: kronis.inkMuted }}
-                            onClick={() => assign(s.id, null)}
-                          >
-                            Return
-                          </button>
-                        </div>
-                      </SoftRaised>
-                    );
-                  })}
-                  <SoftButton
-                    label={busy ? "Creating…" : "Share selected sensors"}
-                    variant="orange"
-                    className="w-full"
-                    icon={Share2}
-                    onClick={createShare}
-                  />
-                </div>
-              )}
             </section>
           </div>
         ) : null}
@@ -1323,7 +900,7 @@ function OrgSensorsPageInner() {
                   icon={Plus}
                   color={kronis.lime}
                   label="New"
-                  onClick={() => setTab("assign")}
+                  onClick={() => router.push("/org/farmers")}
                 />
               </div>
 
@@ -1376,13 +953,13 @@ function OrgSensorsPageInner() {
                     No shares yet
                   </div>
                   <p className="mt-1 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-                    Assign sensors to a farmer, then create a share.
+                    Open a farmer, assign sensors from stock, then create a share there.
                   </p>
                   <SoftButton
-                    label="Go to Assign"
+                    label="Open farmers"
                     variant="orange"
                     className="mt-3"
-                    onClick={() => setTab("assign")}
+                    onClick={() => router.push("/org/farmers")}
                   />
                 </div>
               ) : filteredShareRows.length === 0 ? (

@@ -10,7 +10,7 @@ import { ArrowLeft, ChevronLeft, ChevronRight, Plus, Search } from "lucide-react
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 12;
 
 function OrgFarmersPageInner() {
   const router = useRouter();
@@ -151,7 +151,7 @@ function OrgFarmersPageInner() {
             Farmers
           </div>
           <div className="text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
-            Onboard farmers, then open one to see sensors and share data
+            Onboard farmers, open one to assign sensors and share data
           </div>
         </div>
         <SoftChip
@@ -232,37 +232,62 @@ function OrgFarmersPageInner() {
         ) : (
           <>
             {view === "card" ? (
-              <div className="space-y-2.5">
+              <div
+                className={`grid gap-2.5 ${
+                  isWeb ? "grid-cols-2 xl:grid-cols-3" : "grid-cols-1 sm:grid-cols-2"
+                }`}
+              >
                 {pagedFarmers.map((f) => {
                   const sensorCount = counts.get(f.id) ?? 0;
+                  const initials = f.name
+                    .split(" ")
+                    .filter(Boolean)
+                    .slice(0, 2)
+                    .map((p) => p[0]?.toUpperCase() ?? "")
+                    .join("");
                   return (
-                    <button
+                    <SoftRaised
                       key={f.id}
-                      type="button"
+                      className="w-full p-3.5"
+                      contentClassName="flex h-full flex-col gap-3"
+                      radius={16}
                       onClick={() => router.push(`/org/farmers/${f.id}`)}
-                      className="flex w-full items-center gap-3 rounded-[18px] border px-3.5 py-3.5 text-left"
-                      style={{ background: kronis.surface, borderColor: kronis.border }}
                     >
-                      <span
-                        className="grid h-11 w-11 place-items-center rounded-full text-[12px] font-extrabold"
-                        style={{ background: kronis.ink, color: kronis.lime }}
+                      <div className="flex items-start gap-3">
+                        <span
+                          className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[12px] font-extrabold"
+                          style={{ background: kronis.ink, color: kronis.lime }}
+                        >
+                          {initials || "?"}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-[15px] font-extrabold leading-tight" style={{ color: kronis.ink }}>
+                            {f.name}
+                          </span>
+                          <span className="mt-0.5 block truncate text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+                            {f.farmName || "No farm name"}
+                          </span>
+                        </span>
+                        <ChevronRight size={16} color={kronis.inkMuted} className="mt-1 shrink-0 opacity-70" />
+                      </div>
+                      <div
+                        className="mt-auto flex items-center justify-between gap-2 border-t pt-2.5"
+                        style={{ borderColor: "rgba(23,26,18,0.08)" }}
                       >
-                        {f.name
-                          .split(" ")
-                          .slice(0, 2)
-                          .map((p) => p[0])
-                          .join("")}
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[15px] font-extrabold" style={{ color: kronis.ink }}>
-                          {f.name}
+                        <span className="min-w-0 truncate text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+                          {f.village || "—"}
                         </span>
-                        <span className="block text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-                          {f.farmName} · {f.village} · {sensorCount} sensor{sensorCount === 1 ? "" : "s"}
+                        <span
+                          className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.06em]"
+                          style={{
+                            background: sensorCount > 0 ? "rgba(31,169,122,0.14)" : "rgba(23,26,18,0.06)",
+                            color: sensorCount > 0 ? "#1FA97A" : kronis.inkMuted,
+                          }}
+                        >
+                          {sensorCount} sensor{sensorCount === 1 ? "" : "s"}
                         </span>
-                      </span>
-                      <ChevronRight size={18} color={kronis.inkMuted} />
-                    </button>
+                      </div>
+                    </SoftRaised>
                   );
                 })}
               </div>

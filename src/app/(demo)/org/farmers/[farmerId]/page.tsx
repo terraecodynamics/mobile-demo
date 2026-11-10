@@ -75,6 +75,15 @@ export default function OrgFarmerDetailPage() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    if (!bundle) return;
+    const focus = new URLSearchParams(window.location.search).get("focus");
+    if (focus !== "sensor") return;
+    const el = document.getElementById("assign-sensor");
+    if (!el) return;
+    window.setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+  }, [bundle]);
+
   const apiUrl = useMemo(
     () => `/api/org/sensors?farmerId=${encodeURIComponent(farmerId)}`,
     [farmerId]
@@ -249,13 +258,16 @@ export default function OrgFarmerDetailPage() {
   return (
     <div className="relative flex min-h-0 flex-1 flex-col" style={{ background: kronis.background }}>
       <header className={`flex items-start gap-2.5 pb-2 pt-2 ${isWeb ? "px-8 pt-6" : "px-3.5"}`}>
-        <SoftChip icon={ArrowLeft} onClick={() => router.push("/org")} label="Back" flat />
+        <SoftChip icon={ArrowLeft} onClick={() => router.push("/org/farmers")} label="Back" flat />
         <div className="min-w-0 flex-1 pt-0.5">
           <div className="text-[22px] font-extrabold tracking-[-0.3px]" style={{ color: kronis.ink }}>
             {farmer.name}
           </div>
           <div className="text-[13px] font-semibold" style={{ color: kronis.inkMuted }}>
             {farmer.farmName} · {farmer.village} · {farmer.phone}
+          </div>
+          <div className="mt-1 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
+            Assign sensors from stock · share live data
           </div>
         </div>
       </header>
@@ -283,7 +295,8 @@ export default function OrgFarmerDetailPage() {
             </div>
             {sensors.length === 0 ? (
               <div className="rounded-[18px] border px-4 py-5 text-[13px] font-semibold" style={{ background: kronis.surface, borderColor: kronis.border, color: kronis.inkMuted }}>
-                No sensors on this farmer yet. Assign from stock on the right.
+                No sensors on this farmer yet. Assign from organization stock below
+                {isWeb ? " on the right" : ""}.
               </div>
             ) : (
               <div className="space-y-2.5">
@@ -546,6 +559,7 @@ export default function OrgFarmerDetailPage() {
             ) : null}
           </SoftRaised>
 
+          <div id="assign-sensor" className="scroll-mt-4">
           <SoftRaised className="w-full p-4" radius={18}>
             <div className="mb-2 flex items-center justify-between gap-2">
               <div className="text-[14px] font-extrabold" style={{ color: kronis.ink }}>
@@ -560,7 +574,7 @@ export default function OrgFarmerDetailPage() {
               ) : null}
             </div>
             <p className="mb-3 text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
-              Give a sensor from organization stock to this farmer.
+              Tap a sensor to give it to {farmer.name}. Add new stock in Sensors → Inventory.
             </p>
             {stock.length === 0 ? (
               <div className="text-[12px] font-semibold" style={{ color: kronis.inkMuted }}>
@@ -661,6 +675,7 @@ export default function OrgFarmerDetailPage() {
               </div>
             )}
           </SoftRaised>
+          </div>
         </div>
       </div>
 
