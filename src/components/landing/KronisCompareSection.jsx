@@ -8,8 +8,8 @@ const MODELS = [
   {
     id: 'core',
     href: '/pump/micro-4',
-    image: '/pump-prototype.png',
-    alt: 'Kronis Micro 4 controller',
+    image: '/micro-4.png',
+    alt: 'Kronis Micro 4 solar pump kit',
     label: 'Core',
     name: 'Kronis Micro 4',
     lede: 'Compact solar micro pump for everyday irrigation.',
@@ -18,8 +18,8 @@ const MODELS = [
   {
     id: 'iot',
     href: '/pump/micro-4i',
-    image: '/pump-prototype.png',
-    alt: 'Kronis Micro 4i controller',
+    image: '/micro-4i.png',
+    alt: 'Kronis Micro 4i solar pump kit',
     label: 'Connected',
     name: 'Kronis Micro 4i',
     lede: 'Foldable panels with IoT, portal and app control.',
@@ -81,9 +81,7 @@ export default function KronisCompareSection({ dmSansFamily }) {
                 alt={model.alt}
                 width={900}
                 height={900}
-                className={`h-auto object-contain drop-shadow-[0_22px_30px_rgba(20,33,25,0.16)] ${
-                  model.id === 'pro' ? 'w-[min(94%,240px)]' : 'w-[min(78%,200px)]'
-                }`}
+                className="h-auto w-[min(94%,240px)] object-contain drop-shadow-[0_22px_30px_rgba(20,33,25,0.16)]"
               />
             </figure>,
           ])}
