@@ -7,7 +7,7 @@ const TYPES = [
   {
     id: "core",
     href: "/pump/micro-4",
-    image: "/pump-prototype.png",
+    image: "/micro-4.png",
     label: "Core",
     name: "Kronis Micro 4",
     lede: "Compact solar micro pump for everyday irrigation.",
@@ -17,7 +17,7 @@ const TYPES = [
   {
     id: "iot",
     href: "/pump/micro-4i",
-    image: "/pump-prototype.png",
+    image: "/micro-4i.png",
     label: "Connected",
     name: "Kronis Micro 4i",
     lede: "Foldable panels with IoT, portal and app control.",

@@ -2,8 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState, useCallback } from 'react';
-import { ArrowRight, Play, Plus } from 'lucide-react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { ArrowRight, Play, Plus, X } from 'lucide-react';
+
+const HERO_VIDEO_SRC = '/pump2.mp4';
 
 /** Orange–red palette (aligned with TerraEco branding) */
 const ACCENT_ORANGE = '#f97316';
@@ -44,10 +47,55 @@ function HotspotButton({ active, onToggle, label }) {
 
 export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection }) {
   const [activeHotspot, setActiveHotspot] = useState(null);
+  const [videoOpen, setVideoOpen] = useState(false);
+  const videoRef = useRef(null);
 
   const toggleHotspot = useCallback((id) => {
     setActiveHotspot((prev) => (prev === id ? null : id));
   }, []);
+
+  const openVideo = useCallback(() => setVideoOpen(true), []);
+
+  const closeVideo = useCallback(() => {
+    const v = videoRef.current;
+    if (v) {
+      v.pause();
+      v.currentTime = 0;
+    }
+    setVideoOpen(false);
+  }, []);
+
+  useEffect(() => {
+    if (!videoOpen) return undefined;
+    const html = document.documentElement;
+    const prevHtmlOverflow = html.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+    html.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+
+    const frame = requestAnimationFrame(() => {
+      const v = videoRef.current;
+      if (v) {
+        v.currentTime = 0;
+        void v.play().catch(() => {});
+      }
+    });
+
+    return () => {
+      cancelAnimationFrame(frame);
+      html.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, [videoOpen]);
+
+  useEffect(() => {
+    if (!videoOpen) return undefined;
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeVideo();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [videoOpen, closeVideo]);
 
   return (
     <section
@@ -210,7 +258,7 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
           <div className="flex flex-row items-center gap-3 sm:items-start sm:gap-4">
             <button
               type="button"
-              onClick={() => scrollToSection('platform')}
+              onClick={openVideo}
               className="group relative w-[7.5rem] shrink-0 overflow-hidden rounded-xl border border-emerald-500/20 bg-[#0e1a15]/90 text-left shadow-lg backdrop-blur-sm transition hover:border-orange-500/40 sm:w-full sm:max-w-[11rem]"
             >
               <div className="relative aspect-[4/3] w-full">
@@ -226,7 +274,7 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
                   <Play className="ml-0.5 h-[18px] w-[18px] fill-white text-white" />
                 </span>
               </div>
-              <span className="sr-only">Watch platform overview</span>
+              <span className="sr-only">Play pump overview video</span>
             </button>
 
             <p className="min-w-0 flex-1 text-left text-[12px] leading-snug text-white/85 sm:text-[13px] md:text-sm">
@@ -277,6 +325,41 @@ export default function TerraecoHero({ dmSansFamily, onBookDemo, scrollToSection
         </div>
         </div>
       </div>
+
+      {videoOpen && typeof document !== 'undefined'
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-black/90 p-4 backdrop-blur-sm sm:p-6"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Pump overview video"
+              onClick={closeVideo}
+            >
+              <div
+                className="relative flex max-h-[90vh] w-full max-w-4xl shrink-0 items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  type="button"
+                  onClick={closeVideo}
+                  className="absolute -top-2 right-0 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-black/70 text-white backdrop-blur-md transition hover:bg-black/90 sm:-right-2 sm:-top-10"
+                  aria-label="Close video"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+                <video
+                  ref={videoRef}
+                  className="block max-h-[85vh] w-full rounded-2xl border border-white/10 bg-black object-contain shadow-2xl"
+                  src={HERO_VIDEO_SRC}
+                  controls
+                  playsInline
+                  preload="metadata"
+                />
+              </div>
+            </div>,
+            document.body
+          )
+        : null}
     </section>
   );
 }
