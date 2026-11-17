@@ -30,6 +30,7 @@ import TerraecoHero from '@/components/landing/TerraecoHero';
 import TwoSolutionsSection from '@/components/landing/TwoSolutionsSection';
 import SunToSoilSection from '@/components/landing/SunToSoilSection';
 import KronisCompareSection from '@/components/landing/KronisCompareSection';
+import PumpShowcaseStage from '@/components/landing/PumpShowcaseStage';
 import { preferNativeLandingScroll } from '@/lib/landingMotion';
 import { setAppView } from '@/lib/appView';
 import { applySavedScroll, consumePopRestore } from '@/lib/scrollMemory';
@@ -662,84 +663,62 @@ export default function LandingHome() {
       </section>
 
       {/* Precision Engineering Section */}
-      <section id="pump-showcase" className="bg-black relative z-10 flex min-h-0 items-center py-8 sm:py-12 md:min-h-screen md:py-16">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full">
-          <div className="text-center mb-6 sm:mb-8 md:mb-10">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 md:mb-5"  style={{ 
-                        background: 'radial-gradient(circle closest-corner at 50% 50%, #ffffff, #fff6)',
-                        backgroundClip: 'text',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        color: 'transparent',
-                        lineHeight:1.5,
-                    }}>
+      <section
+        id="pump-showcase"
+        className="relative z-10 flex min-h-0 items-center overflow-hidden py-10 sm:py-14 md:min-h-screen md:py-16"
+        style={{ background: '#000' }}
+      >
+        <div className="pointer-events-none absolute inset-0 bg-black" aria-hidden>
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse 85% 55% at 50% 48%, rgba(40,95,200,0.14) 0%, rgba(18,45,100,0.05) 40%, transparent 68%), radial-gradient(ellipse 95% 45% at 50% 100%, rgba(25,65,150,0.1) 0%, transparent 55%)',
+            }}
+          />
+        </div>
+        <div className="relative mx-auto w-full max-w-6xl px-4 sm:px-6">
+          <div className="mb-8 text-center sm:mb-10 md:mb-12">
+            <h2
+              className="mb-3 text-2xl font-bold text-white sm:mb-4 sm:text-3xl md:mb-5 md:text-4xl lg:text-5xl"
+              style={{
+                background: 'radial-gradient(circle closest-corner at 50% 50%, #ffffff, #fff6)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                color: 'transparent',
+                lineHeight: 1.5,
+              }}
+            >
               Precision Engineering
             </h2>
-            <p className="text-base sm:text-lg md:text-xl text-gray-300 max-w-2xl lg:max-w-3xl mx-auto px-4">
+            <div
+              className="relative mx-auto mb-5 h-4 w-full max-w-4xl sm:mb-6 md:mb-8"
+              aria-hidden
+            >
+              <div
+                className="absolute left-1/2 top-1/2 h-[3px] w-[min(92%,720px)] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-90 blur-[3px]"
+                style={{
+                  background:
+                    'linear-gradient(90deg, transparent 0%, rgba(40,110,220,0.25) 12%, rgba(90,180,255,0.55) 38%, rgba(160,220,255,0.95) 50%, rgba(90,180,255,0.55) 62%, rgba(40,110,220,0.25) 88%, transparent 100%)',
+                }}
+              />
+              <div
+                className="absolute left-1/2 top-1/2 h-px w-[min(92%,720px)] -translate-x-1/2 -translate-y-1/2"
+                style={{
+                  background:
+                    'linear-gradient(90deg, transparent 0%, rgba(55,130,240,0.35) 15%, rgba(130,200,255,0.85) 42%, #b8e4ff 50%, rgba(130,200,255,0.85) 58%, rgba(55,130,240,0.35) 85%, transparent 100%)',
+                  boxShadow:
+                    '0 0 14px rgba(80,165,255,0.85), 0 0 32px rgba(55,130,255,0.45), 0 0 56px rgba(40,100,220,0.25)',
+                }}
+              />
+            </div>
+            <p className="mx-auto max-w-2xl px-4 text-base text-gray-300 sm:text-lg md:text-xl lg:max-w-3xl">
               Every component of our solar pump is meticulously designed and engineered for maximum efficiency and durability.
             </p>
           </div>
-          
-          <div className="relative flex justify-center items-center">
-            {/* 3D Device Rendering with Callouts */}
-            <div className="relative">
-              <Image 
-                src="/pump-prototype.png" 
-                alt="TerraEco Solar Pump Prototype" 
-                width={400}
-                height={100}
-                className="h-auto w-full max-w-sm object-contain sm:max-w-md md:max-w-lg lg:max-w-xl"
-              />
-              
-              {/* Callout 1 - Top Right Annotation */}
-              {/* <div className="absolute top-4" style={{ right: '144px' }}>
-                <div className="absolute w-6 h-6 bg-orange-500 rounded-full shadow-lg" style={{ left: '-82px', bottom: '-120px' }}></div>
-                <div className="absolute top-3 -right-6 w-32 h-1 bg-white transform -rotate-45 origin-right"></div>
-                <div className="absolute top-0 -right-40 text-white w-48" style={{ left: '64px' }}>
-                  <div className="text-sm font-semibold text-white">Device Box 1</div>
-                  <div className="text-xs text-gray-300 mt-2 leading-relaxed">
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
-                  </div>
-                </div>
-              </div> */}
-              
-              {/* Callout 2 - Mid-Left Annotation */}
-              {/* <div className="absolute top-1/2 -left-4">
-                <div className="absolute left-48 w-6 h-6 bg-orange-500 rounded-full shadow-lg"></div>
-                <div className="absolute top-3 left-48 w-32 h-1 bg-white transform rotate-45 origin-left"></div>
-                <div className="absolute top-0 left-6 text-white w-48">
-                  <div className="text-sm font-semibold text-white">Device Box 1</div>
-                  <div className="text-xs text-gray-300 mt-2 leading-relaxed">
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
-                  </div>
-                </div>
-              </div> */}
-              
-              {/* Callout 3 - Bottom-Left Annotation */}
-              {/* <div className="absolute bottom-4 -left-4">
-                <div className="absolute left-48 w-6 h-6 bg-orange-500 rounded-full shadow-lg"></div>
-                <div className="absolute top-3 left-48 w-32 h-1 bg-white transform rotate-45 origin-left"></div>
-                <div className="absolute top-0 left-6 text-white w-48">
-                  <div className="text-sm font-semibold text-white">Device Box 1</div>
-                  <div className="text-xs text-gray-300 mt-2 leading-relaxed">
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
-                  </div>
-                </div>
-              </div> */}
-              
-              {/* Callout 4 - Mid-Right Annotation */}
-              {/* <div className="absolute top-1/2 -right-4">
-                <div className="w-6 h-6 bg-orange-500 rounded-full shadow-lg"></div>
-                <div className="absolute top-3 -right-6 w-32 h-1 bg-white transform -rotate-45 origin-right"></div>
-                <div className="absolute top-0 -right-40 text-white w-48">
-                  <div className="text-sm font-semibold text-white">Device Box 1</div>
-                  <div className="text-xs text-gray-300 mt-2 leading-relaxed">
-                    It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
-                  </div>
-                </div>
-              </div> */}
-            </div>
-          </div>
+
+          <PumpShowcaseStage />
         </div>
       </section>
       

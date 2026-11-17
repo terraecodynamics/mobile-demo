@@ -2,7 +2,7 @@
 
 import { NeumorphStartButton } from "@/components/pump/NeumorphStartButton";
 import { kronis } from "@/lib/kronis";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const SWEEP = 270;
 const MAX_MIN = 480;
@@ -16,6 +16,8 @@ function degToRad(deg: number) {
 type Props = {
   size?: number;
   timerMinutes: number;
+  remainingMinutes?: number | null;
+  countdownActive?: boolean;
   running: boolean;
   offline: boolean;
   powerLoading?: boolean;
@@ -31,6 +33,8 @@ type Props = {
 export function PumpDial({
   size = 260,
   timerMinutes,
+  remainingMinutes = null,
+  countdownActive = false,
   running,
   offline,
   powerLoading = false,
@@ -50,17 +54,30 @@ export function PumpDial({
   const wellPad = Math.max(8, Math.min(desiredPad, Math.floor((maxWell - btnSize) / 2)));
   const wellSize = Math.min(btnSize + wellPad * 2, maxWell);
   const grooveR = r + size * (4 / 224);
-  /** Ring-only — Start face sits on top and owns the center */
-  const deadZone = Math.max(btnSize / 2 + 6, wellSize / 2 - 4);
+  /** Ring-only — pan/taps inside well go to Start (native deadZoneRef) */
+  const deadZone = Math.max(btnSize / 2 + 6, wellSize / 2 + 8);
 
   const rootRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
+  const centerPressRef = useRef<{ x: number; y: number } | null>(null);
   const [dragging, setDragging] = useState(false);
 
-  const minutes = Math.max(0, Math.min(MAX_MIN, timerMinutes));
+  const committedMinutes =
+    remainingMinutes != null && (running || countdownActive)
+      ? remainingMinutes
+      : timerMinutes;
+
+  const [dialMinutes, setDialMinutes] = useState(committedMinutes);
+
+  useEffect(() => {
+    if (draggingRef.current) return;
+    setDialMinutes(committedMinutes);
+  }, [committedMinutes]);
+
+  const minutes = Math.max(0, Math.min(MAX_MIN, dialMinutes));
   const fillDeg = -SWEEP / 2 + (minutes / MAX_MIN) * SWEEP;
   const hasTimedDial = minutes > 0.5;
-  const showHandle = !running || minutes > 0;
+  const showHandle = !running || (remainingMinutes != null && remainingMinutes > 0) || timerMinutes > 0;
 
   const polar = (deg: number, radius = r) => ({
     x: cx + radius * Math.cos(degToRad(deg)),
@@ -125,12 +142,13 @@ export function PumpDial({
   };
 
   const setFromLocal = (x: number, y: number) => {
-    if (running || offline || powerLoading) return;
+    if (running || powerLoading) return;
     let deg = (Math.atan2(y, x) * 180) / Math.PI + 90;
     if (deg > 180) deg -= 360;
     const clamped = Math.max(-SWEEP / 2, Math.min(SWEEP / 2, deg));
     const m =
       Math.round((((clamped + SWEEP / 2) / SWEEP) * MAX_MIN) / STEP_MIN) * STEP_MIN;
+    setDialMinutes(m);
     onTimerChange(m);
   };
 
@@ -139,8 +157,17 @@ export function PumpDial({
     setDragging(false);
   };
 
+  const tryCenterToggle = (clientX: number, clientY: number) => {
+    const press = centerPressRef.current;
+    centerPressRef.current = null;
+    if (!press) return;
+    if (Math.hypot(clientX - press.x, clientY - press.y) > 14) return;
+    if (powerLoading) return;
+    onToggle();
+  };
+
   const progress = arcPath(-SWEEP / 2, fillDeg);
-  const canDrag = !running && !offline && !powerLoading;
+  const canDrag = !running && !powerLoading;
 
   return (
     <div
@@ -260,10 +287,14 @@ export function PumpDial({
           touchAction: "none",
         }}
         onPointerDown={(e) => {
-          if (!canDrag) return;
           if (e.button !== 0 && e.pointerType === "mouse") return;
           const { x, y, d } = localFromClient(e.clientX, e.clientY);
-          if (d < deadZone) return;
+          if (d < deadZone) {
+            centerPressRef.current = { x: e.clientX, y: e.clientY };
+            e.stopPropagation();
+            return;
+          }
+          if (!canDrag) return;
           draggingRef.current = true;
           setDragging(true);
           try {
@@ -281,8 +312,20 @@ export function PumpDial({
           const { x, y } = localFromClient(e.clientX, e.clientY);
           setFromLocal(x, y);
         }}
-        onPointerUp={endDrag}
-        onPointerCancel={endDrag}
+        onPointerUp={(e) => {
+          if (centerPressRef.current) {
+            tryCenterToggle(e.clientX, e.clientY);
+            return;
+          }
+          endDrag();
+        }}
+        onPointerCancel={(e) => {
+          if (centerPressRef.current) {
+            centerPressRef.current = null;
+            return;
+          }
+          endDrag();
+        }}
       />
 
       {/* Start / Stop — above drag layer */}
@@ -293,7 +336,8 @@ export function PumpDial({
           left: (canvas - wellSize) / 2,
           width: wellSize,
           height: wellSize,
-          pointerEvents: "none",
+          pointerEvents: "auto",
+          touchAction: "manipulation",
         }}
       >
         <NeumorphStartButton
