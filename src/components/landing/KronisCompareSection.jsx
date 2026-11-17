@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
+import { resetDocumentScroll } from '@/lib/scrollMemory';
 
 const MODELS = [
   {
@@ -111,6 +112,8 @@ export default function KronisCompareSection({ dmSansFamily }) {
               </ul>
               <Link
                 href={model.href}
+                scroll
+                onClick={() => resetDocumentScroll()}
                 className="mt-auto inline-flex items-center gap-2 rounded-full bg-[#142119] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#1c2a22]"
               >
                 View {model.name}

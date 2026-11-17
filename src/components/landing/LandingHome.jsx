@@ -33,7 +33,7 @@ import KronisCompareSection from '@/components/landing/KronisCompareSection';
 import PumpShowcaseStage from '@/components/landing/PumpShowcaseStage';
 import { preferNativeLandingScroll } from '@/lib/landingMotion';
 import { setAppView } from '@/lib/appView';
-import { applySavedScroll, consumePopRestore } from '@/lib/scrollMemory';
+import { applySavedScroll, consumePopRestore, resetDocumentScroll } from '@/lib/scrollMemory';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -128,6 +128,7 @@ export default function LandingHome() {
     return () => {
       smoother.kill();
       if (smootherRef.current === smoother) smootherRef.current = null;
+      resetDocumentScroll();
     };
   }, []);
 

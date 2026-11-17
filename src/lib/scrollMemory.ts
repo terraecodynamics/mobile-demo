@@ -70,3 +70,15 @@ export function consumePopRestore(pathname: string) {
 export function applySavedScroll(pathname: string) {
   writeScrollY(loadScroll(pathname));
 }
+
+/** New route should start at the top (landing ScrollSmoother keeps a deep document scroll). */
+export function resetDocumentScroll() {
+  try {
+    if (typeof history !== "undefined" && "scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+  } catch {
+    /* ignore */
+  }
+  writeScrollY(0);
+}

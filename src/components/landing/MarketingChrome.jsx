@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLayoutEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { resetDocumentScroll } from '@/lib/scrollMemory';
 
 export default function MarketingChrome({ children }) {
   const year = new Date().getFullYear();
@@ -12,11 +13,23 @@ export default function MarketingChrome({ children }) {
   const liveRef = useRef(null);
 
   useLayoutEffect(() => {
+    resetDocumentScroll();
+    const id = window.requestAnimationFrame(() => resetDocumentScroll());
+    const t = window.setTimeout(() => resetDocumentScroll(), 50);
+
     const root = liveRef.current;
-    if (!root) return undefined;
+    if (!root) {
+      return () => {
+        window.cancelAnimationFrame(id);
+        window.clearTimeout(t);
+      };
+    }
 
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      return undefined;
+      return () => {
+        window.cancelAnimationFrame(id);
+        window.clearTimeout(t);
+      };
     }
 
     const curtain = root.querySelector('.page-live-curtain');
@@ -42,7 +55,11 @@ export default function MarketingChrome({ children }) {
         .set(curtain, { autoAlpha: 0 });
     }, root);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      window.cancelAnimationFrame(id);
+      window.clearTimeout(t);
+    };
   }, [pathname]);
 
   return (
