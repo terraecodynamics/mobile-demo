@@ -51,31 +51,25 @@ export function NeumorphStartButton({
     stop: `stopIcon-${uid}`,
   };
 
-  const label = offline ? "Offline" : running ? "Stop" : "Start";
-  const disabled = Boolean(loading || offline);
+  const label = running ? "Stop" : "Start";
+  const inactive = Boolean(loading);
 
   const activate = () => {
-    if (disabled) return;
+    if (inactive) return;
     onClick();
   };
 
   return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation();
-        activate();
-      }}
-      disabled={disabled}
-      aria-label={label}
-      className="group relative overflow-visible active:[&_.neo-face]:translate-y-[4px] active:[&_.neo-face]:scale-[0.9]"
+    <div
+      role="presentation"
+      className="group relative overflow-visible"
       style={{
         width: wellSize,
         height: wellSize,
         borderRadius: wellSize / 2,
         background: NEO_SURFACE,
-        // Well ring must not block the timer thumb — only the face is clickable
-        pointerEvents: "none",
+        pointerEvents: "auto",
+        touchAction: "manipulation",
       }}
     >
       {/* Outer recessed ring */}
@@ -130,12 +124,13 @@ export function NeumorphStartButton({
         }}
       />
 
-      {/* Raised face */}
-      <span
-        role="presentation"
-        className="neo-face absolute z-[2] flex items-center justify-center transition-transform duration-75"
+      {/* Raised face — sole hit target for Start / Stop */}
+      <button
+        type="button"
+        aria-label={label}
+        aria-disabled={offline || inactive}
+        className="neo-face absolute z-[2] flex items-center justify-center border-0 p-0 transition-transform duration-75 active:translate-y-[4px] active:scale-[0.9]"
         onPointerDown={(e) => {
-          // Own the tap so the dial drag layer never steals it
           e.stopPropagation();
         }}
         onClick={(e) => {
@@ -150,7 +145,7 @@ export function NeumorphStartButton({
           borderRadius: faceR,
           overflow: running ? "hidden" : "visible",
           pointerEvents: "auto",
-          cursor: disabled ? "default" : "pointer",
+          cursor: inactive ? "wait" : offline ? "not-allowed" : "pointer",
           background: running
             ? "linear-gradient(145deg, #FFC266 0%, #FF6B35 48%, #E04E1C 100%)"
             : "linear-gradient(145deg, #f5f6f8 0%, #eceef1 48%, #e2e5ea 100%)",
@@ -160,7 +155,7 @@ export function NeumorphStartButton({
           boxShadow: running
             ? "4px 10px 16px rgba(224,78,28,0.45)"
             : `${darkOffX}px ${darkOffY}px ${darkBlur}px rgba(102,109,122,0.34)`,
-          opacity: loading ? 0.88 : 1,
+          opacity: loading ? 0.88 : offline ? 0.72 : 1,
         }}
       >
         {!running ? (
@@ -251,7 +246,7 @@ export function NeumorphStartButton({
             </span>
           ) : null}
         </span>
-      </span>
+      </button>
 
       {running ? (
         <span
@@ -263,6 +258,6 @@ export function NeumorphStartButton({
           }}
         />
       ) : null}
-    </button>
+    </div>
   );
 }

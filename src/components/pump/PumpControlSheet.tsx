@@ -15,6 +15,8 @@ type Props = {
   statusTitle: string;
   statusSubtitle: string;
   timerMinutes: number;
+  remainingMinutes?: number | null;
+  countdownActive?: boolean;
   onTimerChange: (m: number) => void;
   running: boolean;
   offline: boolean;
@@ -112,6 +114,8 @@ export function PumpControlSheet({
   statusTitle,
   statusSubtitle,
   timerMinutes,
+  remainingMinutes = null,
+  countdownActive = false,
   onTimerChange,
   running,
   offline,
@@ -246,6 +250,8 @@ export function PumpControlSheet({
               <PumpDial
                 size={dialSize}
                 timerMinutes={timerMinutes}
+                remainingMinutes={remainingMinutes}
+                countdownActive={countdownActive}
                 running={running}
                 offline={offline}
                 powerLoading={powerLoading}

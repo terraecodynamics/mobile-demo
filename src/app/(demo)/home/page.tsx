@@ -117,6 +117,8 @@ export default function HomePage() {
   const [flowOverride, setFlowOverride] = useState<number | null>(null);
   const [geoTick, setGeoTick] = useState(0);
   const toggleLock = useRef(false);
+  const countdownAnchorRef = useRef<{ startMs: number; durationMinutes: number } | null>(null);
+  const [countdownTick, setCountdownTick] = useState(0);
 
   useEffect(() => {
     preloadPumpSounds();
@@ -203,6 +205,8 @@ export default function HomePage() {
 
   const running = runningOverride ?? pump.running;
   const offline = !pump.online;
+  const countdownActive =
+    running && timerMinutes > 0 && remainingMinutes != null && remainingMinutes > 0;
   const unread = dummyNotifications.filter((n) => n.unread).length;
   const sheetH = sheetHeightFor(stageH);
   const pickerSheetH = pickerSheetHeightFor(stageH);
@@ -217,25 +221,33 @@ export default function HomePage() {
           : 42
         : pump.flowLpm;
 
-  // Countdown while running with a dial timer (native remainingMinutes)
+  // Smooth dial countdown — anchor start time (native fastTick)
   useEffect(() => {
-    if (!running || remainingMinutes == null || remainingMinutes <= 0) return;
-    const id = window.setInterval(() => {
-      setRemainingMinutes((prev) => {
-        if (prev == null) return prev;
-        const next = Math.max(0, prev - 1 / 60);
-        if (next <= 0) {
-          playPumpStopSound();
-          setRunningOverride(false);
-          setFlowOverride(0);
-          setTimerMinutes(0);
-          return null;
-        }
-        return next;
-      });
-    }, 1000);
+    const anchor = countdownAnchorRef.current;
+    if (!running || !anchor) return undefined;
+
+    const { startMs, durationMinutes } = anchor;
+    const totalSeconds = Number(durationMinutes) * 60;
+
+    const tick = () => {
+      const elapsed = Math.floor((Date.now() - startMs) / 1000);
+      const rem = Math.max(0, (totalSeconds - elapsed) / 60);
+      if (rem <= 0) {
+        playPumpStopSound();
+        setRunningOverride(false);
+        setFlowOverride(0);
+        setTimerMinutes(0);
+        setRemainingMinutes(null);
+        countdownAnchorRef.current = null;
+        return;
+      }
+      setRemainingMinutes(rem);
+    };
+
+    tick();
+    const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
-  }, [running, remainingMinutes]);
+  }, [running, countdownTick]);
 
   // Simulated live flow jitter while running
   useEffect(() => {
@@ -284,11 +296,21 @@ export default function HomePage() {
     setRunningOverride(nextRunning);
     if (nextRunning) {
       setFlowOverride(timerMinutes > 0 ? 38 : 42);
-      if (timerMinutes > 0) setRemainingMinutes(timerMinutes);
-      else setRemainingMinutes(null);
+      if (timerMinutes > 0) {
+        countdownAnchorRef.current = {
+          startMs: Date.now(),
+          durationMinutes: timerMinutes,
+        };
+        setRemainingMinutes(timerMinutes);
+        setCountdownTick((n) => n + 1);
+      } else {
+        countdownAnchorRef.current = null;
+        setRemainingMinutes(null);
+      }
     } else {
       setFlowOverride(0);
       setRemainingMinutes(null);
+      countdownAnchorRef.current = null;
     }
 
     // Brief loading pulse like native power request
@@ -392,11 +414,9 @@ export default function HomePage() {
               onModeChange={setMode}
               statusTitle={statusTitle}
               statusSubtitle={statusSubtitle}
-              timerMinutes={
-                running && remainingMinutes != null
-                  ? Math.max(0, Math.round(remainingMinutes))
-                  : timerMinutes
-              }
+              timerMinutes={timerMinutes}
+              remainingMinutes={remainingMinutes}
+              countdownActive={countdownActive}
               onTimerChange={handleTimerChange}
               running={running}
               offline={offline}
@@ -479,11 +499,9 @@ export default function HomePage() {
               onModeChange={setMode}
               statusTitle={statusTitle}
               statusSubtitle={statusSubtitle}
-              timerMinutes={
-                running && remainingMinutes != null
-                  ? Math.max(0, Math.round(remainingMinutes))
-                  : timerMinutes
-              }
+              timerMinutes={timerMinutes}
+              remainingMinutes={remainingMinutes}
+              countdownActive={countdownActive}
               onTimerChange={handleTimerChange}
               running={running}
               offline={offline}
